@@ -1,0 +1,4 @@
+node_modules/
+.traveler-saves/
+*.tmp
+.env
