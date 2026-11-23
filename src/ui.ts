@@ -37,19 +37,15 @@ export function formatStatusHeader(state: GameState): string {
   const loc = LOCATIONS[state.locationId];
   const raceName = RACES[p.race].name;
   const bgName = BACKGROUNDS[p.background].name;
-  const daysLeft = Math.max(0, state.maxDays - state.day);
-
-  const hpStr = `HP ${p.hp}/${p.maxHp}`;
-  const stmStr = `STM ${p.stamina}/${p.maxStamina}`;
-  const focStr = `FOC ${p.focus}/${p.maxFocus}`;
+  const sexLabel = p.sex === 'female' ? 'Female' : 'Male';
   const seals = countBrokenSeals(state);
 
-  const top = `${p.name} (${p.sex === 'female' ? 'F' : 'M'} ${raceName} ${bgName}, Lv${p.level}) | ${loc?.name ?? state.locationId}`;
-  const bar = `Day ${state.day}/${state.maxDays} (${daysLeft}d left) | ${hpStr} | ${stmStr} | ${focStr} | Rations:${p.rations} Torches:${p.torches} Crowns:${p.crowns} | Seals:${seals}/3`;
+  const top = `${p.name} - ${sexLabel} ${raceName} ${bgName} Lv${p.level} | ${loc?.name ?? state.locationId}`;
+  const bar = `Day ${state.day}/${state.maxDays} | HP ${p.hp}/${p.maxHp} | STM ${p.stamina}/${p.maxStamina} | FOC ${p.focus}/${p.maxFocus} | Rations ${p.rations} | Torches ${p.torches} | Crowns ${p.crowns} | Seals ${seals}/3`;
 
   const statusLine =
     p.statuses.length > 0
-      ? `Statuses: ${p.statuses.map((st) => `${st.type.toUpperCase()}(${st.turns}t)`).join(', ')}`
+      ? `Statuses: ${p.statuses.map((st) => `${st.type} ${st.turns}t`).join(', ')}`
       : '';
 
   if (s) {
@@ -70,25 +66,26 @@ export function renderAsciiMap(state: GameState): string {
   const cur = state.locationId;
   const mark = (id: string, code: string) => {
     const visited = state.visitedLocations.includes(id);
-    if (cur === id) return `[${code}*]`;
-    return visited ? `[${code} ]` : `[${code}?]`;
+    if (cur === id) return `${code}*`;
+    return visited ? `${code} ` : `${code}?`;
   };
 
   const lines = [
-    'FRONTIER MAP — THE GLOAMING REACH (* = current, ? = unvisited)',
+    'FRONTIER MAP - THE GLOAMING REACH',
+    '* current   ? unvisited',
     '',
     `  ${mark('weeping_barrow', 'WB')} ------ ${mark('petrified_starwood', 'SW')} ------ ${mark('crown_watchtower', 'CW')}`,
-    '    |            |            |',
-    `  ${mark('cinderford', 'CF')} ------ ${mark('kings_causeway', 'KC')}          ${mark('sunken_belfry', 'SB')}`,
-    '    |            |            |',
+    '   |          |          |',
+    `  ${mark('cinderford', 'CF')} ------ ${mark('kings_causeway', 'KC')}        ${mark('sunken_belfry', 'SB')}`,
+    '   |          |          |',
     `  ${mark('ash_fen', 'AF')} ------ ${mark('silken_cistern', 'SC')} ------ ${mark('drowned_forge', 'DF')}`,
     '',
     'Legend:',
-    '  CF: Cinderford Keep (Town)       KC: Old King\'s Causeway (Road)',
-    '  WB: Weeping Barrow (Ruin)        SW: Petrified Star-Wood (Wilds)',
-    '  AF: Ash-Fen & Spore-Mire (Wilds) SC: Silken Cistern (Sanctuary)',
-    '  DF: Drowned Forge-Vault (Ruin)   CW: Crown-Gate Watchtower (Fort)',
-    '  SB: The Sunken Belfry (Threat Lair — Malakor)',
+    "  CF Cinderford Keep         KC Old King's Causeway",
+    '  WB Weeping Barrow          SW Petrified Star-Wood',
+    '  AF Ash-Fen & Spore-Mire    SC Silken Cistern',
+    '  DF Drowned Forge-Vault     CW Crown-Gate Watchtower',
+    '  SB The Sunken Belfry',
   ];
 
   return s ? lines.join('\n') : paint(lines.join('\n'), 'white', false);
@@ -104,27 +101,23 @@ export function renderCharacterSheet(state: GameState): string {
   const trinket = p.trinketId ? ITEMS[p.trinketId] : null;
 
   const lines: string[] = [
-    `CHARACTER SHEET — ${p.name}`,
-    `Identity: ${p.sex === 'female' ? 'Female' : 'Male'} ${race.name} (${race.subtitle}) | ${bg.name}`,
-    `Level ${p.level} (XP ${p.xp}/${p.xpToNext}) | HP ${p.hp}/${p.maxHp} | Stamina ${p.stamina}/${p.maxStamina} | Focus ${p.focus}/${p.maxFocus}`,
+    `CHARACTER SHEET - ${p.name}`,
+    `Identity: ${p.sex === 'female' ? 'Female' : 'Male'} ${race.name} ${bg.name}`,
+    `Level ${p.level} | XP ${p.xp}/${p.xpToNext} | HP ${p.hp}/${p.maxHp} | Stamina ${p.stamina}/${p.maxStamina} | Focus ${p.focus}/${p.maxFocus}`,
     `Stats: Might ${getEffectiveStat(state, 'might')} | Agility ${getEffectiveStat(state, 'agility')} | Wit ${getEffectiveStat(state, 'wit')} | Grit ${getEffectiveStat(state, 'grit')}`,
-    `Passives: ${race.passive.name} (${race.passive.description}); ${bg.passive.name} (${bg.passive.description})`,
-    `Heirloom: ${heirloom.name} — ${heirloom.combatDescription}`,
-    `Equipment:`,
-    `  Weapon : ${weapon?.name ?? p.weaponId}${p.weaponHoned ? ' [Honed +1]' : ''} (${weapon?.description ?? ''})`,
-    `  Armor  : ${armor?.name ?? p.armorId} (${armor?.description ?? ''})`,
-    `  Trinket: ${trinket ? `${trinket.name} (${trinket.description})` : 'None'}`,
-    `Abilities & Spells:`,
+    `Passives: ${race.passive.name} - ${race.passive.description} | ${bg.passive.name} - ${bg.passive.description}`,
+    `Heirloom: ${heirloom.name} - ${heirloom.combatDescription}`,
+    'Equipment:',
+    `  Weapon : ${weapon?.name ?? p.weaponId}${p.weaponHoned ? ' Honed' : ''}`,
+    `  Armor  : ${armor?.name ?? p.armorId}`,
+    `  Trinket: ${trinket ? trinket.name : 'None'}`,
+    'Abilities:',
   ];
 
   for (const abId of p.abilities) {
     const ab = ABILITIES[abId];
     if (ab) {
-      const costParts: string[] = [];
-      if (ab.staminaCost > 0) costParts.push(`${ab.staminaCost} Stm`);
-      if (ab.focusCost > 0) costParts.push(`${ab.focusCost} Foc`);
-      if (ab.hpCost) costParts.push(`${ab.hpCost} HP`);
-      lines.push(`  - [${ab.kind.toUpperCase()}] ${ab.name} (${costParts.join(', ')}): ${ab.description}`);
+      lines.push(`  - ${ab.name}: ${ab.description}`);
     }
   }
 
@@ -142,29 +135,25 @@ export function renderCharacterSheet(state: GameState): string {
 export function renderInventory(state: GameState): string {
   const p = state.player;
   const lines = [
-    `INVENTORY & SUPPLIES`,
-    `Crowns: ${p.crowns} | Rations: ${p.rations} | Torches: ${p.torches}`,
-    `Equipped Weapon: ${ITEMS[p.weaponId]?.name ?? p.weaponId}${p.weaponHoned ? ' [Honed]' : ''}`,
-    `Equipped Armor : ${ITEMS[p.armorId]?.name ?? p.armorId}`,
-    `Equipped Trinket: ${p.trinketId ? ITEMS[p.trinketId]?.name : 'None'}`,
+    'INVENTORY',
+    `Crowns ${p.crowns} | Rations ${p.rations} | Torches ${p.torches}`,
+    `Weapon : ${ITEMS[p.weaponId]?.name ?? p.weaponId}${p.weaponHoned ? ' Honed' : ''}`,
+    `Armor  : ${ITEMS[p.armorId]?.name ?? p.armorId}`,
+    `Trinket: ${p.trinketId ? ITEMS[p.trinketId]?.name : 'None'}`,
     '',
     'Pack:',
   ];
 
   if (p.inventory.length === 0) {
-    lines.push('  (empty)');
+    lines.push('  Empty');
   } else {
     for (const entry of p.inventory) {
       const item = ITEMS[entry.id];
       if (item) {
-        lines.push(
-          `  - ${item.name} x${entry.qty} [${item.slot}] (${item.value}c) — ${item.description}`,
-        );
+        lines.push(`  - ${item.name} x${entry.qty} - ${item.description}`);
       }
     }
   }
-  lines.push('');
-  lines.push('Tip: type "use <item name>" or "equip <item name>" to use or swap gear.');
   return lines.join('\n');
 }
 
@@ -173,28 +162,28 @@ export function renderMemoryChronicle(state: GameState): string {
   lines.push('Faction Standing:');
   (Object.keys(FACTION_NAMES) as Array<keyof typeof FACTION_NAMES>).forEach((fid) => {
     const val = state.memory.factions[fid] ?? 0;
-    lines.push(`  - ${FACTION_NAMES[fid]}: ${val >= 0 ? `+${val}` : val} (${getFactionStance(val)})`);
+    lines.push(`  - ${FACTION_NAMES[fid]}: ${val >= 0 ? `+${val}` : val} - ${getFactionStance(val)}`);
   });
 
   lines.push('');
-  lines.push('Counter-Seals & Key Leads against Malakor:');
+  lines.push('Counter-Seals:');
   lines.push(
-    `  - Seal of Silence (Silken Cistern): ${state.memory.flags['seal_of_silence'] ? 'ACQUIRED' : 'Unfound'}`,
+    `  - Seal of Silence: ${state.memory.flags['seal_of_silence'] ? 'Acquired' : 'Unfound'}`,
   );
   lines.push(
-    `  - Root Conduit Severed (Star-Wood / Forge): ${state.memory.flags['root_conduit_severed'] ? 'SEVERED' : 'Intact'}`,
+    `  - Root Conduit: ${state.memory.flags['root_conduit_severed'] ? 'Severed' : 'Intact'}`,
   );
   lines.push(
-    `  - First Kiln Cipher (Weeping Barrow): ${state.memory.flags['kiln_cipher_learned'] ? 'LEARNED' : 'Unfound'}`,
+    `  - First Kiln Cipher: ${state.memory.flags['kiln_cipher_learned'] ? 'Learned' : 'Unfound'}`,
   );
 
   lines.push('');
-  lines.push('Recorded Deeds:');
+  lines.push('Chronicle:');
   if (state.memory.chronicle.length === 0) {
-    lines.push('  (Your deeds are not yet written in the Reach.)');
+    lines.push('  Your deeds are not yet written in the Reach.');
   } else {
     for (const c of state.memory.chronicle) {
-      lines.push(`  [Day ${c.day}] ${c.title}: ${c.summary}`);
+      lines.push(`  Day ${c.day} - ${c.title}: ${c.summary}`);
     }
   }
   return lines.join('\n');
@@ -203,17 +192,18 @@ export function renderMemoryChronicle(state: GameState): string {
 export function renderHelpText(): string {
   return [
     'COMMANDS',
-    '  1, 2, 3...       Select a numbered action, dialogue, combat move, or destination',
-    '  look (l)         Re-read the current location and available choices',
-    '  go <name>        Travel directly to a connected location (e.g. "go causeway")',
-    '  map (m)          Display the ASCII map of the Gloaming Reach',
-    '  stats (st)       View character sheet, stats, passives, spells, and perks',
-    '  inv (i)          View pack, supplies, and equipped gear',
-    '  equip <item>     Equip a weapon, armor, or trinket from your pack',
-    '  use <item>       Use a consumable (e.g. "use poultice") outside combat',
-    '  camp             Make camp in the wilds (costs 1 Ration; heals HP/Stm/Foc; advances 1 day)',
-    '  memory (j)       Inspect faction standings, Counter-Seals, and recorded deeds',
-    '  stealth          Toggle plain monochrome log mode (no ANSI colors)',
-    '  quit (q)         Save and exit cleanly',
+    '  1, 2, 3...    Choose a numbered option',
+    '  0 or back     Return to the previous menu',
+    '  look          Re-read the current scene',
+    '  go <place>    Travel directly to a neighboring site',
+    '  map           Display the frontier map',
+    '  stats         View character sheet',
+    '  inv           View pack and supplies',
+    '  equip <item>  Equip gear from pack',
+    '  use <item>    Use a consumable outside combat',
+    '  camp          Make camp',
+    '  memory        Inspect factions and chronicle',
+    '  stealth       Toggle monochrome plain-text mode',
+    '  quit          Save and exit',
   ].join('\n');
 }

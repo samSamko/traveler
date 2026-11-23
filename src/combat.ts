@@ -9,7 +9,9 @@ import { getEffectiveStat, nextRandom, rollDice } from './dice.ts';
 import { ABILITIES, HEIRLOOMS, PERKS } from './content/characters.ts';
 import { ITEMS } from './content/items.ts';
 import { ENEMIES } from './content/enemies.ts';
-import { hasFlag, recordChronicle, setFlag } from './memory.ts';
+import { recordChronicle, setFlag } from './memory.ts';
+
+const ROMAN = ['I', 'II', 'III', 'IV'] as const;
 
 export function addItemToInventory(
   state: GameState,
@@ -100,7 +102,8 @@ export function clearNegativeStatuses(list: StatusEffect[]): StatusEffect[] {
 export function startCombatEncounter(
   state: GameState,
   opts: {
-    enemyId: string;
+    enemyId?: string;
+    enemyIds?: string[];
     canFlee?: boolean;
     onVictoryFlag?: string;
     onVictoryChronicle?: { title: string; summary: string; tag: string };
@@ -108,55 +111,77 @@ export function startCombatEncounter(
     brokenSeals?: string[];
   },
 ): CombatState {
-  const template = ENEMIES[opts.enemyId];
-  if (!template) {
-    throw new Error(`Unknown enemy template: ${opts.enemyId}`);
-  }
+  const ids = opts.enemyIds && opts.enemyIds.length > 0
+    ? opts.enemyIds
+    : opts.enemyId
+      ? [opts.enemyId]
+      : ['root_husk'];
 
-  const intents = template.intents.map((i) => ({ ...i, status: i.status ? { ...i.status } : undefined }));
-  let baseArmor = template.armor;
+  const counts: Record<string, number> = {};
+  for (const id of ids) {
+    counts[id] = (counts[id] ?? 0) + 1;
+  }
+  const seen: Record<string, number> = {};
   const broken = opts.brokenSeals ?? [];
 
-  if (broken.includes('root_conduit_severed')) {
-    baseArmor = Math.max(0, baseArmor - 2);
-    for (const intent of intents) {
-      if (intent.kind === 'guard' && intent.armorGain) {
-        intent.armorGain = Math.max(2, intent.armorGain - 4);
+  const enemies: ActiveEnemy[] = ids.map((id, idx) => {
+    const template = ENEMIES[id];
+    if (!template) {
+      throw new Error(`Unknown enemy template: ${id}`);
+    }
+    const intents = template.intents.map((i) => ({ ...i, status: i.status ? { ...i.status } : undefined }));
+    let baseArmor = template.armor;
+
+    if (idx === 0) {
+      if (broken.includes('root_conduit_severed')) {
+        baseArmor = Math.max(0, baseArmor - 2);
+        for (const intent of intents) {
+          if (intent.kind === 'guard' && intent.armorGain) {
+            intent.armorGain = Math.max(2, intent.armorGain - 4);
+          }
+        }
+      }
+      if (broken.includes('seal_of_silence')) {
+        for (const intent of intents) {
+          if (intent.kind === 'toll') {
+            intent.damage = Math.max(5, Math.floor(intent.damage / 2));
+            intent.status = undefined;
+          }
+        }
       }
     }
-  }
-  if (broken.includes('seal_of_silence')) {
-    for (const intent of intents) {
-      if (intent.kind === 'toll') {
-        intent.damage = Math.max(5, Math.floor(intent.damage / 2));
-        intent.status = undefined;
-      }
-    }
-  }
 
-  const hpLoss = opts.preDamageRatio ? Math.floor(template.maxHp * opts.preDamageRatio) : 0;
-  const startHp = Math.max(10, template.maxHp - hpLoss);
+    const hpLoss = idx === 0 && opts.preDamageRatio
+      ? Math.floor(template.maxHp * opts.preDamageRatio)
+      : 0;
+    const startHp = Math.max(10, template.maxHp - hpLoss);
 
-  const enemy: ActiveEnemy = {
-    templateId: template.id,
-    name: template.name,
-    category: template.category,
-    hp: startHp,
-    maxHp: template.maxHp,
-    baseArmor,
-    turnArmor: 0,
-    statuses: [],
-    intents,
-    nextIntentIndex: 0,
-    isBoss: template.isBoss,
-    isElite: template.isElite,
-    xpReward: template.xpReward,
-    crownReward: template.crownReward,
-    lootTable: template.lootTable,
-  };
+    seen[id] = (seen[id] ?? 0) + 1;
+    const suffix = counts[id] > 1 ? ` ${ROMAN[seen[id] - 1] ?? seen[id]}` : '';
+
+    return {
+      templateId: template.id,
+      name: `${template.name}${suffix}`,
+      category: template.category,
+      hp: startHp,
+      maxHp: template.maxHp,
+      baseArmor,
+      turnArmor: 0,
+      statuses: [],
+      intents,
+      nextIntentIndex: idx % intents.length,
+      isBoss: template.isBoss,
+      isElite: template.isElite,
+      xpReward: template.xpReward,
+      crownReward: template.crownReward,
+      lootTable: template.lootTable,
+    };
+  });
 
   const combat: CombatState = {
-    enemy,
+    enemies,
+    subMenu: 'root',
+    pendingActionId: null,
     round: 1,
     heirloomUsedThisFight: false,
     guaranteedDodgeThisTurn: false,
@@ -165,7 +190,9 @@ export function startCombatEncounter(
     onVictoryFlag: opts.onVictoryFlag,
     onVictoryChronicle: opts.onVictoryChronicle,
     canFlee: opts.canFlee ?? true,
-    log: [template.description],
+    log: enemies.length === 1
+      ? [ENEMIES[enemies[0].templateId].description]
+      : [`${enemies.length} foes bar the way.`],
   };
 
   state.combat = combat;
@@ -181,78 +208,119 @@ export interface CombatMenuOption {
   reason?: string;
 }
 
+function getLivingEnemyIndices(combat: CombatState): number[] {
+  const indices: number[] = [];
+  combat.enemies.forEach((e, idx) => {
+    if (e.hp > 0) indices.push(idx);
+  });
+  return indices;
+}
+
 export function getCombatMenuOptions(state: GameState): CombatMenuOption[] {
   const combat = state.combat;
   if (!combat) return [];
   const p = state.player;
-  const weapon = ITEMS[p.weaponId];
   const opts: CombatMenuOption[] = [];
 
-  opts.push({
-    index: 1,
-    id: 'strike',
-    label: `Strike with ${weapon?.name ?? 'Weapon'}`,
-    enabled: true,
-  });
+  if (combat.subMenu === 'root') {
+    opts.push({ index: 1, id: 'strike', label: 'Strike', enabled: true });
+    opts.push({ index: 2, id: 'guard', label: 'Guard', enabled: true });
 
-  opts.push({
-    index: 2,
-    id: 'guard',
-    label: 'Guard & Channel (+4 Armor, +1 Stm, +2 Foc)',
-    enabled: true,
-  });
+    const hasSkills = p.abilities.some((id) => ABILITIES[id]?.kind === 'skill');
+    if (hasSkills) {
+      opts.push({ index: opts.length + 1, id: 'menu:skills', label: 'Skills', enabled: true });
+    }
 
-  for (const abId of p.abilities) {
-    const ab = ABILITIES[abId];
-    if (!ab) continue;
-    const costLabel: string[] = [];
-    if (ab.staminaCost > 0) costLabel.push(`${ab.staminaCost} Stm`);
-    if (ab.focusCost > 0) costLabel.push(`${ab.focusCost} Foc`);
-    if (ab.hpCost) costLabel.push(`${ab.hpCost} HP`);
-
-    const canPay =
-      p.stamina >= ab.staminaCost &&
-      p.focus >= ab.focusCost &&
-      (!ab.hpCost || p.hp > ab.hpCost);
-
-    opts.push({
-      index: opts.length + 1,
-      id: `ability:${ab.id}`,
-      label: `[${ab.kind.toUpperCase()}] ${ab.name} (${costLabel.join(', ')})`,
-      enabled: canPay,
-      reason: canPay ? undefined : 'Insufficient Stamina/Focus/HP',
+    const hasSpells = p.abilities.some((id) => {
+      const k = ABILITIES[id]?.kind;
+      return k === 'cantrip' || k === 'spell';
     });
+    if (hasSpells) {
+      opts.push({ index: opts.length + 1, id: 'menu:spells', label: 'Spells', enabled: true });
+    }
+
+    if (!combat.heirloomUsedThisFight) {
+      opts.push({ index: opts.length + 1, id: 'heirloom', label: 'Heirloom', enabled: true });
+    }
+
+    const hasCombatItems = p.inventory.some((entry) => {
+      const item = ITEMS[entry.id];
+      return item && item.slot === 'consumable' && entry.qty > 0;
+    });
+    if (hasCombatItems) {
+      opts.push({ index: opts.length + 1, id: 'menu:items', label: 'Item', enabled: true });
+    }
+
+    if (combat.canFlee) {
+      opts.push({ index: opts.length + 1, id: 'flee', label: 'Flee', enabled: true });
+    }
+    return opts;
   }
 
-  if (!combat.heirloomUsedThisFight) {
-    const h = HEIRLOOMS[p.heirloom];
-    opts.push({
-      index: opts.length + 1,
-      id: 'heirloom',
-      label: `[HEIRLOOM] ${h.name} (1/fight)`,
-      enabled: true,
-    });
-  }
-
-  for (const entry of p.inventory) {
-    const item = ITEMS[entry.id];
-    if (item && item.slot === 'consumable' && entry.qty > 0) {
+  if (combat.subMenu === 'skills') {
+    for (const abId of p.abilities) {
+      const ab = ABILITIES[abId];
+      if (!ab || ab.kind !== 'skill') continue;
+      const canPay =
+        p.stamina >= ab.staminaCost &&
+        p.focus >= ab.focusCost &&
+        (!ab.hpCost || p.hp > ab.hpCost);
       opts.push({
         index: opts.length + 1,
-        id: `item:${item.id}`,
-        label: `[ITEM] ${item.name} x${entry.qty}`,
+        id: `ability:${ab.id}`,
+        label: ab.name,
+        enabled: canPay,
+        reason: canPay ? undefined : 'Insufficient stamina or focus',
+      });
+    }
+    opts.push({ index: opts.length + 1, id: 'menu:back', label: 'Back', enabled: true });
+    return opts;
+  }
+
+  if (combat.subMenu === 'spells') {
+    for (const abId of p.abilities) {
+      const ab = ABILITIES[abId];
+      if (!ab || (ab.kind !== 'cantrip' && ab.kind !== 'spell')) continue;
+      const canPay = p.stamina >= ab.staminaCost && p.focus >= ab.focusCost;
+      opts.push({
+        index: opts.length + 1,
+        id: `ability:${ab.id}`,
+        label: ab.name,
+        enabled: canPay,
+        reason: canPay ? undefined : 'Insufficient focus',
+      });
+    }
+    opts.push({ index: opts.length + 1, id: 'menu:back', label: 'Back', enabled: true });
+    return opts;
+  }
+
+  if (combat.subMenu === 'items') {
+    for (const entry of p.inventory) {
+      const item = ITEMS[entry.id];
+      if (item && item.slot === 'consumable' && entry.qty > 0) {
+        opts.push({
+          index: opts.length + 1,
+          id: `item:${item.id}`,
+          label: item.name,
+          enabled: true,
+        });
+      }
+    }
+    opts.push({ index: opts.length + 1, id: 'menu:back', label: 'Back', enabled: true });
+    return opts;
+  }
+
+  if (combat.subMenu === 'target') {
+    for (const idx of getLivingEnemyIndices(combat)) {
+      opts.push({
+        index: opts.length + 1,
+        id: `target:${idx}`,
+        label: combat.enemies[idx].name,
         enabled: true,
       });
     }
-  }
-
-  if (combat.canFlee) {
-    opts.push({
-      index: opts.length + 1,
-      id: 'flee',
-      label: 'Attempt to Flee (Agility DC 12)',
-      enabled: true,
-    });
+    opts.push({ index: opts.length + 1, id: 'menu:back', label: 'Back', enabled: true });
+    return opts;
   }
 
   return opts;
@@ -266,12 +334,10 @@ function getEnemyArmor(enemy: ActiveEnemy): number {
 }
 
 function dealDamageToEnemy(
-  state: GameState,
+  enemy: ActiveEnemy,
   raw: number,
   pierceArmor = false,
 ): number {
-  const combat = state.combat!;
-  const enemy = combat.enemy;
   const armor = pierceArmor ? 0 : getEnemyArmor(enemy);
   const dealt = Math.max(1, raw - armor);
   enemy.hp = Math.max(0, enemy.hp - dealt);
@@ -280,32 +346,42 @@ function dealDamageToEnemy(
 
 function resolveVictory(state: GameState): string[] {
   const combat = state.combat!;
-  const enemy = combat.enemy;
   const p = state.player;
-  const msgs: string[] = [`VICTORY! ${enemy.name} collapses.`];
+  const msgs: string[] = [
+    combat.enemies.length === 1
+      ? `Victory. ${combat.enemies[0].name} falls.`
+      : 'Victory. Every foe lies still.',
+  ];
 
-  let crowns =
-    enemy.crownReward[0] +
-    Math.floor(nextRandom(state) * (enemy.crownReward[1] - enemy.crownReward[0] + 1));
-  if (p.race === 'grixi') {
-    crowns = Math.ceil(crowns * 1.25);
-  }
-  p.crowns += crowns;
-  msgs.push(`Looted +${crowns} Crowns and +${enemy.xpReward} XP.`);
+  let totalCrowns = 0;
+  let totalXp = 0;
+  for (const enemy of combat.enemies) {
+    let crowns =
+      enemy.crownReward[0] +
+      Math.floor(nextRandom(state) * (enemy.crownReward[1] - enemy.crownReward[0] + 1));
+    if (p.race === 'grixi') {
+      crowns = Math.ceil(crowns * 1.25);
+    }
+    totalCrowns += crowns;
+    totalXp += enemy.xpReward;
 
-  for (const drop of enemy.lootTable) {
-    if (nextRandom(state) <= drop.chance) {
-      addItemToInventory(state, drop.itemId, 1);
-      msgs.push(`Recovered item: ${ITEMS[drop.itemId]?.name ?? drop.itemId}.`);
+    for (const drop of enemy.lootTable) {
+      if (nextRandom(state) <= drop.chance) {
+        addItemToInventory(state, drop.itemId, 1);
+        msgs.push(`Found ${ITEMS[drop.itemId]?.name ?? drop.itemId}.`);
+      }
+    }
+
+    if (p.race === 'grixi' && (enemy.category === 'husk' || enemy.category === 'beast')) {
+      if (nextRandom(state) <= 0.45) {
+        addItemToInventory(state, 'husk_gland', 1);
+        msgs.push('Harvested a Spore Gland.');
+      }
     }
   }
 
-  if (p.race === 'grixi' && (enemy.category === 'husk' || enemy.category === 'beast')) {
-    if (nextRandom(state) <= 0.45) {
-      addItemToInventory(state, 'husk_gland', 1);
-      msgs.push('[Grixi Scrap-Savant] Harvested +1 Calcified Spore-Gland.');
-    }
-  }
+  p.crowns += totalCrowns;
+  msgs.push(`Claimed ${totalCrowns} Crowns.`);
 
   if (combat.onVictoryFlag) {
     setFlag(state, combat.onVictoryFlag, true);
@@ -323,7 +399,7 @@ function resolveVictory(state: GameState): string[] {
   }
 
   p.statuses = [];
-  p.xp += enemy.xpReward;
+  p.xp += totalXp;
   state.combat = null;
 
   if (p.xp >= p.xpToNext) {
@@ -339,10 +415,10 @@ function resolveVictory(state: GameState): string[] {
     if (availablePerks.length > 0) {
       state.pendingPerkIds = availablePerks.slice(0, 3);
       state.scene = 'level_up';
-      msgs.push(`LEVEL UP! Reached Level ${p.level} (+4 Max HP). Choose a new Perk!`);
+      msgs.push(`Reached Level ${p.level}. Choose a perk.`);
       return msgs;
     }
-    msgs.push(`LEVEL UP! Reached Level ${p.level} (+4 Max HP).`);
+    msgs.push(`Reached Level ${p.level}.`);
   }
 
   state.scene = 'location';
@@ -357,7 +433,7 @@ function tickStatusList(statuses: StatusEffect[]): { dmg: number; logs: string[]
   for (const st of statuses) {
     if (st.type === 'bleeding' || st.type === 'burned' || st.type === 'blighted') {
       dmg += st.power;
-      logs.push(`${st.type.toUpperCase()} deals ${st.power} damage.`);
+      logs.push(`${st.type} deals ${st.power} damage.`);
     }
     if (st.turns > 1) {
       next.push({ ...st, turns: st.turns - 1 });
@@ -366,16 +442,71 @@ function tickStatusList(statuses: StatusEffect[]): { dmg: number; logs: string[]
   return { dmg, logs, next };
 }
 
+function needsSingleTarget(actionId: string): boolean {
+  if (actionId === 'strike') return true;
+  if (actionId.startsWith('ability:')) {
+    const ab = ABILITIES[actionId.slice(8)];
+    return Boolean(ab?.damageDice && !ab.isAoE);
+  }
+  if (actionId.startsWith('item:')) {
+    const item = ITEMS[actionId.slice(5)];
+    return Boolean(item?.throwDamage);
+  }
+  return false;
+}
+
 export function executeCombatAction(
   state: GameState,
-  actionId: string,
+  rawChoiceId: string,
 ): { messages: string[] } {
   const combat = state.combat;
   if (!combat) return { messages: ['Not in combat.'] };
   const p = state.player;
-  const enemy = combat.enemy;
-  const logs: string[] = [];
 
+  if (rawChoiceId === 'menu:skills') {
+    combat.subMenu = 'skills';
+    return { messages: [] };
+  }
+  if (rawChoiceId === 'menu:spells') {
+    combat.subMenu = 'spells';
+    return { messages: [] };
+  }
+  if (rawChoiceId === 'menu:items') {
+    combat.subMenu = 'items';
+    return { messages: [] };
+  }
+  if (rawChoiceId === 'menu:back') {
+    combat.subMenu = 'root';
+    combat.pendingActionId = null;
+    return { messages: [] };
+  }
+
+  let actionId = rawChoiceId;
+  let targetIdx = getLivingEnemyIndices(combat)[0] ?? 0;
+
+  if (rawChoiceId.startsWith('target:') && combat.pendingActionId) {
+    targetIdx = Number.parseInt(rawChoiceId.slice(7), 10);
+    actionId = combat.pendingActionId;
+    combat.pendingActionId = null;
+    combat.subMenu = 'root';
+  } else if (needsSingleTarget(actionId) && getLivingEnemyIndices(combat).length > 1) {
+    // Check affordability before opening target sub-menu
+    if (actionId.startsWith('ability:')) {
+      const ab = ABILITIES[actionId.slice(8)];
+      if (ab && (p.stamina < ab.staminaCost || p.focus < ab.focusCost || (ab.hpCost && p.hp <= ab.hpCost))) {
+        return { messages: ['Insufficient stamina, focus, or health.'] };
+      }
+    }
+    combat.pendingActionId = actionId;
+    combat.subMenu = 'target';
+    return { messages: [] };
+  } else {
+    combat.subMenu = 'root';
+  }
+
+  const logs: string[] = [];
+  const livingIndices = getLivingEnemyIndices(combat);
+  const primaryEnemy = combat.enemies[targetIdx] ?? combat.enemies[livingIndices[0]];
   const roundOneBonus = combat.round === 1 && p.background === 'barrow_stalker' ? 3 : 0;
   const perkDmg = getPerkDamageBonus(state);
 
@@ -394,124 +525,126 @@ export function executeCombatAction(
       poise +
       roundOneBonus +
       perkDmg;
-    const dealt = dealDamageToEnemy(state, raw, false);
-    logs.push(`You strike with ${weapon?.name ?? 'your weapon'} for ${dealt} damage!`);
+    const dealt = dealDamageToEnemy(primaryEnemy, raw, false);
+    logs.push(`You strike ${primaryEnemy.name} for ${dealt} damage.`);
   } else if (actionId === 'guard') {
     pushStatus(p.statuses, { type: 'guarded', turns: 1, power: 4 });
     p.stamina = Math.min(p.maxStamina, p.stamina + 1);
     p.focus = Math.min(p.maxFocus, p.focus + 2);
-    logs.push('You brace behind guard (+4 Armor, +1 Stamina, +2 Focus).');
+    logs.push('You raise your guard and steady your breath.');
   } else if (actionId.startsWith('ability:')) {
-    const abId = actionId.slice('ability:'.length);
+    const abId = actionId.slice(8);
     const ab = ABILITIES[abId];
     if (!ab) return { messages: ['Unknown ability.'] };
     if (p.stamina < ab.staminaCost || p.focus < ab.focusCost || (ab.hpCost && p.hp <= ab.hpCost)) {
-      return { messages: ['Not enough Stamina, Focus, or HP for that action.'] };
+      return { messages: ['Insufficient stamina, focus, or health.'] };
     }
 
     p.stamina -= ab.staminaCost;
     p.focus -= ab.focusCost;
     if (ab.hpCost) p.hp -= ab.hpCost;
 
-    if (ab.shatterGuard) {
-      enemy.turnArmor = 0;
-    }
+    const affected = ab.isAoE
+      ? getLivingEnemyIndices(combat).map((i) => combat.enemies[i])
+      : [primaryEnemy];
 
-    if (ab.damageDice) {
-      const [cnt, sides] = ab.damageDice;
-      const statBonus = getEffectiveStat(state, ab.stat);
-      const debuffBonus =
-        ab.bonusVsDebuffed && enemy.statuses.length > 0 ? ab.bonusVsDebuffed : 0;
-      const raw =
-        rollDice(cnt, sides, state) +
-        (ab.baseDamage ?? 0) +
-        statBonus +
-        debuffBonus +
-        roundOneBonus +
-        perkDmg;
-      const dealt = dealDamageToEnemy(state, raw, Boolean(ab.pierceArmor));
-      logs.push(`[${ab.name}] Hits ${enemy.name} for ${dealt} damage!`);
+    for (const target of affected) {
+      if (ab.shatterGuard) target.turnArmor = 0;
+      if (ab.damageDice) {
+        const [cnt, sides] = ab.damageDice;
+        const statBonus = getEffectiveStat(state, ab.stat);
+        const debuffBonus =
+          ab.bonusVsDebuffed && target.statuses.length > 0 ? ab.bonusVsDebuffed : 0;
+        const raw =
+          rollDice(cnt, sides, state) +
+          (ab.baseDamage ?? 0) +
+          statBonus +
+          debuffBonus +
+          roundOneBonus +
+          perkDmg;
+        const dealt = dealDamageToEnemy(target, raw, Boolean(ab.pierceArmor));
+        logs.push(`${ab.name} hits ${target.name} for ${dealt} damage.`);
+      }
+      if (ab.applyEnemyStatus && target.hp > 0) {
+        pushStatus(target.statuses, ab.applyEnemyStatus);
+        logs.push(`${target.name} becomes ${ab.applyEnemyStatus.type}.`);
+      }
     }
 
     if (ab.healAmount) {
       const heal = ab.healAmount + getEffectiveStat(state, ab.stat);
       p.hp = Math.min(p.maxHp, p.hp + heal);
-      logs.push(`[${ab.name}] Restores ${heal} HP.`);
+      logs.push(`${ab.name} restores ${heal} health.`);
     }
-
     if (ab.purgeNegativeStatuses) {
       p.statuses = clearNegativeStatuses(p.statuses);
-      logs.push('Negative statuses purged!');
+      logs.push('Negative afflictions cleared.');
     }
-
     if (ab.restoreStamina) {
       p.stamina = Math.min(p.maxStamina, p.stamina + ab.restoreStamina);
-      logs.push(`Recovered +${ab.restoreStamina} Stamina.`);
+      logs.push(`Recovered ${ab.restoreStamina} stamina.`);
     }
     if (ab.restoreFocus) {
       p.focus = Math.min(p.maxFocus, p.focus + ab.restoreFocus);
-      logs.push(`Recovered +${ab.restoreFocus} Focus.`);
-    }
-
-    if (ab.applyEnemyStatus) {
-      pushStatus(enemy.statuses, ab.applyEnemyStatus);
-      logs.push(`${enemy.name} is afflicted with ${ab.applyEnemyStatus.type.toUpperCase()}!`);
+      logs.push(`Recovered ${ab.restoreFocus} focus.`);
     }
     if (ab.applySelfStatus) {
       pushStatus(p.statuses, ab.applySelfStatus);
-      logs.push(`You gain ${ab.applySelfStatus.type.toUpperCase()}!`);
+      logs.push(`You become ${ab.applySelfStatus.type}.`);
     }
   } else if (actionId === 'heirloom') {
     if (combat.heirloomUsedThisFight) {
-      return { messages: ['Your Heirloom is already spent for this battle.'] };
+      return { messages: ['Your heirloom is already spent for this battle.'] };
     }
     combat.heirloomUsedThisFight = true;
 
     if (p.heirloom === 'kiln_lantern') {
-      enemy.turnArmor = 0;
-      const dealt = dealDamageToEnemy(state, 8, true);
+      primaryEnemy.turnArmor = 0;
+      const dealt = dealDamageToEnemy(primaryEnemy, 8, true);
       p.focus = Math.min(p.maxFocus, p.focus + 3);
-      logs.push(`[Lantern of the First Kiln] Blinding ash-fire scorches ${enemy.name} for ${dealt} damage (+3 Focus)!`);
+      logs.push(`Kiln Lantern sears ${primaryEnemy.name} for ${dealt} damage.`);
     } else if (p.heirloom === 'orin_bell_shard') {
-      pushStatus(enemy.statuses, { type: 'staggered', turns: 1, power: 1 });
+      for (const idx of getLivingEnemyIndices(combat)) {
+        pushStatus(combat.enemies[idx].statuses, { type: 'staggered', turns: 1, power: 1 });
+      }
       pushStatus(p.statuses, { type: 'guarded', turns: 3, power: 4 });
-      logs.push('[Bell-Shard of St. Orin] Counter-chime Staggers the foe and grants +4 Armor (3t)!');
+      logs.push('Orin Bell-Shard rings clear, staggering your foes.');
     } else if (p.heirloom === 'star_dew_vial') {
       p.hp = Math.min(p.maxHp, p.hp + 14);
       p.statuses = clearNegativeStatuses(p.statuses);
       pushStatus(p.statuses, { type: 'blessed', turns: 4, power: 2 });
-      logs.push('[Vial of Star-Dew] Restored 14 HP, purged afflictions, and gained Blessed (+2)!');
+      logs.push('Star-Dew Vial restores 14 health and clears your wounds.');
     } else if (p.heirloom === 'grixi_chronometer') {
       combat.guaranteedDodgeThisTurn = true;
       combat.counterDamagePending =
         rollDice(2, 6, state) + Math.max(getEffectiveStat(state, 'agility'), getEffectiveStat(state, 'wit'));
-      logs.push('[Grixi Chronometer-Compass] Time slips sideways — ready to dodge and counter!');
+      logs.push('Brass Chronometer slips half a heartbeat ahead.');
     }
   } else if (actionId.startsWith('item:')) {
-    const itemId = actionId.slice('item:'.length);
+    const itemId = actionId.slice(5);
     const item = ITEMS[itemId];
     if (!item || !consumeInventoryItem(state, itemId, 1)) {
       return { messages: ['You do not have that item.'] };
     }
     if (item.throwDamage) {
-      const dealt = dealDamageToEnemy(state, item.throwDamage, true);
-      logs.push(`Hurled ${item.name} for ${dealt} fire damage!`);
-      if (item.throwStatus) {
-        pushStatus(enemy.statuses, item.throwStatus);
-        logs.push(`${enemy.name} catches ${item.throwStatus.type.toUpperCase()}!`);
+      const dealt = dealDamageToEnemy(primaryEnemy, item.throwDamage, true);
+      logs.push(`You hurl ${item.name} at ${primaryEnemy.name} for ${dealt} damage.`);
+      if (item.throwStatus && primaryEnemy.hp > 0) {
+        pushStatus(primaryEnemy.statuses, item.throwStatus);
+        logs.push(`${primaryEnemy.name} catches fire.`);
       }
     }
     if (item.healHp) {
       p.hp = Math.min(p.maxHp, p.hp + item.healHp);
-      logs.push(`Used ${item.name}: +${item.healHp} HP.`);
+      logs.push(`Used ${item.name}, restoring ${item.healHp} health.`);
     }
     if (item.restoreStamina) {
       p.stamina = Math.min(p.maxStamina, p.stamina + item.restoreStamina);
-      logs.push(`+${item.restoreStamina} Stamina.`);
+      logs.push(`Restored ${item.restoreStamina} stamina.`);
     }
     if (item.restoreFocus) {
       p.focus = Math.min(p.maxFocus, p.focus + item.restoreFocus);
-      logs.push(`+${item.restoreFocus} Focus.`);
+      logs.push(`Restored ${item.restoreFocus} focus.`);
     }
     if (item.cureNegative) {
       p.statuses = clearNegativeStatuses(p.statuses);
@@ -519,7 +652,7 @@ export function executeCombatAction(
     }
   } else if (actionId === 'flee') {
     if (!combat.canFlee) {
-      return { messages: ['There is no escape from the Choir-Pit!'] };
+      return { messages: ['There is no escape from the Choir-Pit.'] };
     }
     const agi = getEffectiveStat(state, 'agility');
     const roll = rollDice(1, 20, state);
@@ -528,94 +661,99 @@ export function executeCombatAction(
       state.scene = 'location';
       p.statuses = [];
       return {
-        messages: [
-          `[Flee: d20(${roll}) + ${agi} = ${roll + agi} vs DC 12 -> ESCAPED] You slip away into the mist.`,
-        ],
+        messages: ['You slip clear into the mist before the circle closes.'],
       };
     }
-    logs.push(`[Flee: d20(${roll}) + ${agi} = ${roll + agi} vs DC 12 -> FAILED] ${enemy.name} cuts off your retreat!`);
+    logs.push('Your escape route is cut off.');
   } else {
     return { messages: ['Unknown combat action.'] };
   }
 
-  // Check immediate enemy death
-  if (enemy.hp <= 0) {
+  if (getLivingEnemyIndices(combat).length === 0) {
     return { messages: [...logs, ...resolveVictory(state)] };
   }
 
-  // Tick enemy statuses
-  const enemyTick = tickStatusList(enemy.statuses);
-  enemy.statuses = enemyTick.next;
-  if (enemyTick.dmg > 0) {
-    enemy.hp = Math.max(0, enemy.hp - enemyTick.dmg);
-    logs.push(...enemyTick.logs.map((l) => `${enemy.name}: ${l}`));
-  }
-  if (enemy.hp <= 0) {
-    return { messages: [...logs, ...resolveVictory(state)] };
-  }
-
-  // Enemy turn
-  enemy.turnArmor = 0;
-  const intent = enemy.intents[combat.nextIntentIndex];
-  const staggeredIdx = enemy.statuses.findIndex((s) => s.type === 'staggered');
-
-  if (staggeredIdx >= 0) {
-    enemy.statuses.splice(staggeredIdx, 1);
-    logs.push(`[STAGGERED] ${enemy.name} reels and loses its action!`);
-  } else if (intent) {
-    if (intent.kind === 'guard') {
-      enemy.turnArmor += intent.armorGain ?? 4;
-      logs.push(`${enemy.name} uses ${intent.label} (+${enemy.turnArmor} Armor).`);
-    } else if (combat.guaranteedDodgeThisTurn) {
-      combat.guaranteedDodgeThisTurn = false;
-      const cDmg = dealDamageToEnemy(state, combat.counterDamagePending, false);
-      combat.counterDamagePending = 0;
-      logs.push(
-        `You phase cleanly around ${intent.label} and counter-strike for ${cDmg} damage!`,
-      );
-    } else {
-      const dazed = enemy.statuses.find((s) => s.type === 'dazed');
-      const dmgReduction = dazed ? dazed.power : 0;
-      const playerArmor = getPlayerArmor(state, Boolean(enemy.isBoss));
-      const incoming = Math.max(0, intent.damage - dmgReduction - playerArmor);
-      p.hp = Math.max(0, p.hp - incoming);
-      logs.push(
-        `${enemy.name} executes ${intent.label} -> ${incoming} damage (${playerArmor} blocked).`,
-      );
-      if (intent.status) {
-        const half = p.race === 'durnfolk' && (intent.status.type === 'bleeding' || intent.status.type === 'blighted');
-        pushStatus(p.statuses, intent.status, half);
-        logs.push(`You suffer ${intent.status.type.toUpperCase()}!`);
-      }
+  // Tick statuses on all living enemies
+  for (const idx of getLivingEnemyIndices(combat)) {
+    const enemy = combat.enemies[idx];
+    const tick = tickStatusList(enemy.statuses);
+    enemy.statuses = tick.next;
+    if (tick.dmg > 0) {
+      enemy.hp = Math.max(0, enemy.hp - tick.dmg);
+      logs.push(...tick.logs.map((l) => `${enemy.name}: ${l}`));
+    }
+    if (enemy.hp <= 0) {
+      logs.push(`${enemy.name} collapses.`);
     }
   }
 
-  if (enemy.hp <= 0) {
+  if (getLivingEnemyIndices(combat).length === 0) {
     return { messages: [...logs, ...resolveVictory(state)] };
   }
 
-  // Tick player statuses & round recovery
+  // Enemy turns
+  for (const idx of getLivingEnemyIndices(combat)) {
+    const enemy = combat.enemies[idx];
+    enemy.turnArmor = 0;
+    const intent = enemy.intents[enemy.nextIntentIndex];
+    const staggeredIdx = enemy.statuses.findIndex((s) => s.type === 'staggered');
+
+    if (staggeredIdx >= 0) {
+      enemy.statuses.splice(staggeredIdx, 1);
+      logs.push(`${enemy.name} reels staggered and loses its action.`);
+    } else if (intent) {
+      if (intent.kind === 'guard') {
+        enemy.turnArmor += intent.armorGain ?? 4;
+        logs.push(`${enemy.name} uses ${intent.label} and raises its guard.`);
+      } else if (combat.guaranteedDodgeThisTurn) {
+        combat.guaranteedDodgeThisTurn = false;
+        const cDmg = dealDamageToEnemy(enemy, combat.counterDamagePending, false);
+        combat.counterDamagePending = 0;
+        logs.push(`You slip past ${enemy.name}'s ${intent.label} and counter for ${cDmg} damage.`);
+      } else {
+        const dazed = enemy.statuses.find((s) => s.type === 'dazed');
+        const dmgReduction = dazed ? dazed.power : 0;
+        const playerArmor = getPlayerArmor(state, Boolean(enemy.isBoss));
+        const incoming = Math.max(0, intent.damage - dmgReduction - playerArmor);
+        p.hp = Math.max(0, p.hp - incoming);
+        logs.push(`${enemy.name} strikes with ${intent.label} for ${incoming} damage.`);
+        if (intent.status) {
+          const half = p.race === 'durnfolk' && (intent.status.type === 'bleeding' || intent.status.type === 'blighted');
+          pushStatus(p.statuses, intent.status, half);
+          logs.push(`You suffer ${intent.status.type}.`);
+        }
+      }
+    }
+
+    enemy.nextIntentIndex = (enemy.nextIntentIndex + 1) % enemy.intents.length;
+    if (p.hp <= 0) break;
+  }
+
+  if (getLivingEnemyIndices(combat).length === 0) {
+    return { messages: [...logs, ...resolveVictory(state)] };
+  }
+
+  // Tick player statuses & recovery
   const playerTick = tickStatusList(p.statuses);
   p.statuses = playerTick.next;
   if (playerTick.dmg > 0) {
     p.hp = Math.max(0, p.hp - playerTick.dmg);
-    logs.push(...playerTick.logs.map((l) => `You: ${l}`));
+    logs.push(...playerTick.logs);
   }
 
   if (p.hp <= 0) {
     state.combat = null;
     state.scene = 'dead';
-    logs.push('Your knees buckle into the ash. The Gloaming Reach claims another traveler...');
+    logs.push('Your knees buckle into the ash. The Gloaming Reach claims another traveler.');
     return { messages: logs };
   }
 
-  combat.nextIntentIndex = (combat.nextIntentIndex + 1) % enemy.intents.length;
   combat.round += 1;
   p.stamina = Math.min(p.maxStamina, p.stamina + 1);
   if (p.background === 'root_scholar') {
     p.focus = Math.min(p.maxFocus, p.focus + 1);
   }
 
-  combat.log = logs.slice(-4);
+  combat.log = logs.slice(-5);
   return { messages: logs };
 }

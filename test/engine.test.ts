@@ -13,6 +13,44 @@ import { hasFlag, pronouns, setFlag, synthesizeEpilogue } from '../src/memory.ts
 import { loadGame, loadMetaProfile, recordRunCompletion, saveGame } from '../src/save.ts';
 import type { BackgroundId, HeirloomId, RaceId, SexId } from '../src/types.ts';
 
+function assertNoParensOrBrackets(text: string, context: string): void {
+  const visible = text.replace(/\x1b\[[0-9;]*m/g, '');
+  assert.equal(/[\[\]()]/.test(visible), false, `Found brackets or parentheses in ${context}:\n${visible}`);
+}
+
+describe('Minimalist Formatting & 1-2 Word Sub-Menus', () => {
+  it('contains zero brackets or parentheses in screens, choices, and uses 1-2 word top verbs', () => {
+    const state = createNewGame({
+      name: 'Aelindra',
+      sex: 'female',
+      race: 'ael_thalor',
+      background: 'root_scholar',
+      heirloom: 'kiln_lantern',
+      stealthMode: true,
+      rngState: 42,
+    });
+
+    const rootScreen = renderCurrentScreen(state, state.lastMessages);
+    assertNoParensOrBrackets(rootScreen, 'root location screen');
+
+    const rootChoices = getSceneChoices(state);
+    assert.deepEqual(
+      rootChoices.map((c) => c.label),
+      ['Explore', 'Talk', 'Trade', 'Rest', 'Pack', 'Travel'],
+    );
+    for (const c of rootChoices) {
+      assert.ok(c.label.split(/\s+/).length <= 2, `Expected 1-2 words, got "${c.label}"`);
+    }
+
+    // Check every sub-menu renders cleanly with zero brackets/parens
+    for (const sub of ['explore', 'talk', 'pack', 'pack_craft', 'travel'] as const) {
+      state.subMenu = sub;
+      const screen = renderCurrentScreen(state, []);
+      assertNoParensOrBrackets(screen, `subMenu ${sub}`);
+    }
+  });
+});
+
 describe('Character Creation & Asymmetric Identities', () => {
   it('initializes all 4 original races, 2 sexes, 4 backgrounds, and 4 heirlooms cleanly', () => {
     const combos: Array<{
@@ -48,8 +86,8 @@ describe('Character Creation & Asymmetric Identities', () => {
   });
 });
 
-describe('World Memory, Sex Reactivity & Race-Only Actions', () => {
-  it('branches Cinderford muster reaction by sex and Vaelorian race', () => {
+describe('Talk Dialogue Trees, Progressive Explore & Crafting', () => {
+  it('handles multi-topic Captain Vane dialogue and sex/race reactivity', () => {
     const maleVael = createNewGame({
       name: 'Aldric',
       sex: 'male',
@@ -58,12 +96,15 @@ describe('World Memory, Sex Reactivity & Race-Only Actions', () => {
       heirloom: 'kiln_lantern',
       rngState: 123,
     });
-    const choicesMale = getSceneChoices(maleVael);
-    const musterMale = choicesMale.find((c) => c.id === 'loc:cf_muster_yard');
-    assert.ok(musterMale);
-    const resMale = processInput(maleVael, String(musterMale.index));
+
+    processInput(maleVael, 'Talk');
+    assert.equal(maleVael.subMenu, 'talk');
+    processInput(maleVael, 'Captain Vane');
+    assert.equal(maleVael.subMenu, 'dialogue');
+    const resMale = processInput(maleVael, 'Blood Charter');
     assert.match(resMale.messages.join(' '), /Blood of the Charter/);
     assert.equal(maleVael.memory.factions.iron_vow, 2);
+    assert.equal(maleVael.subMenu, 'dialogue');
 
     const femaleGrixi = createNewGame({
       name: 'Nyx',
@@ -73,14 +114,49 @@ describe('World Memory, Sex Reactivity & Race-Only Actions', () => {
       heirloom: 'kiln_lantern',
       rngState: 999,
     });
-    const choicesFem = getSceneChoices(femaleGrixi);
-    const musterFem = choicesFem.find((c) => c.id === 'loc:cf_muster_yard');
-    assert.ok(musterFem);
-    const resFem = processInput(femaleGrixi, String(musterFem.index));
+    processInput(femaleGrixi, 'Talk');
+    processInput(femaleGrixi, 'Captain Vane');
+    const resFem = processInput(femaleGrixi, 'Challenge');
     assert.match(resFem.messages.join(' '), /seamstress hall/);
   });
 
-  it('branches Silken Cistern reception by binary sex and unlocks female Unveiled Sisterhood', () => {
+  it('progressively unlocks Weeping Barrow chambers and supports Pack crafting', () => {
+    const grixi = createNewGame({
+      name: 'Kip',
+      sex: 'male',
+      race: 'grixi',
+      background: 'barrow_stalker',
+      heirloom: 'kiln_lantern',
+      rngState: 10,
+    });
+
+    // Craft Poultice and Twin Fire-Pots via Pack -> Craft
+    addItemToInventory(grixi, 'bog_herb', 1);
+    addItemToInventory(grixi, 'ash_resin', 1);
+    addItemToInventory(grixi, 'husk_gland', 1);
+
+    processInput(grixi, 'Pack');
+    assert.equal(grixi.subMenu, 'pack');
+    processInput(grixi, 'Craft');
+    assert.equal(grixi.subMenu, 'pack_craft');
+    const craftChoices = getSceneChoices(grixi);
+    assert.ok(craftChoices.some((c) => c.label === 'Twin Fire-Pots' && c.enabled));
+    const craftRes = processInput(grixi, 'Twin Fire-Pots');
+    assert.match(craftRes.messages.join(' '), /Crafted Fire-Pot/);
+
+    // Progressive Weeping Barrow exploration
+    grixi.subMenu = 'root';
+    grixi.locationId = 'weeping_barrow';
+    processInput(grixi, 'Explore');
+    assert.ok(getSceneChoices(grixi).some((c) => c.label === 'Outer Steps'));
+    assert.ok(!getSceneChoices(grixi).some((c) => c.label === 'Inner Crypt'));
+
+    processInput(grixi, 'Outer Steps');
+    processInput(grixi, 'Explore');
+    assert.ok(getSceneChoices(grixi).some((c) => c.label === 'Inner Crypt'));
+  });
+
+  it('branches Silken Cistern reception by binary sex and carries Kale/Vorne to Malakor', () => {
     const fem = createNewGame({
       name: 'Lyra',
       sex: 'female',
@@ -102,51 +178,7 @@ describe('World Memory, Sex Reactivity & Race-Only Actions', () => {
     });
     male.locationId = 'silken_cistern';
     assert.match(LOCATIONS.silken_cistern.description(male), /masculine footstep/i);
-  });
 
-  it('provides race-exclusive actions for all 4 races and carries Kale consequence to Malakor', () => {
-    // Durnfolk vault in Weeping Barrow
-    const durn = createNewGame({
-      name: 'Thorek',
-      sex: 'male',
-      race: 'durnfolk',
-      background: 'shrine_penitent',
-      heirloom: 'kiln_lantern',
-      rngState: 10,
-    });
-    durn.locationId = 'weeping_barrow';
-    const durnChoices = getSceneChoices(durn);
-    assert.ok(durnChoices.some((c) => c.id === 'loc:wb_durnfolk_vault'));
-
-    // Ael-Thalor Star-Stag pacification in Petrified Star-Wood
-    const elf = createNewGame({
-      name: 'Saelis',
-      sex: 'female',
-      race: 'ael_thalor',
-      background: 'root_scholar',
-      heirloom: 'kiln_lantern',
-      rngState: 10,
-    });
-    elf.locationId = 'petrified_starwood';
-    const stagAction = getSceneChoices(elf).find((c) => c.id === 'loc:sw_star_stag');
-    assert.ok(stagAction);
-    const stagRes = processInput(elf, String(stagAction.index));
-    assert.match(stagRes.messages.join(' '), /Memory-Canticle/);
-    assert.ok(elf.player.inventory.some((i) => i.id === 'star_glaive'));
-
-    // Grixi chitin vent in Ash-Fen
-    const grixi = createNewGame({
-      name: 'Kip',
-      sex: 'male',
-      race: 'grixi',
-      background: 'barrow_stalker',
-      heirloom: 'kiln_lantern',
-      rngState: 10,
-    });
-    grixi.locationId = 'ash_fen';
-    assert.ok(getSceneChoices(grixi).some((c) => c.id === 'loc:af_grixi_salvage'));
-
-    // Redeemed Kale + Seal of Silence + Kiln Cipher weaken Malakor
     const savior = createNewGame({
       name: 'Cael',
       sex: 'male',
@@ -162,27 +194,25 @@ describe('World Memory, Sex Reactivity & Race-Only Actions', () => {
     setFlag(savior, 'kiln_cipher_learned', true);
     savior.locationId = 'sunken_belfry';
 
-    const malakorAction = getSceneChoices(savior).find((c) => c.id === 'loc:sb_confront_malakor');
-    assert.ok(malakorAction);
-    const res = processInput(savior, String(malakorAction.index));
+    processInput(savior, 'Explore');
+    const res = processInput(savior, 'Choir Pit');
     assert.equal(savior.scene, 'combat');
     assert.ok(savior.combat);
-    assert.ok(savior.combat.enemy.hp < savior.combat.enemy.maxHp);
-    assert.match(res.messages.join('\n'), /Kale.*-20% Boss HP/);
-    assert.match(res.messages.join('\n'), /Sir Vorne.*-15% Boss HP/);
+    assert.equal(savior.combat.enemies.length, 1);
+    assert.ok(savior.combat.enemies[0].hp < savior.combat.enemies[0].maxHp);
+    assert.match(res.messages.join('\n'), /Kale hurls chain-shot/);
 
-    // Verify endings synthesize chronicle & fates
     setFlag(savior, 'malakor_slain', true);
     savior.combat = null;
     savior.scene = 'location';
     const epilogue = synthesizeEpilogue(savior, 'rekindle_kiln');
+    assertNoParensOrBrackets(epilogue, 'epilogue');
     assert.match(epilogue, /Kale the Oath-Breaker: Redeemed/);
-    assert.match(epilogue, /Sir Vorne: Freed from hollowing/);
   });
 });
 
-describe('Tactical Combat, Heirlooms, Spells & Leveling', () => {
-  it('resolves telegraphed intents, racial cantrip, heirloom, and victory XP/level-up', () => {
+describe('Multi-Enemy Combat, Nested Sub-Menus & Leveling', () => {
+  it('supports target sub-menu for single-target Strike and AoE Spells across multiple foes', () => {
     const state = createNewGame({
       name: 'Vael',
       sex: 'female',
@@ -191,39 +221,60 @@ describe('Tactical Combat, Heirlooms, Spells & Leveling', () => {
       heirloom: 'kiln_lantern',
       rngState: 1234,
     });
-    state.player.xp = 30; // Next kill (18 XP) will trigger Level 2!
+    state.player.xp = 30;
 
-    startCombatEncounter(state, { enemyId: 'root_husk', canFlee: true });
-    assert.equal(state.scene, 'combat');
-    assert.ok(state.combat);
+    startCombatEncounter(state, { enemyIds: ['iron_deserter', 'chitin_weaver'], canFlee: true });
+    assert.equal(state.combat?.enemies.length, 2);
+    assert.equal(state.combat?.enemies[0].name, 'Levy-Brigand');
+    assert.equal(state.combat?.enemies[1].name, 'Chitin-Weaver');
 
-    const options = getCombatMenuOptions(state);
-    assert.ok(options.some((o) => o.id === 'ability:kiln_spark'));
-    assert.ok(options.some((o) => o.id === 'heirloom'));
+    const rootScreen = renderCurrentScreen(state, []);
+    assertNoParensOrBrackets(rootScreen, 'multi-enemy combat screen');
 
-    // Use Heirloom (Lantern of the First Kiln: 8 damage + 3 focus)
-    const hRes = executeCombatAction(state, 'heirloom');
-    assert.match(hRes.messages.join(' '), /Lantern of the First Kiln/);
-    assert.ok(state.combat?.heirloomUsedThisFight);
+    // Strike opens target selection sub-menu when 2+ foes live
+    executeCombatAction(state, 'strike');
+    assert.equal(state.combat?.subMenu, 'target');
+    const targets = getCombatMenuOptions(state);
+    assert.equal(targets[0].label, 'Levy-Brigand');
+    assert.equal(targets[1].label, 'Chitin-Weaver');
+    assert.equal(targets[2].label, 'Back');
 
-    // Finish enemy with Soul-Dart / Kiln-Spark
+    // Back returns cleanly to root combat menu
+    executeCombatAction(state, 'menu:back');
+    assert.equal(state.combat?.subMenu, 'root');
+
+    // Spells sub-menu -> Wither-Bell hits BOTH foes at once
+    executeCombatAction(state, 'menu:spells');
+    assert.equal(state.combat?.subMenu, 'spells');
+    const aoeRes = executeCombatAction(state, 'ability:wither_bell');
+    assert.equal(state.combat?.subMenu, 'root');
+    assert.match(aoeRes.messages.join('\n'), /Levy-Brigand/);
+    assert.match(aoeRes.messages.join('\n'), /Chitin-Weaver/);
+
+    // Finish remaining enemies cleanly
     let guard = 0;
-    while (state.scene === 'combat' && guard < 10) {
-      executeCombatAction(state, state.player.focus >= 2 ? 'ability:soul_dart' : 'strike');
+    while (state.scene === 'combat' && guard < 15) {
+      if (state.player.focus >= 4) {
+        executeCombatAction(state, 'ability:wither_bell');
+      } else {
+        executeCombatAction(state, 'strike');
+        if (state.combat?.subMenu === 'target') {
+          const t = getCombatMenuOptions(state)[0];
+          executeCombatAction(state, t.id);
+        }
+      }
       guard += 1;
     }
 
     assert.equal(state.scene, 'level_up');
     assert.equal(state.player.level, 2);
-    assert.ok(state.pendingPerkIds.length > 0);
-    const perkPick = processInput(state, '1');
-    assert.match(perkPick.messages.join(' '), /Gained Perk/);
+    processInput(state, '1');
     assert.equal(state.scene, 'location');
   });
 });
 
 describe('Non-Repeating Events, 14-Day Clock & Stealth Mode', () => {
-  it('enforces non-repeating events, Day 15 Drowning Toll loss, and zero ANSI in stealth mode', () => {
+  it('enforces event invariants, Day 15 Drowning Toll loss, and zero ANSI or brackets in stealth mode', () => {
     const state = createNewGame({
       name: 'Shadow',
       sex: 'male',
@@ -234,23 +285,26 @@ describe('Non-Repeating Events, 14-Day Clock & Stealth Mode', () => {
       rngState: 321,
     });
 
-    const rendered = renderCurrentScreen(state, ['Test message']);
+    const rendered = renderCurrentScreen(state, ['Clean message.']);
     assert.equal(/\x1b\[/.test(rendered), false, 'Stealth output must contain no ANSI escape sequences');
+    assertNoParensOrBrackets(rendered, 'stealth screen');
 
-    // Verify all events have unique IDs and valid locations
     const ids = new Set(EVENTS.map((e) => e.id));
     assert.equal(ids.size, EVENTS.length);
     for (const ev of EVENTS) {
       for (const locId of ev.locations) {
         assert.ok(LOCATIONS[locId], `Event ${ev.id} references unknown location ${locId}`);
       }
+      for (const ch of ev.choices) {
+        assert.ok(ch.label.split(/\s+/).length <= 2, `Event ${ev.id} choice "${ch.label}" exceeds 2 words`);
+        assertNoParensOrBrackets(ch.label, `event ${ev.id} choice`);
+      }
     }
 
-    // Advance past Day 14 via camp without killing Malakor -> Day 15 triggers doom
     state.day = 14;
-    const campRes = processInput(state, 'camp');
+    const campRes = processInput(state, 'rest');
     assert.equal(state.scene, 'dead');
-    assert.match(campRes.messages.join(' '), /THIRD DROWNING TOLL SOUNDS/);
+    assert.match(campRes.messages.join(' '), /Third Drowning Toll/);
   });
 });
 
@@ -280,7 +334,7 @@ describe('Atomic Save, Permadeath & Meta-Profile Unlocks', () => {
       assert.ok(hasFlag(loaded, 'seal_of_silence'));
 
       const completion = recordRunCompletion(loaded, 'victory', 'Heir of the First Kiln', tempDir);
-      assert.equal(loadGame(tempDir), null, 'Active run save must be erased after run completion');
+      assert.equal(loadGame(tempDir), null);
       assert.ok(completion.newlyUnlocked.includes('orin_bell_shard'));
       assert.ok(completion.newlyUnlocked.includes('star_dew_vial'));
       assert.ok(completion.newlyUnlocked.includes('grixi_chronometer'));

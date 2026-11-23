@@ -63,6 +63,7 @@ export interface AbilityDef {
   shatterGuard?: boolean;
   bonusVsDebuffed?: number;
   purgeNegativeStatuses?: boolean;
+  isAoE?: boolean;
   description: string;
 }
 
@@ -108,7 +109,7 @@ export interface HeirloomDef {
   combatDescription: string;
 }
 
-export type ItemSlot = 'weapon' | 'armor' | 'trinket' | 'consumable' | 'relic';
+export type ItemSlot = 'weapon' | 'armor' | 'trinket' | 'consumable' | 'relic' | 'reagent';
 
 export interface ItemDef {
   id: string;
@@ -130,6 +131,15 @@ export interface ItemDef {
   cureNegative?: boolean;
   throwDamage?: number;
   throwStatus?: StatusEffect;
+}
+
+export interface RecipeDef {
+  id: string;
+  name: string;
+  outputItemId: string;
+  outputQty: number;
+  ingredients: Array<{ itemId: string; qty: number }>;
+  grixiOrScholarOnly?: boolean;
 }
 
 export interface InventoryEntry {
@@ -194,8 +204,12 @@ export interface ActiveEnemy {
   lootTable: Array<{ itemId: string; chance: number }>;
 }
 
+export type CombatSubMenu = 'root' | 'skills' | 'spells' | 'items' | 'target';
+
 export interface CombatState {
-  enemy: ActiveEnemy;
+  enemies: ActiveEnemy[];
+  subMenu: CombatSubMenu;
+  pendingActionId: string | null;
   round: number;
   heirloomUsedThisFight: boolean;
   guaranteedDodgeThisTurn: boolean;
@@ -254,7 +268,6 @@ export interface PlayerCharacter {
 export interface ChoiceOption {
   id: string;
   label: string;
-  tag?: string;
   visible?: (state: GameState) => boolean;
   enabled?: (state: GameState) => { ok: boolean; reason?: string };
   resolve: (state: GameState) => ActionOutcome;
@@ -275,9 +288,24 @@ export interface EventCard {
 export interface LocationAction {
   id: string;
   label: string;
-  tag?: string;
   visible?: (state: GameState) => boolean;
   resolve: (state: GameState) => ActionOutcome;
+}
+
+export interface DialogueTopic {
+  id: string;
+  label: string;
+  visible?: (state: GameState) => boolean;
+  resolve: (state: GameState) => ActionOutcome;
+}
+
+export interface NpcNode {
+  id: string;
+  name: string;
+  shortLabel: string;
+  visible?: (state: GameState) => boolean;
+  greeting: (state: GameState) => string;
+  topics: DialogueTopic[];
 }
 
 export interface ShopListing {
@@ -297,6 +325,7 @@ export interface LocationNode {
   asciiPos: { row: number; col: number; code: string };
   description: (state: GameState) => string;
   actions: LocationAction[];
+  npcs?: NpcNode[];
   shop?: {
     name: string;
     keeper: string;
@@ -314,6 +343,17 @@ export type SceneMode =
   | 'ending'
   | 'dead';
 
+export type LocationSubMenu =
+  | 'root'
+  | 'explore'
+  | 'talk'
+  | 'dialogue'
+  | 'travel'
+  | 'pack'
+  | 'pack_use'
+  | 'pack_equip'
+  | 'pack_craft';
+
 export interface ActiveEventState {
   eventId: string;
   resolved: boolean;
@@ -323,7 +363,8 @@ export interface ActiveEventState {
 export interface ActionOutcome {
   messages: string[];
   startCombat?: {
-    enemyId: string;
+    enemyId?: string;
+    enemyIds?: string[];
     canFlee?: boolean;
     onVictoryFlag?: string;
     onVictoryChronicle?: { title: string; summary: string; tag: string };
@@ -336,7 +377,7 @@ export interface ActionOutcome {
     openingText: string;
   };
   advanceDay?: number;
-  stayInEvent?: boolean;
+  stayInDialogue?: boolean;
 }
 
 export interface MetaProfile {
@@ -367,6 +408,8 @@ export interface GameState {
   seenEvents: string[];
   memory: WorldMemory;
   scene: SceneMode;
+  subMenu: LocationSubMenu;
+  activeNpcId: string | null;
   activeEvent: ActiveEventState | null;
   combat: CombatState | null;
   pendingPerkIds: string[];

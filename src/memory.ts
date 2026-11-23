@@ -121,16 +121,16 @@ export function synthesizeEpilogue(
     );
   } else if (endingId === 'rekindle_kiln') {
     lines.push(
-      `Speaking the ancient cipher of Aethel, ${p.name} fed the last Vesper-sparks into the First Kiln. Pale flame roared back through the basalt conduits, burning away the Husk-Tide — yet casting the long, iron shadow of a new Empire over the valley.`,
+      `Speaking the ancient cipher of Aethel, ${p.name} fed the last Vesper-sparks into the First Kiln. Pale flame roared back through the basalt conduits, burning away the Husk-Tide yet casting the long iron shadow of a new Empire over the valley.`,
     );
   } else {
     lines.push(
-      `${p.name} lifted Malakor's fractured bell-crown and pressed it onto ${pronouns(p.sex).poss} own brow. The Pale Root bowed in sudden silence. No third toll fell upon the frontier; instead, a watchful, uncanny silence now answers only to ${p.name}.`,
+      `${p.name} lifted Malakor's fractured bell-crown and pressed it onto ${pronouns(p.sex).poss} own brow. The Pale Root bowed in sudden silence. No third toll fell upon the frontier; instead, a watchful silence now answers only to ${p.name}.`,
     );
   }
 
   lines.push('');
-  lines.push('--- FATE OF THE REACH ---');
+  lines.push('FATE OF THE REACH');
 
   if (hasFlag(state, 'cinderford_fallen')) {
     lines.push(
@@ -153,11 +153,11 @@ export function synthesizeEpilogue(
   const kaleFate = getFlag(state, 'kale_fate');
   if (kaleFate === 'redeemed') {
     lines.push(
-      '* Kale the Oath-Breaker: Redeemed on the Causeway, Kale died or vanished on the Belfry steps after shattering Malakor\'s choir-ward — his name struck from the traitor rolls.',
+      "* Kale the Oath-Breaker: Redeemed on the Causeway, Kale fell at the Belfry steps after shattering Malakor's choir-ward — his name struck from the traitor rolls.",
     );
   } else if (kaleFate === 'executed') {
     lines.push(
-      '* Kale the Oath-Breaker: Buried headless beneath the King\'s Causeway; his Iron-Vow bounty bought iron and bread.',
+      "* Kale the Oath-Breaker: Buried headless beneath the King's Causeway; his Iron-Vow bounty bought iron and bread.",
     );
   } else if (kaleFate === 'abandoned') {
     lines.push(
@@ -187,9 +187,9 @@ export function synthesizeEpilogue(
 
   if (state.memory.chronicle.length > 0) {
     lines.push('');
-    lines.push('--- CHRONICLE ---');
+    lines.push('CHRONICLE');
     for (const entry of state.memory.chronicle) {
-      lines.push(`[Day ${entry.day}] ${entry.title}: ${entry.summary}`);
+      lines.push(`Day ${entry.day} - ${entry.title}: ${entry.summary}`);
     }
   }
 

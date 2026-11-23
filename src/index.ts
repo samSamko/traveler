@@ -65,25 +65,24 @@ async function runCharacterCreation(
 ): Promise<GameState> {
   const meta = loadMetaProfile();
   console.log('');
-  console.log(paint('=== TRAVELER: CHRONICLES OF THE GLOAMING REACH ===', 'cyan', stealth));
+  console.log(paint('TRAVELER - THE GLOAMING REACH', 'cyan', stealth));
   if (meta.runsPlayed > 0) {
     console.log(
-      `Meta History: ${meta.runsPlayed} runs | ${meta.victories} victories | Best Day: ${meta.bestDayReached}/14`,
+      `Runs ${meta.runsPlayed} | Victories ${meta.victories} | Best Day ${meta.bestDayReached}/14`,
     );
   }
 
-  console.log('\nChoose Sex (shapes pronouns, oaths & faction reactions):');
-  console.log('  1. Male (he/him — Brother / Lord)');
-  console.log('  2. Female (she/her — Sister / Lady)');
+  console.log('\nSex:');
+  console.log('  1. Male');
+  console.log('  2. Female');
   const sexRaw = await reader.ask('> ');
   const sex: SexId = (sexRaw ?? '').trim() === '2' ? 'female' : 'male';
 
   const raceIds: RaceId[] = ['vaelorian', 'ael_thalor', 'durnfolk', 'grixi'];
-  console.log('\nChoose Race (unique stats, passive, cantrip & race-only choices):');
+  console.log('\nRace:');
   raceIds.forEach((rid, idx) => {
     const r = RACES[rid];
-    console.log(`  ${idx + 1}. ${r.name} — ${r.subtitle}`);
-    console.log(`     ${r.passive.name}: ${r.passive.description}`);
+    console.log(`  ${idx + 1}. ${r.name} - ${r.subtitle}`);
   });
   const raceRaw = await reader.ask('> ');
   const race = pickFromList(raceRaw, raceIds, 0);
@@ -94,34 +93,24 @@ async function runCharacterCreation(
     'barrow_stalker',
     'shrine_penitent',
   ];
-  console.log('\nChoose Background (starting gear, skills, spells/miracles):');
+  console.log('\nBackground:');
   bgIds.forEach((bid, idx) => {
     const b = BACKGROUNDS[bid];
-    console.log(`  ${idx + 1}. ${b.name} — ${b.subtitle} (${b.passive.name})`);
+    console.log(`  ${idx + 1}. ${b.name} - ${b.subtitle}`);
   });
   const bgRaw = await reader.ask('> ');
   const background = pickFromList(bgRaw, bgIds, 0);
 
   const unlocked = meta.unlockedHeirlooms;
-  console.log('\nChoose Active Heirloom:');
+  console.log('\nHeirloom:');
   unlocked.forEach((hid, idx) => {
     const h = HEIRLOOMS[hid];
-    console.log(`  ${idx + 1}. ${h.name} — ${h.combatDescription}`);
+    console.log(`  ${idx + 1}. ${h.name}`);
   });
-  const lockedHeirlooms = (Object.keys(HEIRLOOMS) as HeirloomId[]).filter(
-    (id) => !unlocked.includes(id),
-  );
-  if (lockedHeirlooms.length > 0) {
-    console.log('  (Locked across runs:');
-    for (const hid of lockedHeirlooms) {
-      console.log(`   - ${HEIRLOOMS[hid].name}: ${HEIRLOOMS[hid].unlockRequirement}`);
-    }
-    console.log('  )');
-  }
   const heirloomRaw = await reader.ask('> ');
   const heirloom = pickFromList(heirloomRaw, unlocked, 0);
 
-  console.log('\nEnter Traveler Name (leave blank for "Vesper"):');
+  console.log('\nName:');
   const nameRaw = await reader.ask('> ');
   const name = (nameRaw ?? '').trim() || 'Vesper';
 
@@ -143,7 +132,7 @@ async function main(): Promise<void> {
     let state = loadGame();
     if (state) {
       if (stealthArg) state.stealthMode = true;
-      console.log(`Resuming saved expedition for ${state.player.name} (Day ${state.day}/${state.maxDays})...`);
+      console.log(`Resuming ${state.player.name} on Day ${state.day}/${state.maxDays}.`);
     } else {
       state = await runCharacterCreation(reader, stealthArg);
       saveGame(state);
@@ -156,10 +145,10 @@ async function main(): Promise<void> {
 
       if (state.scene === 'dead') {
         const result = recordRunCompletion(state, 'death');
-        console.log('\n[PERMADEATH] Your active expedition has ended and its save was erased.');
+        console.log('\nExpedition ended. Save erased.');
         if (result.newlyUnlocked.length > 0) {
           console.log(
-            `Unlocked new Heirloom(s): ${result.newlyUnlocked.map((id) => HEIRLOOMS[id].name).join(', ')}!`,
+            `Unlocked: ${result.newlyUnlocked.map((id) => HEIRLOOMS[id].name).join(', ')}`,
           );
         }
         break;
@@ -167,10 +156,10 @@ async function main(): Promise<void> {
 
       if (state.scene === 'ending') {
         const result = recordRunCompletion(state, 'victory', state.endingSummary ?? 'Victory');
-        console.log('\n[VICTORY] Expedition recorded in your persistent chronicle.');
+        console.log('\nVictory recorded.');
         if (result.newlyUnlocked.length > 0) {
           console.log(
-            `Unlocked new Heirloom(s): ${result.newlyUnlocked.map((id) => HEIRLOOMS[id].name).join(', ')}!`,
+            `Unlocked: ${result.newlyUnlocked.map((id) => HEIRLOOMS[id].name).join(', ')}`,
           );
         }
         break;

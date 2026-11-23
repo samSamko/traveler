@@ -17,7 +17,7 @@ export const LOCATIONS: Record<string, LocationNode> = {
     asciiPos: { row: 2, col: 0, code: 'CF' },
     description: (state) => {
       if (hasFlag(state, 'cinderford_fallen')) {
-        return "Cinderford's timber gate hangs crooked on rusted hinges. Pale tendrils curl out of the granary roof, and the watch-bell lies cracked in gray slush. Only ash-carrion answers the wind.";
+        return "Cinderford's timber gate hangs crooked on rusted hinges. Pale tendrils curl out of the granary roof, and the watch-bell lies cracked in gray slush.";
       }
       const p = state.player;
       const base =
@@ -26,21 +26,20 @@ export const LOCATIONS: Record<string, LocationNode> = {
         return `${base} Sentries eye your brass-warren satchel warily, though the quartermaster keeps a discreet ledger beneath the counter for Grixi coin.`;
       }
       if (p.race === 'vaelorian') {
-        return `${base} Old Imperial eagles still cling to the gate lintel; the garrison treats Vaelorian kin as distant cousins of the old crown.`;
+        return `${base} Old Imperial eagles cling to the gate lintel, and the garrison greets Vaelorian blood like distant kin.`;
       }
       return base;
     },
     shop: {
-      name: 'Cinderford Quartermaster & Black-Ledger',
+      name: 'Cinderford Quartermaster',
       keeper: 'Quartermaster Harken',
       greeting: (state) => {
         if (hasFlag(state, 'cinderford_fallen')) {
-          return 'Harken is gone; only scattered salvage crates remain in the deserted storehouse.';
+          return 'Harken is gone; only empty crates remain.';
         }
-        const rationNote = hasFlag(state, 'granary_burned')
-          ? ' (Grain is scarce since the granary fire — rations cost +3c.)'
-          : '';
-        return `Harken taps a notched tally-stick.${rationNote}`;
+        return hasFlag(state, 'granary_burned')
+          ? 'Harken taps a notched tally-stick. Grain prices remain steep since the fire.'
+          : 'Harken taps a notched tally-stick beside stacked crates.';
       },
       items: [
         { itemId: 'poultice', price: 11 },
@@ -52,13 +51,195 @@ export const LOCATIONS: Record<string, LocationNode> = {
         { itemId: 'vesper_needle', price: 52, underWarrenOnly: true },
       ],
     },
+    npcs: [
+      {
+        id: 'captain_vane',
+        name: 'Captain Vane',
+        shortLabel: 'Captain Vane',
+        visible: (state) => !hasFlag(state, 'cinderford_fallen'),
+        greeting: (state) => {
+          if (state.player.race === 'vaelorian') {
+            return 'Captain Vane eyes the old Vaelorian cut of your brow across the muster table.';
+          }
+          if (state.player.sex === 'female') {
+            return 'Captain Vane glances up from his iron muster-roll, his gaze cold and skeptical.';
+          }
+          return 'Captain Vane beckons you toward the scarred oak muster table.';
+        },
+        topics: [
+          {
+            id: 'vane_charter',
+            label: 'Blood Charter',
+            visible: (state) =>
+              state.player.race === 'vaelorian' && !hasFlag(state, 'vane_visited'),
+            resolve: (state) => {
+              setFlag(state, 'vane_visited', true);
+              adjustFaction(state, 'iron_vow', 2);
+              state.player.crowns += 22;
+              state.player.rations += 1;
+              recordChronicle(
+                state,
+                'Imperial Charter at Cinderford',
+                'Captain Vane honored your Vaelorian blood-charter with coin and provisions.',
+                'iron_vow',
+              );
+              return {
+                stayInDialogue: true,
+                messages: [
+                  `Captain Vane salutes crisply. "Blood of the Charter. Good to see an Ash-Born ${pronouns(state.player.sex).kinTitle.toLowerCase()} holding the Reach." He presses a levy purse and trail bread into your hands.`,
+                ],
+              };
+            },
+          },
+          {
+            id: 'vane_muster',
+            label: 'Muster',
+            visible: (state) =>
+              state.player.race !== 'vaelorian' &&
+              state.player.sex === 'male' &&
+              !hasFlag(state, 'vane_visited'),
+            resolve: (state) => {
+              setFlag(state, 'vane_visited', true);
+              adjustFaction(state, 'iron_vow', 1);
+              state.player.crowns += 16;
+              state.player.torches += 1;
+              recordChronicle(
+                state,
+                'Mustered with Iron-Vow',
+                'Captain Vane enrolled you as an auxiliary and issued coin and a torch.',
+                'iron_vow',
+              );
+              return {
+                stayInDialogue: true,
+                messages: [
+                  'Captain Vane nods across the scarred oak table. "Able men are thin on the road, brother. Take a bounty chit and bring word from the Watchtower."',
+                ],
+              };
+            },
+          },
+          {
+            id: 'vane_challenge',
+            label: 'Challenge',
+            visible: (state) =>
+              state.player.race !== 'vaelorian' &&
+              state.player.sex === 'female' &&
+              !hasFlag(state, 'vane_visited'),
+            resolve: (state) => {
+              setFlag(state, 'vane_visited', true);
+              const check = resolveCheck(state, 'might', 12, { label: 'Muster Table' });
+              if (check.success) {
+                adjustFaction(state, 'iron_vow', 2);
+                state.player.crowns += 24;
+                state.player.maxHp += 2;
+                state.player.hp += 2;
+                recordChronicle(
+                  state,
+                  'Outfaced Captain Vane',
+                  "Refused dismissal at the muster table and won the veterans' respect.",
+                  'iron_vow',
+                );
+                return {
+                  stayInDialogue: true,
+                  messages: [
+                    'Captain Vane waves a dismissive gauntlet: "These marches aren\'t a seamstress hall, lass."',
+                    'You drive your weapon flat into the oak plank beside his thumb. The veterans erupt in rough cheers; Vane grunts and slides over an officer purse.',
+                  ],
+                };
+              }
+              adjustFaction(state, 'iron_vow', -1);
+              state.player.crowns += 10;
+              return {
+                stayInDialogue: true,
+                messages: [
+                  'Captain Vane scoffs at your stance and tosses a thin messenger fee across the wood.',
+                ],
+              };
+            },
+          },
+          {
+            id: 'vane_granary',
+            label: 'Granary',
+            resolve: (state) => ({
+              stayInDialogue: true,
+              messages: [
+                hasFlag(state, 'cinderford_saved')
+                  ? 'Vane nods toward the well. "With the granary settled, we might actually outlast winter."'
+                  : 'Vane lowers his voice. "White mold crept under the granary sills last night. Inspect it before Day 8 or this keep rots from within."',
+              ],
+            }),
+          },
+          {
+            id: 'vane_rumors',
+            label: 'Rumors',
+            resolve: () => ({
+              stayInDialogue: true,
+              messages: [
+                'Vane taps three points on his slate: "Sir Vorne still holds the Crown-Gate watchtower, the blind Matrons whisper beneath Ash-Fen, and the Weeping Barrow hides pre-Shattering cipher stones."',
+              ],
+            }),
+          },
+        ],
+      },
+      {
+        id: 'innkeeper_martha',
+        name: 'Innkeeper Martha',
+        shortLabel: 'Martha',
+        visible: (state) => !hasFlag(state, 'cinderford_fallen'),
+        greeting: (state) =>
+          hasFlag(state, 'granary_purified')
+            ? 'Martha ladles hot barley broth with a warm smile.'
+            : 'Martha wipes cracked stoneware beside the peat hearth.',
+        topics: [
+          {
+            id: 'martha_rumors',
+            label: 'Rumors',
+            resolve: () => ({
+              stayInDialogue: true,
+              messages: [
+                '"A deserter named Kale bolted down the King\'s Causeway coughing chalk," Martha murmurs. "And if you descend to the Silken Cistern, mind how the Matrons weigh men against sisters."',
+              ],
+            }),
+          },
+          {
+            id: 'martha_soup',
+            label: 'Broth',
+            visible: (state) => !hasFlag(state, 'martha_broth_today'),
+            resolve: (state) => {
+              setFlag(state, 'martha_broth_today', true);
+              state.player.hp = Math.min(state.player.maxHp, state.player.hp + 4);
+              return {
+                stayInDialogue: true,
+                messages: ['Martha pushes a steaming wooden bowl across the counter.'],
+              };
+            },
+          },
+        ],
+      },
+    ],
     actions: [
       {
-        id: 'cf_granary_inspect',
-        label: 'Address the Cinderford Granary Crisis (Spore Contamination)',
-        tag: 'Quest / Consequence',
+        id: 'cf_granary_outer',
+        label: 'Granary',
         visible: (state) =>
-          !hasFlag(state, 'cinderford_fallen') && !hasFlag(state, 'cinderford_saved'),
+          !hasFlag(state, 'cinderford_fallen') &&
+          !hasFlag(state, 'cf_granary_opened') &&
+          !hasFlag(state, 'cinderford_saved'),
+        resolve: (state) => {
+          setFlag(state, 'cf_granary_opened', true);
+          return {
+            messages: [
+              'You unbar the swollen oak door. Sweet, chalky spore-mist curls up from the lower grain cellar.',
+            ],
+          };
+        },
+      },
+      {
+        id: 'cf_granary_cellar',
+        label: 'Cellar Spores',
+        visible: (state) =>
+          !hasFlag(state, 'cinderford_fallen') &&
+          hasFlag(state, 'cf_granary_opened') &&
+          !hasFlag(state, 'cinderford_saved'),
         resolve: (state) => {
           const p = state.player;
           const canPurifyFree =
@@ -84,15 +265,14 @@ export const LOCATIONS: Record<string, LocationNode> = {
             return {
               messages: [
                 canPurifyFree
-                  ? `Drawing on your ${p.race === 'ael_thalor' ? 'Ael-Thalor root-canticle' : 'sacred/occult training'}, you draw the pale spores out into a clay brazier and turn them to harmless grey dust.`
-                  : 'You distill your Vesper Tonic across the seed-bins, burning away the pale mycelium while sparing every sack of barley.',
-                'The townsfolk weep in relief. Cinderford saves its harvest (+2 Rations, +18 Crowns, +2 Iron-Vow, free Inn beds!).',
+                  ? 'You draw the pale spores into a clay brazier and turn them to harmless grey ash, sparing every sack of barley.'
+                  : 'You distill Vesper Tonic across the seed-bins, burning out the pale mycelium while sparing every sack of grain.',
               ],
             };
           }
 
           const check = resolveCheck(state, 'wit', 14, {
-            label: 'Granary Quarantine',
+            label: 'Cellar Quarantine',
             isLoreOrPerception: true,
           });
           if (check.success) {
@@ -110,7 +290,7 @@ export const LOCATIONS: Record<string, LocationNode> = {
             return {
               messages: [
                 check.logLine,
-                'You trace the damp root-vein to a single rotted cask and excise it cleanly before the choir-blight spreads (+2 Rations, +15 Crowns, +2 Iron-Vow).',
+                'You trace the damp root-vein to a single rotted cask and excise it cleanly before the blight spreads.',
               ],
             };
           }
@@ -127,93 +307,14 @@ export const LOCATIONS: Record<string, LocationNode> = {
           return {
             messages: [
               check.logLine,
-              'The blight spreads faster than your knife. Forced into grim mercy, you seal the doors and put the granary to the torch.',
-              'Cinderford is spared an outbreak (+1 Iron-Vow), but smoke hangs bitter over the yard and ration prices rise (+3c).',
-            ],
-          };
-        },
-      },
-      {
-        id: 'cf_muster_yard',
-        label: 'Report to Captain Vane at the Iron-Vow Muster Table',
-        tag: 'Sex & Race Reactive',
-        visible: (state) => !hasFlag(state, 'cinderford_fallen') && !hasFlag(state, 'vane_visited'),
-        resolve: (state) => {
-          const p = state.player;
-          setFlag(state, 'vane_visited', true);
-
-          if (p.race === 'vaelorian') {
-            adjustFaction(state, 'iron_vow', 2);
-            p.crowns += 22;
-            p.rations += 1;
-            recordChronicle(
-              state,
-              'Imperial Charter at Cinderford',
-              'Captain Vane honored your Vaelorian blood-charter with coin and war-provisions.',
-              'iron_vow',
-            );
-            return {
-              messages: [
-                `Captain Vane salutes the old Vaelorian cut of your brow: "Blood of the Charter! Good to see an Ash-Born ${pronouns(p.sex).kinTitle.toLowerCase()} holding the Reach."`,
-                'He presses a levy purse into your palm (+22 Crowns, +1 Ration, +2 Iron-Vow).',
-              ],
-            };
-          }
-
-          if (p.sex === 'male') {
-            adjustFaction(state, 'iron_vow', 1);
-            p.crowns += 16;
-            p.torches += 1;
-            recordChronicle(
-              state,
-              'Mustered with the Iron-Vow',
-              'Captain Vane enrolled you as a frontier auxiliary and issued garrison gear.',
-              'iron_vow',
-            );
-            return {
-              messages: [
-                'Captain Vane sizes up your shoulders across the scarred oak table: "Able men are thin on the road, brother. Take a bounty chit and bring back word from the Watchtower."',
-                'You receive a muster advance (+16 Crowns, +1 Torch, +1 Iron-Vow).',
-              ],
-            };
-          }
-
-          const check = resolveCheck(state, 'might', 12, { label: 'Defy Muster Prejudice' });
-          if (check.success) {
-            adjustFaction(state, 'iron_vow', 2);
-            p.crowns += 24;
-            p.maxHp += 2;
-            p.hp += 2;
-            recordChronicle(
-              state,
-              'Outfaced Captain Vane',
-              "Refused dismissal at the patriarchal muster table and won the veterans' fierce respect.",
-              'iron_vow',
-            );
-            return {
-              messages: [
-                'Captain Vane waves a dismissive gauntlet: "These marches aren\'t a seamstress hall, lass — leave the Watchtower road to sworn men."',
-                check.logLine,
-                "You slam your weapon flat onto his tally-board, splitting the oak knot beside his thumb. The veterans erupt in rough cheers; Vane grunts and slides over an officer's purse (+24 Crowns, +2 Max HP, +2 Iron-Vow).",
-              ],
-            };
-          }
-
-          adjustFaction(state, 'iron_vow', -1);
-          p.crowns += 10;
-          return {
-            messages: [
-              'Captain Vane waves a dismissive gauntlet: "These marches aren\'t a seamstress hall, lass."',
-              check.logLine,
-              'The table snickers before you turn away, pocketing only a grudging messenger fee (+10 Crowns, -1 Iron-Vow).',
+              'The blight spreads too swiftly for steel. You bar the shutters and put the granary to the torch, sparing the keep at bitter cost.',
             ],
           };
         },
       },
       {
         id: 'cf_durnfolk_masonry',
-        label: "[Durnfolk] Inspect Cinderford Keep's Cracking Curtain-Wall",
-        tag: 'Durnfolk Only',
+        label: 'Curtain Wall',
         visible: (state) =>
           state.player.race === 'durnfolk' &&
           !hasFlag(state, 'cinderford_fallen') &&
@@ -224,36 +325,21 @@ export const LOCATIONS: Record<string, LocationNode> = {
           state.player.crowns += 18;
           return {
             messages: [
-              'Your Durnfolk eyes spot settling mortar above the sluice-gate immediately. You wedge basalt shims and instruct the masons in deep-forge bracing.',
-              'The master builder gladly pays your guild fee (+18 Crowns, +1 Iron-Vow).',
+              'Your Durnfolk eyes spot settling mortar above the sluice-gate. You wedge basalt shims and instruct the masons in deep-forge bracing; the master builder pays your fee gratefully.',
             ],
           };
         },
       },
       {
-        id: 'cf_inn_rest',
-        label: 'Rest at the Ashen Flagon Inn (Heals Full, Clears Statuses, +1 Day)',
-        tag: 'Inn',
-        visible: (state) => !hasFlag(state, 'cinderford_fallen'),
+        id: 'cf_fallen_ruins',
+        label: 'Storehouse',
+        visible: (state) => hasFlag(state, 'cinderford_fallen') && !hasFlag(state, 'cf_looted_ruin'),
         resolve: (state) => {
-          const free = hasFlag(state, 'granary_purified');
-          const cost = free ? 0 : 6;
-          if (state.player.crowns < cost) {
-            return { messages: [`Innkeeper Martha asks for ${cost} Crowns for hearth and broth.`] };
-          }
-          state.player.crowns -= cost;
-          state.player.hp = state.player.maxHp;
-          state.player.stamina = state.player.maxStamina;
-          state.player.focus = state.player.maxFocus;
-          state.player.statuses = [];
-          state.player.determinationAvailable = true;
+          setFlag(state, 'cf_looted_ruin', true);
+          state.player.rations += 1;
+          addItemToInventory(state, 'poultice', 1);
           return {
-            advanceDay: 1,
-            messages: [
-              free
-                ? 'Martha waves away your coin — "Cinderford never charges the savior of its bread." Warm stew and deep sleep restore you completely.'
-                : `You pay ${cost} Crowns for a straw cot by the peat hearth and wake restored.`,
-            ],
+            messages: ['Among spilled grain sacks you rescue a bundle of rations and a clean poultice.'],
           };
         },
       },
@@ -271,15 +357,13 @@ export const LOCATIONS: Record<string, LocationNode> = {
       'Flagstones wide enough for Imperial war-wagons heave upward where white roots split the mortar. Toppled milestone obelisks bear faded Vaelish edicts beside hanged deserter cages.',
     actions: [
       {
-        id: 'kc_forage',
-        label: 'Search the Roadside Milestones & Scavenge Supplies',
+        id: 'kc_milestones',
+        label: 'Milestones',
+        visible: (state) => !hasFlag(state, 'kc_milestones_checked'),
         resolve: (state) => {
-          if (hasFlag(state, 'kc_scavenged')) {
-            return { messages: ['Only windblown gravel and broken wagon spokes remain here.'] };
-          }
-          setFlag(state, 'kc_scavenged', true);
+          setFlag(state, 'kc_milestones_checked', true);
           const check = resolveCheck(state, 'wit', 11, {
-            label: 'Read Milestone Ciphers',
+            label: 'Milestone Ciphers',
             isLoreOrPerception: true,
           });
           if (check.success) {
@@ -289,15 +373,27 @@ export const LOCATIONS: Record<string, LocationNode> = {
             return {
               messages: [
                 check.logLine,
-                'Beneath a loose keystone you find an emergency courier cache (+1 Ration, +1 Torch, +8 Crowns).',
+                'Beneath a loose keystone rests an emergency courier cache with rations, a torch, and silver.',
               ],
             };
           }
           return {
+            messages: [check.logLine, 'You spot cart tracks leading into a sunken drainage ditch nearby.'],
+          };
+        },
+      },
+      {
+        id: 'kc_ditch',
+        label: 'Courier Ditch',
+        visible: (state) => hasFlag(state, 'kc_milestones_checked') && !hasFlag(state, 'kc_ditch_cleared'),
+        resolve: (state) => {
+          setFlag(state, 'kc_ditch_cleared', true);
+          addItemToInventory(state, 'ash_resin', 1);
+          return {
             messages: [
-              check.logLine,
-              'The weathered moss hides any seam; you find nothing useful.',
+              'Half-buried in ash mud sits a scorched saddlebag holding resin, though a gaunt hound snarls from the culvert.',
             ],
+            startCombat: { enemyId: 'ash_hound', canFlee: true },
           };
         },
       },
@@ -321,70 +417,89 @@ export const LOCATIONS: Record<string, LocationNode> = {
     },
     actions: [
       {
-        id: 'wb_explore_crypt',
-        label: 'Explore the Inner Reliquary (Torch/Lantern Recommended)',
-        tag: 'Key Lead',
-        visible: (state) => !hasFlag(state, 'wb_crypt_cleared'),
+        id: 'wb_outer_steps',
+        label: 'Outer Steps',
+        visible: (state) => !hasFlag(state, 'wb_steps_entered'),
         resolve: (state) => {
           const p = state.player;
           const msgs: string[] = [];
           if (p.heirloom === 'kiln_lantern') {
-            msgs.push('Your Lantern of the First Kiln bathes the tomb in steady amber light.');
+            msgs.push('Your Kiln Lantern bathes the drowned stairs in steady amber light.');
           } else if (p.torches > 0) {
             p.torches -= 1;
-            msgs.push('You strike a pitch-torch (-1 Torch), driving back the wet dark.');
+            msgs.push('You strike a pitch-torch and drive back the wet dark.');
           } else {
-            msgs.push('In the blind dark, stone splinters slice your shins (-3 HP).');
+            msgs.push('Stone splinters slice your shins in the blind dark before you feel your way down.');
             p.hp = Math.max(1, p.hp - 3);
           }
-
-          setFlag(state, 'wb_crypt_cleared', true);
-          setFlag(state, 'vorne_oath_known', true);
-          addItemToInventory(state, 'echo_shell', 1);
-          msgs.push(
-            'Upon the central sarcophagus rests a silver-inlaid tablet naming Sir Vorne\'s forgotten oath: "Hold the Crown-Gate until the First Bell answers twice — never yield to the Choir."',
-          );
-          msgs.push('You also recover a Resonant Echo-Shell (+1 Echo-Shell, sought by the Silken Cistern).');
-
-          if (p.race === 'vaelorian' || p.race === 'ael_thalor' || p.background === 'root_scholar') {
-            setFlag(state, 'kiln_cipher_learned', true);
-            recordChronicle(
-              state,
-              'Learned the First Kiln Cipher',
-              'Translated the pre-Shattering ignition sigils inside the Weeping Barrow.',
-              'seal',
-            );
-            msgs.push(
-              `Your ${p.race === 'vaelorian' ? 'High Vaelish lineage' : p.race === 'ael_thalor' ? 'Star-Script mastery' : 'Root-Scholar training'} decodes the scorched altar frieze! You learn the First Kiln Cipher (Counter-Seal unlocked).`,
-            );
-          } else {
-            const check = resolveCheck(state, 'wit', 13, {
-              label: 'Decipher Kiln Altar',
-              isLoreOrPerception: true,
-            });
-            msgs.push(check.logLine);
-            if (check.success) {
-              setFlag(state, 'kiln_cipher_learned', true);
-              recordChronicle(
-                state,
-                'Learned the First Kiln Cipher',
-                'Pieced together the pre-Shattering Kiln sigils from the tomb lintel.',
-                'seal',
-              );
-              msgs.push('You copy the First Kiln Cipher into your travel-slate (Counter-Seal unlocked!).');
-            } else {
-              msgs.push("The broken glyphs elude your grasp, though Vorne's oath tablet is clear.");
-            }
-          }
-
+          setFlag(state, 'wb_steps_entered', true);
+          msgs.push('Below the threshold wait an inner sarcophagus chamber and a sealed frieze wall.');
           return { messages: msgs };
         },
       },
       {
+        id: 'wb_inner_crypt',
+        label: 'Inner Crypt',
+        visible: (state) => hasFlag(state, 'wb_steps_entered') && !hasFlag(state, 'wb_crypt_cleared'),
+        resolve: (state) => {
+          setFlag(state, 'wb_crypt_cleared', true);
+          setFlag(state, 'vorne_oath_known', true);
+          addItemToInventory(state, 'echo_shell', 1);
+          return {
+            messages: [
+              'Upon the central sarcophagus rests a silver-inlaid tablet naming Sir Vorne\'s forgotten oath: "Hold the Crown-Gate until the First Bell answers twice — never yield to the Choir." Beside it lies a Resonant Echo-Shell.',
+            ],
+          };
+        },
+      },
+      {
+        id: 'wb_altar_frieze',
+        label: 'Altar Frieze',
+        visible: (state) => hasFlag(state, 'wb_crypt_cleared') && !hasFlag(state, 'kiln_cipher_learned'),
+        resolve: (state) => {
+          const p = state.player;
+          if (p.race === 'vaelorian' || p.race === 'ael_thalor' || p.background === 'root_scholar') {
+            setFlag(state, 'kiln_cipher_learned', true);
+            recordChronicle(
+              state,
+              'Learned First Kiln Cipher',
+              'Translated the pre-Shattering ignition sigils inside the Weeping Barrow.',
+              'seal',
+            );
+            return {
+              messages: [
+                'Reading the ancient script directly from the scorched marble, you master the First Kiln Cipher.',
+              ],
+            };
+          }
+          const check = resolveCheck(state, 'wit', 13, {
+            label: 'Kiln Altar',
+            isLoreOrPerception: true,
+          });
+          if (check.success) {
+            setFlag(state, 'kiln_cipher_learned', true);
+            recordChronicle(
+              state,
+              'Learned First Kiln Cipher',
+              'Pieced together the pre-Shattering Kiln sigils from the tomb lintel.',
+              'seal',
+            );
+            return {
+              messages: [check.logLine, 'You copy the First Kiln Cipher onto your travel-slate.'],
+            };
+          }
+          return {
+            messages: [check.logLine, 'The broken glyphs refuse to cohere under your lamp.'],
+          };
+        },
+      },
+      {
         id: 'wb_durnfolk_vault',
-        label: '[Durnfolk] Trigger the Hidden Basalt Counterweight Vault',
-        tag: 'Durnfolk Only',
-        visible: (state) => state.player.race === 'durnfolk' && !hasFlag(state, 'wb_dwarf_vault'),
+        label: 'Basalt Vault',
+        visible: (state) =>
+          state.player.race === 'durnfolk' &&
+          hasFlag(state, 'wb_steps_entered') &&
+          !hasFlag(state, 'wb_dwarf_vault'),
         resolve: (state) => {
           setFlag(state, 'wb_dwarf_vault', true);
           addItemToInventory(state, 'runic_warhammer', 1);
@@ -397,8 +512,7 @@ export const LOCATIONS: Record<string, LocationNode> = {
           );
           return {
             messages: [
-              'Tapping the third lintel with your knuckle, you hear a hollow stone pin drop into place. A hidden alcove rotates open!',
-              'Inside lies a Khaz-Durn Runic Warhammer and 20 ancient Crowns!',
+              'Tapping the third lintel with your knuckle drops a hidden stone pin. A counterweight chamber swings open, revealing a Runic Warhammer and ancient silver.',
             ],
           };
         },
@@ -414,12 +528,59 @@ export const LOCATIONS: Record<string, LocationNode> = {
     neighbors: ['cinderford', 'silken_cistern'],
     asciiPos: { row: 4, col: 0, code: 'AF' },
     description: () =>
-      'Knee-deep gray bog dotted with sunken stone lanterns and pale, bell-shaped fungi. Beneath the cattails, an ancient stone culvert leads downward toward the Silken Cistern.',
+      'Knee-deep gray bog dotted with sunken stone lanterns and pale, bell-shaped fungi. Beneath the cattails, an ancient stone culvert descends toward the Silken Cistern.',
     actions: [
       {
+        id: 'af_herbs',
+        label: 'Herb Bank',
+        visible: (state) => !hasFlag(state, 'af_herbs_picked'),
+        resolve: (state) => {
+          setFlag(state, 'af_herbs_picked', true);
+          addItemToInventory(state, 'bog_herb', 2);
+          return {
+            messages: ['You cut two bundles of silver-veined bog herb from the reeds.'],
+          };
+        },
+      },
+      {
+        id: 'af_stones',
+        label: 'Stepping Stones',
+        visible: (state) => !hasFlag(state, 'af_stones_crossed'),
+        resolve: (state) => {
+          const check = resolveCheck(state, 'agility', 12, { label: 'Mire Stones' });
+          setFlag(state, 'af_stones_crossed', true);
+          if (check.success) {
+            return {
+              messages: [check.logLine, 'You cross the bone-white stones cleanly to reach a sunken shrine.'],
+            };
+          }
+          state.player.hp = Math.max(1, state.player.hp - 4);
+          return {
+            messages: [
+              check.logLine,
+              'A slab tilts into freezing mire and thorn-leeches tear your calf before you reach the shrine.',
+            ],
+          };
+        },
+      },
+      {
+        id: 'af_shrine',
+        label: 'Sunken Shrine',
+        visible: (state) => hasFlag(state, 'af_stones_crossed') && !hasFlag(state, 'af_shrine_done'),
+        resolve: (state) => {
+          setFlag(state, 'af_shrine_done', true);
+          addItemToInventory(state, 'poultice', 1);
+          state.player.focus = Math.min(state.player.maxFocus, state.player.focus + 3);
+          return {
+            messages: [
+              'Beneath the drowned altar you retrieve a dry poultice and steady your mind.',
+            ],
+          };
+        },
+      },
+      {
         id: 'af_grixi_salvage',
-        label: '[Grixi] Skim the Mire-Vents for Volatile Alchemy & Salvage',
-        tag: 'Grixi Only',
+        label: 'Mire Vents',
         visible: (state) => state.player.race === 'grixi' && !hasFlag(state, 'af_grixi_skimmed'),
         resolve: (state) => {
           setFlag(state, 'af_grixi_skimmed', true);
@@ -428,33 +589,7 @@ export const LOCATIONS: Record<string, LocationNode> = {
           state.player.crowns += 16;
           return {
             messages: [
-              'Knowing the Under-Warren drainage traps by smell alone, you fish out an intact brass canister (+1 Fire-Pot, +1 Antitoxin, +16 Crowns).',
-            ],
-          };
-        },
-      },
-      {
-        id: 'af_wade_shrine',
-        label: 'Search the Sunken Wayfarer Shrine in the Mire',
-        visible: (state) => !hasFlag(state, 'af_shrine_done'),
-        resolve: (state) => {
-          setFlag(state, 'af_shrine_done', true);
-          const check = resolveCheck(state, 'agility', 12, { label: 'Cross Bog Stepping-Stones' });
-          if (check.success) {
-            addItemToInventory(state, 'poultice', 1);
-            state.player.focus = Math.min(state.player.maxFocus, state.player.focus + 3);
-            return {
-              messages: [
-                check.logLine,
-                'You leap cleanly across the bone-white stones and claim a dry offering satchel (+1 Poultice, +3 Focus).',
-              ],
-            };
-          }
-          state.player.hp = Math.max(1, state.player.hp - 4);
-          return {
-            messages: [
-              check.logLine,
-              'A slab tilts into freezing mire; thorn-leeches tear your calf (-4 HP) before you scramble back.',
+              'Knowing Under-Warren drainage traps by scent alone, you fish out an intact brass canister holding alchemical pots and silver.',
             ],
           };
         },
@@ -480,7 +615,7 @@ export const LOCATIONS: Record<string, LocationNode> = {
       return 'Vast subterranean vaults draped in pale luminous spider-silk above mirror-still black water. Blind Matrons stand rigid beside the Loom-Gate, turning sightless faces toward your masculine footstep.';
     },
     shop: {
-      name: 'Cistern Loom-Apothecary',
+      name: 'Loom Apothecary',
       keeper: 'Sister Orla',
       greeting: (state) =>
         hasFlag(state, 'stole_cistern_vesper')
@@ -495,136 +630,176 @@ export const LOCATIONS: Record<string, LocationNode> = {
         { itemId: 'silken_veil', price: 42 },
       ],
     },
+    npcs: [
+      {
+        id: 'matron_veyra',
+        name: 'Matron Veyra',
+        shortLabel: 'Matron Veyra',
+        visible: (state) => !hasFlag(state, 'stole_cistern_vesper'),
+        greeting: (state) =>
+          state.player.sex === 'female'
+            ? '"Step past the silk, Sister. Let our blind looms weigh your breath."'
+            : '"Halt at the black water, man. Speak why the loom should spare your weight."',
+        topics: [
+          {
+            id: 'veyra_shell',
+            label: 'Echo Shell',
+            visible: (state) => hasItem(state, 'echo_shell') && !hasFlag(state, 'seal_of_silence'),
+            resolve: (state) => {
+              consumeInventoryItem(state, 'echo_shell', 1);
+              setFlag(state, 'seal_of_silence', true);
+              adjustFaction(state, 'silken_cistern', 3);
+              state.player.maxFocus += 1;
+              state.player.focus = state.player.maxFocus;
+              recordChronicle(
+                state,
+                'Earned Seal of Silence',
+                'Returned the Echo-Shell to the blind Matrons and received their counter-harmonic Seal.',
+                'seal',
+              );
+              return {
+                stayInDialogue: true,
+                messages: [
+                  `Matron Veyra gasps as you lay the Echo-Shell on the altar. "The barrow's lost voice! Keep faith with the deep waters, ${pronouns(state.player.sex).formal}." She binds the silver Seal of Silence around your wrist.`,
+                ],
+              };
+            },
+          },
+          {
+            id: 'veyra_sisterhood',
+            label: 'Sisterhood',
+            visible: (state) => state.player.sex === 'female' && !hasFlag(state, 'seal_of_silence'),
+            resolve: (state) => {
+              adjustFaction(state, 'silken_cistern', 1);
+              const check = resolveCheck(state, 'wit', 11, {
+                label: 'Sisterhood Rite',
+                isLoreOrPerception: true,
+              });
+              if (check.success) {
+                setFlag(state, 'seal_of_silence', true);
+                recordChronicle(
+                  state,
+                  'Earned Seal of Silence',
+                  'Passed the Unveiled Sisterhood rite before the Matrons of the Silken Cistern.',
+                  'seal',
+                );
+                return {
+                  stayInDialogue: true,
+                  messages: [
+                    'Veyra welcomes you behind the inner veil. Your quiet pulse stills the silk basin, and she binds the Seal of Silence to your wrist.',
+                  ],
+                };
+              }
+              return {
+                stayInDialogue: true,
+                messages: [
+                  'The silk trembles at the edge of the basin. "Bring us the Echo-Shell from the Weeping Barrow, Sister, or still your breath."',
+                ],
+              };
+            },
+          },
+          {
+            id: 'veyra_liturgy',
+            label: 'Liturgy',
+            visible: (state) =>
+              state.player.sex === 'male' &&
+              (state.player.race === 'ael_thalor' || state.player.background === 'shrine_penitent') &&
+              !hasFlag(state, 'seal_of_silence'),
+            resolve: (state) => {
+              const check = resolveCheck(state, 'grit', 13, {
+                label: 'Water Liturgy',
+                isLoreOrPerception: true,
+              });
+              if (check.success) {
+                setFlag(state, 'seal_of_silence', true);
+                adjustFaction(state, 'silken_cistern', 2);
+                recordChronicle(
+                  state,
+                  'Earned Seal of Silence',
+                  "Won the Matrons' trust through ancient liturgy.",
+                  'seal',
+                );
+                return {
+                  stayInDialogue: true,
+                  messages: [
+                    'Matron Veyra bows slightly as your pre-Shattering water-liturgy echoes across the cistern. "Take the Seal of Silence."',
+                  ],
+                };
+              }
+              return {
+                stayInDialogue: true,
+                messages: [
+                  'The blind weavers turn away. "Bring the Echo-Shell from the Barrow, man, or spill blood upon the threshold."',
+                ],
+              };
+            },
+          },
+          {
+            id: 'veyra_blood',
+            label: 'Blood Oath',
+            visible: (state) =>
+              state.player.sex === 'male' && !hasFlag(state, 'seal_of_silence') && state.player.hp > 6,
+            resolve: (state) => {
+              const check = resolveCheck(state, 'grit', 14, { label: 'Loom Blood-Oath' });
+              state.player.hp -= 5;
+              if (check.success) {
+                setFlag(state, 'seal_of_silence', true);
+                adjustFaction(state, 'silken_cistern', 1);
+                recordChronicle(
+                  state,
+                  'Blood-Oath of Cistern',
+                  'Spilled your own blood upon the Loom-threshold to earn the Seal of Silence.',
+                  'seal',
+                );
+                return {
+                  stayInDialogue: true,
+                  messages: [
+                    'You draw steel across your palm. Your blood sinks cleanly into the black water without waking the Choir-spores, earning the Seal of Silence.',
+                  ],
+                };
+              }
+              return {
+                stayInDialogue: true,
+                messages: [
+                  'The dark water ripples angrily against your bleeding palm. "Not enough. Bring the Echo-Shell."',
+                ],
+              };
+            },
+          },
+          {
+            id: 'veyra_belfry',
+            label: 'Belfry',
+            resolve: (state) => ({
+              stayInDialogue: true,
+              messages: [
+                hasFlag(state, 'seal_of_silence')
+                  ? '"With our Seal around your wrist, Malakor\'s Drowning Toll cannot shatter your mind," Veyra whispers.'
+                  : '"Malakor prepares the Third Toll beneath the Belfry. Without our Seal or severed roots beneath the forge, his bell crushes bone."',
+              ],
+            }),
+          },
+        ],
+      },
+    ],
     actions: [
       {
-        id: 'sc_audience',
-        label: "Seek the Matrons' Audience & the Seal of Silence",
-        tag: 'Sex & Race Reactive / Seal',
-        visible: (state) =>
-          !hasFlag(state, 'stole_cistern_vesper') && !hasFlag(state, 'seal_of_silence'),
+        id: 'sc_pool_rest',
+        label: 'Quiet Pool',
+        visible: (state) => !hasFlag(state, 'stole_cistern_vesper'),
         resolve: (state) => {
-          const p = state.player;
-          const hasShell = hasItem(state, 'echo_shell');
-
-          if (hasShell) {
-            consumeInventoryItem(state, 'echo_shell', 1);
-            setFlag(state, 'seal_of_silence', true);
-            adjustFaction(state, 'silken_cistern', 3);
-            p.maxFocus += 1;
-            p.focus = p.maxFocus;
-            recordChronicle(
-              state,
-              'Earned the Seal of Silence',
-              'Returned the Resonant Echo-Shell to the blind Matrons and received their counter-harmonic Seal.',
-              'seal',
-            );
-            return {
-              messages: [
-                `You lay the Resonant Echo-Shell onto the Loom-Altar. Matron Veyra gasps: "The barrow's lost voice! Whatever your blood, ${pronouns(p.sex).formal}, you keep faith with the deep waters."`,
-                "She binds a silver thread around your wrist: Seal of Silence acquired (+1 Max Focus, +3 Cistern, weakens Malakor's Drowning Toll!).",
-              ],
-            };
-          }
-
-          if (p.sex === 'female') {
-            adjustFaction(state, 'silken_cistern', 1);
-            const check = resolveCheck(state, 'wit', 11, {
-              label: 'Unveiled Sisterhood Rite',
-              isLoreOrPerception: true,
-            });
-            if (check.success) {
-              setFlag(state, 'seal_of_silence', true);
-              recordChronicle(
-                state,
-                'Earned the Seal of Silence',
-                'Passed the Unveiled Sisterhood rite before the Matrons of the Silken Cistern.',
-                'seal',
-              );
-              return {
-                messages: [
-                  'Matron Veyra welcomes you past the inner veil: "Sister, let us hear whether your breath carries the Root\'s falsehood or the quiet water."',
-                  check.logLine,
-                  'Your pulse steadies the silk basin. You receive the Seal of Silence (Counter-Seal unlocked!).',
-                ],
-              };
-            }
-            return {
-              messages: [
-                'Matron Veyra welcomes you as Sister, though the silk trembles during the listening rite.',
-                check.logLine,
-                '"Bring us the Echo-Shell from the Weeping Barrow, Sister, or return when your spirit stills."',
-              ],
-            };
-          }
-
-          if (p.race === 'ael_thalor' || p.background === 'shrine_penitent') {
-            const check = resolveCheck(state, 'grit', 13, {
-              label: 'Canticle at the Silk Threshold',
-              isLoreOrPerception: true,
-            });
-            if (check.success) {
-              setFlag(state, 'seal_of_silence', true);
-              adjustFaction(state, 'silken_cistern', 2);
-              recordChronicle(
-                state,
-                'Earned the Seal of Silence',
-                "Won the Matrons' rare trust through ancient liturgy despite their distrust of men.",
-                'seal',
-              );
-              return {
-                messages: [
-                  'The Matrons bar the bridge against a male intruder until you intone the pre-Shattering water-liturgy.',
-                  check.logLine,
-                  'Veyra bows slightly: "An unbroken tongue in an age of noise. Take the Seal of Silence."',
-                ],
-              };
-            }
-            return {
-              messages: [
-                check.logLine,
-                'The Matrons turn their blind heads away. "Return with the Weeping Barrow\'s Echo-Shell, man, or spill blood upon the threshold to prove your oath."',
-              ],
-            };
-          }
-
-          if (p.hp > 6) {
-            const check = resolveCheck(state, 'grit', 14, { label: 'Blood-Oath on the Loom' });
-            p.hp -= 5;
-            if (check.success) {
-              setFlag(state, 'seal_of_silence', true);
-              adjustFaction(state, 'silken_cistern', 1);
-              recordChronicle(
-                state,
-                'Blood-Oath of the Cistern',
-                'Spilled your own blood upon the Loom-threshold to earn the Seal of Silence.',
-                'seal',
-              );
-              return {
-                messages: [
-                  '"No man crosses unbled," Matron Veyra decrees. You draw steel across your palm (-5 HP).',
-                  check.logLine,
-                  'Your blood sinks cleanly without waking the Choir-spores. You receive the Seal of Silence!',
-                ],
-              };
-            }
-            return {
-              messages: [
-                'You cut your palm (-5 HP), yet the dark water ripples angrily.',
-                check.logLine,
-                '"Not enough. Bring the Echo-Shell from the Weeping Barrow."',
-              ],
-            };
-          }
-
+          state.player.hp = Math.min(state.player.maxHp, state.player.hp + 12);
+          state.player.focus = state.player.maxFocus;
+          state.player.stamina = state.player.maxStamina;
+          state.player.statuses = [];
           return {
-            messages: ["You are too wounded to attempt the Matrons' Blood-Oath safely."],
+            advanceDay: 1,
+            messages: ['Cool subterranean water washes away fatigue and lingering root-spores.'],
           };
         },
       },
       {
         id: 'sc_steal_font',
-        label: 'Desecrate & Drain the Sacred Vesper-Font (Risky Power vs Cistern Wrath)',
-        tag: 'Dark Choice',
+        label: 'Vesper Font',
         visible: (state) => !hasFlag(state, 'stole_cistern_vesper'),
         resolve: (state) => {
           setFlag(state, 'stole_cistern_vesper', true);
@@ -635,30 +810,14 @@ export const LOCATIONS: Record<string, LocationNode> = {
           state.player.crowns += 45;
           recordChronicle(
             state,
-            'Plundered the Vesper-Font',
+            'Plundered Vesper-Font',
             'Siphoned the sacred cistern amber, turning the blind Matrons into mortal enemies.',
             'dark',
           );
           return {
             messages: [
-              'While the watchers chant, you shatter the silver basin and siphon pure soul-amber into your flask (+2 Max Focus, +45 Crowns, +2 Choir Resonance)!',
-              'Behind you, the Matrons scream in a single discordant voice — Silk-Vengeance assassins now hunt your trail (-5 Silken Cistern).',
+              'While the watchers chant, you shatter the silver basin and siphon pure soul-amber into your flask. Behind you, the Matrons scream in a single discordant voice.',
             ],
-          };
-        },
-      },
-      {
-        id: 'sc_pool_rest',
-        label: 'Bathe in the Quiet Cistern Waters (Heal 12 HP & Full Focus, +1 Day)',
-        visible: (state) => !hasFlag(state, 'stole_cistern_vesper'),
-        resolve: (state) => {
-          state.player.hp = Math.min(state.player.maxHp, state.player.hp + 12);
-          state.player.focus = state.player.maxFocus;
-          state.player.stamina = state.player.maxStamina;
-          state.player.statuses = [];
-          return {
-            advanceDay: 1,
-            messages: ['Cool subterranean water washes away fatigue and root-spores (+12 HP, Full Focus/Stamina).'],
           };
         },
       },
@@ -674,16 +833,29 @@ export const LOCATIONS: Record<string, LocationNode> = {
     asciiPos: { row: 0, col: 1, code: 'SW' },
     description: (state) => {
       if (state.player.race === 'ael_thalor') {
-        return "Colossal ivory-stone trunks spiral toward a pale sky — your exiled kin's ancient home, now strangled by vibrating pale root-veins.";
+        return "Colossal ivory-stone trunks spiral toward a pale sky — your exiled kin's ancient home, now strangled by vibrating root-veins.";
       }
       return 'Fossilized white trunks tower like cathedral ribs. Pale blossoms chime faintly when the wind brushes them, and antlers scrape somewhere in the silver brush.';
     },
     actions: [
       {
+        id: 'sw_resin_grove',
+        label: 'Resin Grove',
+        visible: (state) => !hasFlag(state, 'sw_grove_searched'),
+        resolve: (state) => {
+          setFlag(state, 'sw_grove_searched', true);
+          addItemToInventory(state, 'ash_resin', 2);
+          return {
+            messages: [
+              'You scrape volatile amber resin from petrified boughs and clear a deer trail into the Heart-Glade.',
+            ],
+          };
+        },
+      },
+      {
         id: 'sw_star_stag',
-        label: 'Confront the Corrupted Star-Stag at the Heart-Glade',
-        tag: 'Elite / Race Reactive',
-        visible: (state) => !hasFlag(state, 'star_stag_resolved'),
+        label: 'Heart Glade',
+        visible: (state) => hasFlag(state, 'sw_grove_searched') && !hasFlag(state, 'star_stag_resolved'),
         resolve: (state) => {
           if (state.player.race === 'ael_thalor') {
             setFlag(state, 'star_stag_resolved', true);
@@ -697,15 +869,14 @@ export const LOCATIONS: Record<string, LocationNode> = {
             );
             return {
               messages: [
-                '[Ael-Thalor] You kneel and sing the elder Memory-Canticle. The great Star-Stag halts mid-charge, shaking the choking pale vines from its silver rack.',
-                'Bowing its head, it leaves a Silver Star-Glaive embedded in the mossy plinth (+1 Star-Glaive, +1 Max Focus).',
+                'You kneel and sing the elder Memory-Canticle. The great Star-Stag halts, shakes pale vines from its silver antlers, and leaves a Star-Glaive gleaming in the mossy plinth.',
               ],
             };
           }
 
           return {
             messages: [
-              'A towering stag plated in chalky bark bursts from the petrified ferns, pale chimes rattling from its antlers!',
+              'A towering stag plated in chalky bark bursts from the petrified ferns, pale chimes rattling from its antlers.',
             ],
             startCombat: {
               enemyId: 'star_stag',
@@ -722,9 +893,9 @@ export const LOCATIONS: Record<string, LocationNode> = {
       },
       {
         id: 'sw_sever_conduit',
-        label: 'Sever the Western Pale-Root Conduit',
-        tag: 'Counter-Seal',
-        visible: (state) => !hasFlag(state, 'root_conduit_severed'),
+        label: 'Root Conduit',
+        visible: (state) =>
+          hasFlag(state, 'star_stag_resolved') && !hasFlag(state, 'root_conduit_severed'),
         resolve: (state) => {
           const p = state.player;
           if (p.abilities.includes('kiln_spark') || p.abilities.includes('cinder_brand') || hasItem(state, 'fire_pot')) {
@@ -740,12 +911,12 @@ export const LOCATIONS: Record<string, LocationNode> = {
             );
             return {
               messages: [
-                "Flame tears into the throbbing pale taproot! The forest shudders as the Belfry's outer armor-conduit snaps (Counter-Seal unlocked!).",
+                "Flame tears into the throbbing pale taproot. The forest shudders as the Belfry's outer armor-conduit snaps.",
               ],
             };
           }
 
-          const check = resolveCheck(state, 'might', 14, { label: 'Hack Through Root-Core' });
+          const check = resolveCheck(state, 'might', 14, { label: 'Root-Core' });
           if (check.success) {
             setFlag(state, 'root_conduit_severed', true);
             recordChronicle(
@@ -757,17 +928,14 @@ export const LOCATIONS: Record<string, LocationNode> = {
             return {
               messages: [
                 check.logLine,
-                "With brutal strokes you sever the pulsing conduit! Sap sprays across the snow as Malakor's root-aegis weakens (Counter-Seal unlocked!).",
+                "With brutal strokes you sever the pulsing conduit, starving Malakor's bark-aegis.",
               ],
             };
           }
 
           p.hp = Math.max(1, p.hp - 5);
           return {
-            messages: [
-              check.logLine,
-              'The iron-hard root snaps back, whipping your shoulder (-5 HP). Fire or greater strength is needed.',
-            ],
+            messages: [check.logLine, 'The iron-hard root lashes back across your shoulder.'],
           };
         },
       },
@@ -787,8 +955,7 @@ export const LOCATIONS: Record<string, LocationNode> = {
     actions: [
       {
         id: 'df_warden',
-        label: 'Confront or Bypass the Basalt Kiln-Warden',
-        tag: 'Elite / Race Reactive',
+        label: 'Sluice Hall',
         visible: (state) => !hasFlag(state, 'forge_cleared'),
         resolve: (state) => {
           const p = state.player;
@@ -797,19 +964,19 @@ export const LOCATIONS: Record<string, LocationNode> = {
             addItemToInventory(state, 'basalt_plate', 1);
             recordChronicle(
               state,
-              'Commanded the Forge-Warden',
-              'Used ancestral Durnfolk master-signs to stand down the Basalt Kiln-Warden peacefully.',
+              'Commanded Forge-Warden',
+              'Used ancestral Durnfolk master-signs to stand down the Basalt Kiln-Warden.',
               'durnfolk',
             );
             return {
               messages: [
-                '[Durnfolk] You rap the ancient guild-cadence twice upon your helm. The towering Basalt Kiln-Warden kneels in grinding stone deference, opening the armory locker (+1 Basalt-Kiln Cuirass!).',
+                'You rap the ancient guild-cadence twice upon your helm. The towering Basalt Kiln-Warden kneels in grinding stone deference, opening the armory locker.',
               ],
             };
           }
           if (p.race === 'grixi') {
             const check = resolveCheck(state, 'agility', 12, {
-              label: 'Slip Chitin-Flue Bypass',
+              label: 'Flue Bypass',
               isCraftOrStealth: true,
             });
             if (check.success) {
@@ -818,20 +985,20 @@ export const LOCATIONS: Record<string, LocationNode> = {
               return {
                 messages: [
                   check.logLine,
-                  '[Grixi] You wriggle through the ash-exhaust duct behind the golem, pull its pressure pin, and loot the Basalt-Kiln Cuirass without waking it!',
+                  'You wriggle through the ash-exhaust duct behind the golem, pull its pressure pin, and claim the Basalt Cuirass.',
                 ],
               };
             }
           }
 
           return {
-            messages: ['Steam hisses from copper joints as the Basalt Kiln-Warden lurches forward with a furnace hammer!'],
+            messages: ['Steam hisses from copper joints as the Basalt Kiln-Warden lurches forward with a furnace hammer.'],
             startCombat: {
               enemyId: 'forge_automaton',
               canFlee: true,
               onVictoryFlag: 'forge_cleared',
               onVictoryChronicle: {
-                title: 'Shattered the Kiln-Warden',
+                title: 'Shattered Kiln-Warden',
                 summary: 'Defeated the ancient Durnfolk automaton inside the Drowned Forge-Vault.',
                 tag: 'combat',
               },
@@ -841,33 +1008,32 @@ export const LOCATIONS: Record<string, LocationNode> = {
       },
       {
         id: 'df_hone_weapon',
-        label: 'Hone Your Equipped Weapon at the Glowing Runic Brazier',
+        label: 'Runic Brazier',
         visible: (state) => hasFlag(state, 'forge_cleared') && !state.player.weaponHoned,
         resolve: (state) => {
           state.player.weaponHoned = true;
           return {
             messages: [
-              'You draw your weapon across the warm basalt whetstone. Sparks of old Kiln-steel kiss the edge (+1 permanent Weapon Damage!).',
+              'You draw your weapon across the warm basalt whetstone. Sparks of old Kiln-steel kiss the edge.',
             ],
           };
         },
       },
       {
         id: 'df_drain_conduit',
-        label: 'Shut the Sluice-Valve & Choke the Abyssal Root-Conduit',
-        tag: 'Counter-Seal',
+        label: 'Abyssal Valve',
         visible: (state) => hasFlag(state, 'forge_cleared') && !hasFlag(state, 'root_conduit_severed'),
         resolve: (state) => {
           setFlag(state, 'root_conduit_severed', true);
           recordChronicle(
             state,
-            'Choked Deep Root Conduit',
+            'Choked Deep Conduit',
             "Closed the flooded Durnfolk sluice-valves, starving Malakor's root-shield.",
             'seal',
           );
           return {
             messages: [
-              "You haul the heavy bronze wheel shut. Superheated brine floods the lower root-shaft, crippling Malakor's Belfry Aegis (Counter-Seal unlocked!).",
+              "You haul the heavy bronze wheel shut. Superheated brine floods the lower root-shaft, crippling Malakor's Belfry Aegis.",
             ],
           };
         },
@@ -886,69 +1052,109 @@ export const LOCATIONS: Record<string, LocationNode> = {
       if (hasFlag(state, 'vorne_resolved')) {
         return 'Wind howls through the ruined gate-arch overlooking the Sunken Belfry below. An empty bronze chair faces the chasm.';
       }
-      return 'A shattered parapet overlooking the abyssal crater of the Sunken Belfry. On a bronze plinth sits Sir Vorne, the Bell-Knight, motionless save for the slow ring of his helm in the wind.';
+      return 'A shattered parapet overlooking the abyssal crater of the Sunken Belfry. On a bronze plinth sits Sir Vorne, motionless save for the slow ring of his bell-helm in the wind.';
     },
-    actions: [
+    npcs: [
       {
-        id: 'cw_vorne',
-        label: 'Approach Sir Vorne, the Hollowed Bell-Knight',
-        tag: 'Mini-Boss / Memory Reactive',
+        id: 'sir_vorne_npc',
+        name: 'Sir Vorne',
+        shortLabel: 'Sir Vorne',
         visible: (state) => !hasFlag(state, 'vorne_resolved'),
-        resolve: (state) => {
-          const p = state.player;
-          if (hasFlag(state, 'vorne_oath_known')) {
-            setFlag(state, 'vorne_resolved', true);
-            setFlag(state, 'vorne_redeemed', true);
-            addItemToInventory(state, 'bell_cleaver', 1);
-            recordChronicle(
-              state,
-              'Redeemed Sir Vorne',
-              'Spoke the forgotten Weeping Barrow oath, freeing Sir Vorne to strike at the Belfry steps.',
-              'vorne',
-            );
-            return {
-              messages: [
-                'Sir Vorne rises slowly, bell-helm groaning — until you recite the exact oath engraved in the Weeping Barrow.',
-                "He freezes. A long, rusted sigh escapes his visor: \"The First Bell... I kept the gate.\" He presses his Bell-Cleaver into your hands and descends toward the Belfry bridge to break Malakor's guard (+1 Vorne's Bell-Cleaver!).",
-              ],
-            };
-          }
-
-          if (p.race === 'vaelorian' || p.background === 'ashen_blade') {
-            const check = resolveCheck(state, 'grit', 14, {
-              label: 'Challenge Knightly Oath',
-            });
-            if (check.success) {
+        greeting: () =>
+          'Beneath a great bronze bell-helm, Sir Vorne grips his massive cleaver without rising.',
+        topics: [
+          {
+            id: 'vorne_oath',
+            label: 'Recite Oath',
+            visible: (state) => hasFlag(state, 'vorne_oath_known'),
+            resolve: (state) => {
               setFlag(state, 'vorne_resolved', true);
               setFlag(state, 'vorne_redeemed', true);
               addItemToInventory(state, 'bell_cleaver', 1);
               recordChronicle(
                 state,
                 'Redeemed Sir Vorne',
-                'Recalled Sir Vorne to knightly honor at the Crown-Gate Watchtower.',
+                'Spoke the forgotten Weeping Barrow oath, freeing Sir Vorne to strike at the Belfry steps.',
                 'vorne',
               );
               return {
                 messages: [
-                  check.logLine,
-                  "You stand unyielding and utter the Vaelish knight's dismissal. Sir Vorne lowers his blade, yields his Bell-Cleaver, and pledges his final charge to break Malakor's choir.",
+                  'You recite the exact oath engraved in the Weeping Barrow. Sir Vorne freezes, sighs deeply through his visor, presses his Bell-Cleaver into your hands, and marches down to break Malakor\'s choir.',
                 ],
               };
-            }
-          }
-
-          return {
-            messages: ['"None pass the Crown-Gate unweighed," Sir Vorne rumbles, hoisting his massive Bell-Cleaver!'],
-            startCombat: {
-              enemyId: 'sir_vorne',
-              canFlee: true,
-              onVictoryFlag: 'vorne_resolved',
-              onVictoryChronicle: {
-                title: 'Slain Sir Vorne',
-                summary: 'Defeated Sir Vorne, the Bell-Knight, in single combat at the Crown-Gate.',
-                tag: 'vorne',
-              },
             },
+          },
+          {
+            id: 'vorne_challenge',
+            label: 'Challenge',
+            visible: (state) =>
+              state.player.race === 'vaelorian' || state.player.background === 'ashen_blade',
+            resolve: (state) => {
+              const check = resolveCheck(state, 'grit', 14, { label: 'Knightly Oath' });
+              if (check.success) {
+                setFlag(state, 'vorne_resolved', true);
+                setFlag(state, 'vorne_redeemed', true);
+                addItemToInventory(state, 'bell_cleaver', 1);
+                recordChronicle(
+                  state,
+                  'Redeemed Sir Vorne',
+                  'Recalled Sir Vorne to knightly honor at the Crown-Gate Watchtower.',
+                  'vorne',
+                );
+                return {
+                  messages: [
+                    check.logLine,
+                    'You utter the old Vaelish knight dismissal. Sir Vorne lowers his blade, yields his Bell-Cleaver, and pledges his final charge to break Malakor\'s choir.',
+                  ],
+                };
+              }
+              return {
+                messages: [check.logLine, 'Sir Vorne rises slowly, bell-helm tolling once as he draws his cleaver.'],
+                startCombat: {
+                  enemyId: 'sir_vorne',
+                  canFlee: true,
+                  onVictoryFlag: 'vorne_resolved',
+                  onVictoryChronicle: {
+                    title: 'Slain Sir Vorne',
+                    summary: 'Defeated Sir Vorne in single combat at the Crown-Gate.',
+                    tag: 'vorne',
+                  },
+                },
+              };
+            },
+          },
+          {
+            id: 'vorne_fight',
+            label: 'Draw Steel',
+            resolve: () => ({
+              messages: ['"None pass the Crown-Gate unweighed," Sir Vorne rumbles, hoisting his massive Bell-Cleaver.'],
+              startCombat: {
+                enemyId: 'sir_vorne',
+                canFlee: true,
+                onVictoryFlag: 'vorne_resolved',
+                onVictoryChronicle: {
+                  title: 'Slain Sir Vorne',
+                  summary: 'Defeated Sir Vorne in single combat at the Crown-Gate.',
+                  tag: 'vorne',
+                },
+              },
+            }),
+          },
+        ],
+      },
+    ],
+    actions: [
+      {
+        id: 'cw_parapet',
+        label: 'Parapet',
+        visible: (state) => !hasFlag(state, 'cw_parapet_checked'),
+        resolve: (state) => {
+          setFlag(state, 'cw_parapet_checked', true);
+          addItemToInventory(state, 'poultice', 1);
+          return {
+            messages: [
+              'Tucked behind a fallen battlement you uncover a dry watchman satchel and a clear vantage over the Sunken Belfry below.',
+            ],
           };
         },
       },
@@ -964,56 +1170,58 @@ export const LOCATIONS: Record<string, LocationNode> = {
     neighbors: ['crown_watchtower', 'drowned_forge'],
     asciiPos: { row: 2, col: 2, code: 'SB' },
     description: () =>
-      'At the bottom of a drowned stone amphitheater hangs an upside-down bronze bell as large as a keep. Pale roots weave a living throne beneath it where Malakor, the Choir-Husk, awaits the Third Drowning Toll.',
+      'At the bottom of a drowned stone amphitheater hangs an upside-down bronze bell as large as a keep. Pale roots weave a living throne beneath it where Malakor awaits the Third Drowning Toll.',
     actions: [
       {
         id: 'sb_confront_malakor',
-        label: 'Descend into the Choir-Pit and Confront Malakor, the Choir-Husk',
-        tag: 'FINAL BOSS',
+        label: 'Choir Pit',
         visible: (state) => !hasFlag(state, 'malakor_slain'),
         resolve: (state) => {
           const brokenSeals: string[] = [];
           const msgs: string[] = [
-            'You step onto the cracked bronze dais. Above you, the great drowned bell trembles with gathered air.',
+            'You descend onto the cracked bronze dais. Above you, the great drowned bell trembles with gathered air.',
           ];
           let preDamageRatio = 0;
+          let thrallCleared = false;
 
           if (hasFlag(state, 'kale_fate', 'redeemed')) {
             preDamageRatio += 0.2;
+            thrallCleared = true;
             msgs.push(
-              "A shout echoes from the upper gallery! Kale, the redeemed deserter, hurls a chain-shot into the Choir pillars, shattering Malakor's outer ward (-20% Boss HP)!",
+              'A shout echoes from the upper gallery as Kale hurls chain-shot into the choir pillars, cutting down Malakor\'s acolyte guard.',
             );
           }
           if (hasFlag(state, 'vorne_redeemed')) {
             preDamageRatio += 0.15;
+            thrallCleared = true;
             msgs.push(
-              'Heavy bronze footsteps thunder beside you — Sir Vorne charges into the pale choir-thralls, cleaving open your path (-15% Boss HP)!',
+              'Heavy bronze footsteps thunder beside you as Sir Vorne charges into the pale choir, breaking their outer guard.',
             );
           }
           if (hasFlag(state, 'seal_of_silence')) {
             brokenSeals.push('seal_of_silence');
-            msgs.push("[Counter-Seal] Your Seal of Silence hums — Malakor's Drowning Toll is halved!");
+            msgs.push('Your Seal of Silence hums against the air, dampening the bell.');
           }
           if (hasFlag(state, 'root_conduit_severed')) {
             brokenSeals.push('root_conduit_severed');
-            msgs.push("[Counter-Seal] The severed Root Conduit starves Malakor's bark-shield (-2 Boss Armor)!");
+            msgs.push('With the deep Root Conduit severed, Malakor\'s bark-shield crumbles.');
           }
           if (hasFlag(state, 'kiln_cipher_learned')) {
             brokenSeals.push('kiln_cipher_learned');
             preDamageRatio += 0.12;
-            msgs.push("[Counter-Seal] Speaking the First Kiln Cipher sears Malakor's throne with ancient fire (-12% Boss HP)!");
+            msgs.push('Speaking the First Kiln Cipher sears Malakor\'s throne with pale fire.');
           }
 
           return {
             messages: msgs,
             startCombat: {
-              enemyId: 'malakor',
+              enemyIds: thrallCleared ? ['malakor'] : ['malakor', 'blight_acolyte'],
               canFlee: false,
               preDamageRatio: Math.min(0.55, preDamageRatio),
               brokenSeals,
               onVictoryFlag: 'malakor_slain',
               onVictoryChronicle: {
-                title: 'Slew Malakor, the Choir-Husk',
+                title: 'Slew Malakor',
                 summary: 'Defeated the Choir-Husk beneath the Sunken Belfry.',
                 tag: 'boss',
               },
@@ -1023,11 +1231,10 @@ export const LOCATIONS: Record<string, LocationNode> = {
       },
       {
         id: 'sb_ending_shatter',
-        label: '[Ending] Shatter the Sunken Bell & End the Husk-Tide',
-        tag: 'Victory',
+        label: 'Shatter Bell',
         visible: (state) => hasFlag(state, 'malakor_slain'),
         resolve: () => ({
-          messages: ['You raise your weapon against the cracked heart of the great bronze bell...'],
+          messages: ['You raise your weapon against the cracked heart of the great bronze bell.'],
           triggerEnding: {
             endingId: 'shatter_belfry',
             title: 'Silence Over the Reach',
@@ -1037,15 +1244,14 @@ export const LOCATIONS: Record<string, LocationNode> = {
       },
       {
         id: 'sb_ending_kiln',
-        label: '[Ending] Speak the Cipher and Rekindle the First Kiln',
-        tag: 'Vaelorian / Durnfolk / Cipher',
+        label: 'Rekindle Kiln',
         visible: (state) =>
           hasFlag(state, 'malakor_slain') &&
           (hasFlag(state, 'kiln_cipher_learned') ||
             state.player.race === 'vaelorian' ||
             state.player.race === 'durnfolk'),
         resolve: () => ({
-          messages: ['You turn from the dead bell toward the dormant furnace beneath the altar...'],
+          messages: ['You turn from the dead bell toward the dormant furnace beneath the altar.'],
           triggerEnding: {
             endingId: 'rekindle_kiln',
             title: 'Heir of the First Kiln',
@@ -1055,8 +1261,7 @@ export const LOCATIONS: Record<string, LocationNode> = {
       },
       {
         id: 'sb_ending_ascend',
-        label: '[Ending] Claim the Bell-Crown & Ascend as the New Choir-Warden',
-        tag: 'Dark / Occult',
+        label: 'Claim Crown',
         visible: (state) =>
           hasFlag(state, 'malakor_slain') &&
           (state.memory.factions.husk_choir >= 2 ||
@@ -1064,7 +1269,7 @@ export const LOCATIONS: Record<string, LocationNode> = {
             state.player.race === 'ael_thalor' ||
             state.player.background === 'root_scholar'),
         resolve: () => ({
-          messages: ["You reach down through the settling spore-dust for Malakor's crown..."],
+          messages: ["You reach down through settling spore-dust for Malakor's bell-crown."],
           triggerEnding: {
             endingId: 'ascend_warden',
             title: 'The Quiet Crown',

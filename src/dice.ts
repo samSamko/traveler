@@ -4,7 +4,6 @@ import { PERKS } from './content/characters.ts';
 
 export function nextRandom(state?: GameState): number {
   if (state && typeof state.rngState === 'number') {
-    // Mulberry32 deterministic PRNG for reproducible tests when rngState is seeded.
     let t = (state.rngState += 0x6d2b79f5);
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
@@ -71,48 +70,41 @@ export function resolveCheck(
   let roll = rollDie(20, state);
   const statMod = getEffectiveStat(state, stat);
   let traitBonus = options?.extraBonus ?? 0;
-  const traitNotes: string[] = [];
 
   if (p.race === 'vaelorian' && p.hp <= Math.floor(p.maxHp / 2)) {
     traitBonus += 2;
-    traitNotes.push('+2 Unbound Will');
   }
   if (p.race === 'ael_thalor' && options?.isLoreOrPerception) {
     traitBonus += 2;
-    traitNotes.push('+2 Star-Sight');
   }
   if (p.race === 'grixi' && options?.isCraftOrStealth) {
     traitBonus += 2;
-    traitNotes.push('+2 Scrap-Savant');
   }
 
   const blessed = p.statuses.find((s) => s.type === 'blessed');
   if (blessed) {
     traitBonus += blessed.power;
-    traitNotes.push(`+${blessed.power} Blessed`);
   }
 
   let total = roll + statMod + traitBonus;
 
-  // Vaelorian determination auto-reroll if failed and available.
-  let rerolledNote = '';
+  let rerolled = false;
   if (total < dc && p.race === 'vaelorian' && p.determinationAvailable && roll < 14) {
     const second = rollDie(20, state);
     if (second > roll) {
-      rerolledNote = ` [Unbound Will reroll ${roll}->${second}]`;
       roll = second;
       total = roll + statMod + traitBonus;
       p.determinationAvailable = false;
+      rerolled = true;
     }
   }
 
   const success = roll === 20 || (roll !== 1 && total >= dc);
-  const statLabel = stat.charAt(0).toUpperCase() + stat.slice(1);
-  const labelPrefix = options?.label ? `${options.label} — ` : '';
-  const extraText = traitNotes.length > 0 ? ` (${traitNotes.join(', ')})` : '';
-  const outcomeTag = roll === 20 ? 'CRITICAL SUCCESS' : roll === 1 ? 'CRITICAL FAIL' : success ? 'SUCCESS' : 'FAIL';
-
-  const logLine = `[CHECK ${labelPrefix}${statLabel}: d20(${roll}) + ${statMod}${extraText} = ${total} vs DC ${dc} -> ${outcomeTag}]${rerolledNote}`;
+  const actionLabel = options?.label ? `${options.label}: ` : '';
+  const rerollProse = rerolled ? 'Stubborn will pulls you through at the brink. ' : '';
+  const outcomeProse = success
+    ? `${rerollProse}${actionLabel}Your nerve holds steady.`
+    : `${actionLabel}Your footing slips at the crucial moment.`;
 
   return {
     success,
@@ -121,6 +113,6 @@ export function resolveCheck(
     traitBonus,
     total,
     dc,
-    logLine,
+    logLine: outcomeProse,
   };
 }
