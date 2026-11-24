@@ -101,7 +101,7 @@ export function formatStatusHeader(state: GameState): string {
   const placeLabel =
     state.locationId === 'camp_hub' ? 'Lone Camp' : (loc?.name ?? state.locationId);
   const top = `${p.name} - ${sexLabel} ${raceName} ${bgName} Lv${p.level} | ${placeLabel}`;
-  const clockBar = `${formatClockLabel(state.clock)} | Crowns ${p.crowns} | Rations ${p.rations} | Torches ${p.torches} | Seals ${seals}/3`;
+  const clockBar = `${formatClockLabel(state.clock)} | Onyx ${p.crowns} | Rations ${p.rations} | Torches ${p.torches} | Seals ${seals}/3`;
   const vitalsBar = `HP ${p.hp}/${p.maxHp} | RES ${p.resolve}/${p.maxResolve} | STM ${p.stamina}/${p.maxStamina} | FOC ${p.focus}/${p.maxFocus} | DEF ${p.defilement}/100 | RESV ${p.reserves}/${p.maxReserves} | GRACE ${p.grace}/${p.maxGrace}`;
 
   const alerts: string[] = [];
@@ -222,7 +222,7 @@ export function renderInventory(state: GameState): string {
   const trinket = p.equipment.trinket ? ITEMS[p.equipment.trinket] : null;
   const lines = [
     'INVENTORY',
-    `Crowns ${p.crowns} | Rations ${p.rations} | Torches ${p.torches}`,
+    `Onyx ${p.crowns} | Rations ${p.rations} | Torches ${p.torches}`,
     `Main-Hand: ${mainHand ? mainHand.name : 'None'}${p.weaponHoned ? ' Honed' : ''}${p.weaponCoating ? ` - ${p.weaponCoating.name} ${p.weaponCoating.charges}x` : ''}`,
     `Off-Hand : ${offHand ? offHand.name : mainHand?.twoHanded ? 'Two-Handed Locked' : 'None'}`,
     `Armor    : ${armor ? `${armor.name} Tier ${p.armorTierCurrent}` : 'None'}`,

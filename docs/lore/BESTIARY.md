@@ -1,17 +1,17 @@
-# Lore Bible — Bestiary Dossiers
+# Bestiary & D&D-Style Creature Types
 
-Every creature enters combat under its `unidentifiedName` with full `firstSightProse` describing surroundings and form before identification.
+## 1. Canonical Creature Types
+Every enemy template uses an explicit creature type (`category`) so spells, weapon oils, perks, and tactical weaknesses interact consistently:
+- `animal` / `beast`: Feral northern wolves, starving hounds, frost-boars, and chitinous scavengers driven mad by hunger and northern cold.
+- `humanoid`: Trapped bandits, deserters, desperate scavengers, and northern cultists.
+- `orc_kin`: 100% barbaric, animal-like northern raiders driven by pack savagery—never civilized, never parley.
+- `husk`: Vacant, fungal-crusted victims of the northern stupor and creeping rot.
+- `undead`: Frozen, salt-preserved corpses animated inside old burial crypts and sunken tombs.
+- `construct`: Towering clockwork or bronze wardens still patrolling late-imperial aqueducts and subterranean vaults.
+- `demonic`: Twisted fiendish horrors summoned or warped in forbidden northern shrines.
+- `lunar`: **Strictly ultra-rare** non-human astral anomalies appearing only under Full Moon alignment, extreme Defilement, or deep-ruin triggers (never in standard patrols or early areas).
+- `boss`: Unique apex threats guarding major seals, dungeons, or plazas of the Pure Silver Capital.
 
-| ID | Proper Name | Unidentified Moniker | Primary Habitat | Visible Gear |
-|---|---|---|---|---|
-| `root_husk` | Root-Husk Vagrant | Chalk-Ribbed Walker | `@place:ash_fen`, `@place:cinderford` | Splinter bone claws, bark-plated wool |
-| `ash_hound` | Cinder-Maw Hound | Ember-Jawed Hound | `@place:kings_causeway`, `@place:petrified_starwood` | Soot-black fangs, singed mastiff hide |
-| `chitin_weaver` | Chitin-Weaver | Pale Carapace Stalker | `@place:ash_fen`, `@place:drowned_forge` | Serrated mandibles, ivory chitin plates |
-| `iron_deserter` | Levy-Brigand | Rusted Pike-Man | `@place:kings_causeway` | Notched halberd, dented pavise & brigandine |
-| `blight_acolyte` | Choir Acolyte | Censer Zealot | `@place:petrified_starwood`, `@place:sunken_belfry` | Tarnished bronze censer, ash vestments |
-| `husk_kale` | Husk-Stalker Kale | Root-Bound Deserter | `@place:kings_causeway` | Root-fused broken sword, torn chainmail |
-| `star_stag` | Corrupted Star-Stag | Chime-Antlered Stag | `@place:petrified_starwood` | Chiming silver antlers, fossilized bark hide |
-| `forge_automaton` | Basalt Kiln-Warden | Basalt Furnace-Giant | `@place:drowned_forge` | Piston furnace hammer, slate shutters |
-| `sir_vorne` | Sir Vorne | Bell-Helmed Knight | `@place:crown_watchtower` | `@item:bell_cleaver`, fused bronze plate |
-| `silk_assassin` | Cistern Vengeance | Veiled Wire-Hunter | Road ambushes | Twin `@item:vesper_needle`, luminous silk mantle |
-| `malakor` | Malakor, Choir-Husk | Crowned Choir-Warden | `@place:sunken_belfry` | Root-twisted bell-scepter, fractured bell-crown |
+## 2. Bestiary Grounding Rules
+- Always author `unidentifiedName` and observable `firstSightProse` without naming the creature upfront.
+- Mirror full anatomy (`AnatomyProfile`) so the `Observe` free action reveals build, visible weapons, and creature type cues.

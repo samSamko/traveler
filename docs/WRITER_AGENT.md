@@ -1,44 +1,42 @@
 # Writer Agent Protocol — Traveler
 
-This document governs all narrative, anatomical, environmental, and relational authoring for **Traveler: The Gloaming Reach**. Every new location, creature, NPC, event, or item MUST follow these rules and pass `node scripts/validate-lore.ts`.
+This document governs all narrative, anatomical, environmental, and relational authoring for **Traveler**. Every new location, creature, NPC, event, or item MUST follow these rules and pass `node scripts/validate-lore.ts`.
 
-## 1. Narrative Voice & Inspirations
-- **Tone**: Grounded, elegiac, tactile dark frontier fantasy. Blend Middle-earth antiquity, Dark Souls / Elden Ring decayed majesty, Hollow Knight subterranean melancholy, and D&D tactical concreteness.
-- **Sensory First**: Ground every scene in cold rain, ash, damp stone, copper/bronze scent, dim lantern light, and physical weight before introducing abstractions.
-- **Concision via Links**: Keep scene prose tight and evocative; store deep history, anatomy, and cross-references inside the structured registry (`src/writing/links.ts`, `src/writing/anatomy.ts`, `docs/lore/`), surfaced on demand in the **Journal**.
+## 1. Narrative Voice & World Tone
+- **Tone**: Bleak, tactile dark frontier survival with gothic weight and late-imperial ruined grandeur. Contrast rough early-medieval frontier grit and systemic inter-racial friction in the south against overgrown Constantinian-scale ruins and the hollowing aftermath of the northern collapse.
+- **Sensory First**: Ground every scene in cold air, freezing lung-burn, jagged stone, wet timber, rot, copper/iron, or overgrown marble before introducing abstractions or proper names.
+- **No Cliché Slop**: Never use *ancient, whispers, palpable, obsidian, shadows dance,* or *a testament to*. Keep scene descriptions at 6–10 lines (2–3 short paragraphs) for locations and key thresholds; keep combat beats tight.
+- **Strict Late-Game Secrecy**: Never reveal the true origin of the lunar stone, why the Pure Silver Capital failed, or the existence of ultra-rare Lunar Entities in opening prose, early areas, or casual NPC dialogue. Describe only what a traveler physically sees, hears, and feels.
+- **Concision via Links**: Store deep history, anatomy, and cross-references in `data/links.json`, `src/writing/anatomy.ts`, and `docs/lore/` (`WORLD.md`, `RACES_AND_ANATOMY.md`, `CHARACTERS.md`, `BESTIARY.md`, `PLACES_AND_ITEMS.md`), surfaced on demand in the **Journal**.
 
 ## 2. Non-Negotiable Authoring Rules
-1. **Describe Before Naming (Plain Sensory Grounding First)**:
+1. **Describe Before Naming**:
    - Never print a creature's or NPC's proper name on first sight before describing surroundings and observable form.
-   - Never stack unexplained capitalized proper nouns (`First Kiln of Aethel`, `Third Drowning Toll`, `Pale Root`, `Iron-Vow`, `Vesper-Scribe`) in opening prose, scene descriptions, or event prompts. Always describe what the player **sees, hears, smells, and understands physically** in plain English first (a massive cracked underground furnace, pale spore-choked roots splitting the road, a ragged border garrison in soot-stained mail), and introduce proper names sparingly only after the thing is grounded.
-   - Author an `unidentifiedName` / `unidentifiedLabel` (e.g., `Ember-Jawed Hound`, `Scarred Officer`), a full `firstSightProse` (which MUST NOT contain the proper name), and a concise `returnSightProse` for repeat encounters.
-2. **Mirrored Full-Body Anatomy**:
+   - Do not stack unexplained capitalized proper nouns in opening prose, scene blocks, or event prompts. Ground the player in physical observation first; introduce names only after sensory context or when learned.
+   - Author `unidentifiedName` / `unidentifiedLabel`, `firstSightProse` (no proper name), and `returnSightProse` (no premature name leak).
+2. **Mirrored Full-Body Anatomy & Stigmata**:
    - Player, NPCs, and Enemies share `AnatomyProfile` (`height`, `weight`, `skinColor`, `hairLength`, `hairStyle`, `hairColor`, `eyeShape`, `eyeColor`, `musculature`, `bodyShape`, `facialScars`, `bodyScars`, `faceDetail`, `chestTorsoDetail`, `armsHandsDetail`, `legsStanceDetail`, `distinguishingMark`, `visibleTags`).
-   - Every visible trait should make sense at a glance and feed into NPC reactions (`getNpcAppearanceReaction`) or combat appraisal (`appraisal.ts`).
+   - Keep entries concise and functional. Reflect racial tension, frostbite/impairment, `Defilement` stigmata, and `BodyModDef` scars (`anatomyOverlay`, `excisionScar`) in `getNpcAppearanceReaction` and `appraisal.ts`.
 3. **Zero Brackets or Parentheses**:
    - Never use `[...]` or `(...)` in choices, headers, prose, or Journal text.
-   - Never print `(DC 13)` or `(+18 Crowns)` in story text or choices.
-   - Keep exact numbers strictly inside `Journal -> Self`, `Journal -> Arts`, and `Journal -> Items`.
-4. **1-2 Word Action Labels**:
-   - Top-level and sub-menu verbs/choices MUST be 1-2 words max (`Explore`, `Talk`, `Observe`, `Journal`, `Cure Kale`, `Flash Charter`).
-   - Whenever multiple actions, skills, spells, items, or enemies exist, branch into a clean sub-menu with `Back`.
-5. **Cross-Link Everything**:
-   - Register every relational tie (`commands`, `guards`, `prowls`, `holds`, `seeks`, `wields`, `yields`, `serves`, `based_at`) in `src/writing/links.ts` (`ENTITY_LINKS`).
-6. **Variable Prose & QBN Storylets**:
-   - Use `renderProse(template, state)` from `src/writing/prose.ts` (`{name}`, `{skin}`, `{hair}`, `{eyes}`, `{height}`, `{weapon}`, `{weather}`, `{period}`, `{if:tag}...{/if}`, `{if:defilement>=N}...{/if}`) so scenes stay concise yet reflect customized anatomy, scars, body mods, weather, and Defilement.
-   - Gate new `EventCard`s cleanly with `periods`, `weathers`, `minDefilement`, `maxDefilement`, `requiredTags`, `repeatable`, and `cooldownHours`.
-7. **Damage Types, Resolve, Defilement & Body Mods**:
+   - Never print DCs, damage dice, or numeric deltas in story prose or choices. Keep exact numbers strictly inside `Journal -> Self`, `Journal -> Arts`, and `Journal -> Items`.
+4. **1-2 Word Action Labels & Diegetic Telegraphing**:
+   - Top-level and sub-menu action labels MUST be 1–2 words max (`Explore`, `Talk`, `Observe`, `Journal`, `Force Gate`, `Press North`).
+   - Branch multi-option lists into sub-menus with `Back`.
+   - Telegraph severe risk, time passage, starvation/impairment strain, `Defilement` spikes, or irreversible thresholds (such as passing the Black Stone Gate) through concrete sensory cues in the preceding prose.
+5. **Cross-Linking & Template Safety**:
+   - Register every relational tie (`commands`, `guards`, `prowls`, `holds`, `seeks`, `wields`, `yields`, `serves`, `based_at`) in `data/links.json`.
+   - In `renderProse(template, state)` (`src/writing/prose.ts`), ensure every variable (`{name}`, `{skin}`, `{hair}`, `{eyes}`, `{height}`, `{weapon}`, `{weather}`, `{period}`, `{if:tag}...{/if}`, `{if:defilement>=N}...{/if}`) handles empty/unarmed values cleanly without double spaces, broken articles, or dangling punctuation.
+6. **QBN Storylets & High-Stakes Trade-Offs**:
+   - Gate `EventCard`s cleanly (`periods`, `weathers`, `minDefilement`, `maxDefilement`, `requiredTags`, `repeatable`, `cooldownHours`). Avoid mutually exclusive dead locks and ensure repeatable cards vary phrasing.
+   - Pair ruthless, greedy, or desperate choices with real tactical/material upside AND harsh, deterministic blowback or world-state fallout.
+7. **Damage Types, Creature Types, Defilement & Body Mods**:
    - Assign one of the 10 damage types (`slashing`, `piercing`, `bludgeoning`, `fire`, `cold`, `lightning`, `acid`, `poison`, `blight`, `resonant`) to every weapon, offensive ability, and enemy intent.
-   - Every `BodyModDef` in `src/systems/bodymods.ts` MUST declare its `kind` (`mutation` | `surgery` | `implant`), anatomical `slot`, explicit `bonusSummary` AND `drawbackSummary`, `defilementLoad`, `anatomyOverlay`, and `excisionScar`.
-   - Update the matching internal canon dossier under `docs/lore/`:
-     - [WORLD.md](file:///c:/Users/samael.samoilenko/Desktop/Projs/traveler/docs/lore/WORLD.md)
-     - [RACES_AND_ANATOMY.md](file:///c:/Users/samael.samoilenko/Desktop/Projs/traveler/docs/lore/RACES_AND_ANATOMY.md)
-     - [CHARACTERS.md](file:///c:/Users/samael.samoilenko/Desktop/Projs/traveler/docs/lore/CHARACTERS.md)
-     - [BESTIARY.md](file:///c:/Users/samael.samoilenko/Desktop/Projs/traveler/docs/lore/BESTIARY.md)
-     - [PLACES_AND_ITEMS.md](file:///c:/Users/samael.samoilenko/Desktop/Projs/traveler/docs/lore/PLACES_AND_ITEMS.md)
+   - Assign a canonical creature type (`animal`, `humanoid`, `orc_kin`, `husk`, `undead`, `construct`, `demonic`, `lunar`, `boss`) to every enemy template.
+   - Every `BodyModDef` in `data/bodymods.json` must declare `kind` (`mutation` | `surgery` | `implant`), `slot`, `bonusSummary`, `drawbackSummary`, `defilementLoad`, `anatomyOverlay`, and `excisionScar`.
 
 ## 3. Verification Gate
-Run both gates after every narrative or structural edit:
+Run both checks after every narrative or structural edit:
 ```powershell
 node scripts/validate-lore.ts
 node --test test/engine.test.ts

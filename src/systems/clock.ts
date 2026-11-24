@@ -1,6 +1,44 @@
-import type { GameState, TimePeriod, WeatherId, WorldClock } from '../types.ts';
+import type { GameState, LunarPhaseId, TimePeriod, WeatherId, WorldClock } from '../types.ts';
 import { nextRandom } from '../dice.ts';
 import { maybeRollPaleShiftAtDawn } from './frontier.ts';
+
+export const LUNAR_PHASE_DATA: Record<
+  LunarPhaseId,
+  {
+    label: string;
+    subtitle: string;
+    atmosphere: string;
+  }
+> = {
+  new_moon: {
+    label: 'New Moon',
+    subtitle: 'The Severed Thread',
+    atmosphere: 'The moon goes dark; warmth fades quickly and cold rot leaks deeper through the quiet streets.',
+  },
+  waxing_moon: {
+    label: 'Waxing Moon',
+    subtitle: 'The Silver Tugging',
+    atmosphere: 'A growing crescent sharpens the compulsive pull northward, drawing more drifters along the frost.',
+  },
+  full_moon: {
+    label: 'Full Moon',
+    subtitle: 'The Lunar Eye',
+    atmosphere: 'Stark pale moonlight floods the broken marble arches and intensifies Defilement exposure outdoors.',
+  },
+  waning_moon: {
+    label: 'Waning Moon',
+    subtitle: 'The Ash-Settling',
+    atmosphere: 'The northern sky settles into heavy, sluggish quiet while scavengers pick over frozen remains.',
+  },
+};
+
+export function getLunarPhaseForCycleDay(cycleDay: number): LunarPhaseId {
+  const norm = ((cycleDay % 12) + 12) % 12;
+  if (norm < 3) return 'new_moon';
+  if (norm < 6) return 'waxing_moon';
+  if (norm < 9) return 'full_moon';
+  return 'waning_moon';
+}
 
 export const WEATHER_DATA: Record<
   WeatherId,
@@ -58,6 +96,8 @@ export function createInitialClock(): WorldClock {
     totalHours: 8,
     weather: 'ash_rain',
     weatherHoursLeft: 6,
+    lunarPhase: 'waxing_moon',
+    lunarCycleDay: 3,
     paleShift: 'none',
     paleShiftDaysLeft: 0,
   };
@@ -85,7 +125,8 @@ export function formatClockLabel(clock: WorldClock): string {
   const hh = String(clock.hour).padStart(2, '0');
   const period = formatPeriodLabel(getTimePeriod(clock.hour));
   const weather = WEATHER_DATA[clock.weather].label;
-  return `Day ${clock.day} ${hh}:00 ${period} - ${weather}`;
+  const lunar = LUNAR_PHASE_DATA[clock.lunarPhase ?? 'waxing_moon'].label;
+  return `Day ${clock.day} ${hh}:00 ${period} - ${weather} - ${lunar}`;
 }
 
 export function advanceHours(
@@ -116,6 +157,13 @@ export function advanceHours(
         state.player.resolve = Math.max(0, state.player.resolve - 3);
         msgs.push('Empty stomach and cold air gnaw at your strength.');
       }
+      clock.lunarCycleDay = ((clock.lunarCycleDay ?? 3) + 1) % 12;
+      const nextPhase = getLunarPhaseForCycleDay(clock.lunarCycleDay);
+      if (nextPhase !== clock.lunarPhase) {
+        clock.lunarPhase = nextPhase;
+        const meta = LUNAR_PHASE_DATA[nextPhase];
+        msgs.push(`Lunar shift: ${meta.label} - ${meta.subtitle}. ${meta.atmosphere}`);
+      }
       const shiftMsg = maybeRollPaleShiftAtDawn(state);
       if (shiftMsg) {
         msgs.push(shiftMsg);
@@ -135,15 +183,19 @@ export function advanceHours(
     }
   }
 
-  // Environmental exposure in Spore-Fog outdoors at night
-  if (
-    !options?.sheltered &&
-    clock.weather === 'spore_fog' &&
-    isDarkPeriod(clock.hour) &&
-    hours >= 2
-  ) {
-    state.player.defilement = Math.min(100, state.player.defilement + 1);
-    msgs.push('Thick spore-fog coats your throat with chalky residue.');
+  // Environmental exposure outdoors at night
+  if (!options?.sheltered && isDarkPeriod(clock.hour) && hours >= 2) {
+    if (clock.weather === 'spore_fog') {
+      state.player.defilement = Math.min(100, state.player.defilement + 1);
+      msgs.push('Thick spore-fog coats your throat with chalky residue.');
+    }
+    if (clock.lunarPhase === 'full_moon') {
+      state.player.defilement = Math.min(100, state.player.defilement + 1);
+      msgs.push('Stark pale moonlight raises a cold ache beneath your skin.');
+    } else if (clock.lunarPhase === 'new_moon') {
+      state.player.defilement = Math.min(100, state.player.defilement + 1);
+      msgs.push('Moonless cold draws thin rot upward from the frozen stones.');
+    }
   }
 
   return msgs;

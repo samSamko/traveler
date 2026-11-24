@@ -54,6 +54,8 @@ export function loadGame(saveDir = DEFAULT_SAVE_DIR): GameState | null {
     if (p.grace === undefined) p.grace = 2;
     if (p.maxGrace === undefined) p.maxGrace = 2;
     if (parsed.clock) {
+      if (!parsed.clock.lunarPhase) parsed.clock.lunarPhase = 'waxing_moon';
+      if (parsed.clock.lunarCycleDay === undefined) parsed.clock.lunarCycleDay = 3;
       if (!parsed.clock.paleShift) parsed.clock.paleShift = 'none';
       if (parsed.clock.paleShiftDaysLeft === undefined) parsed.clock.paleShiftDaysLeft = 0;
     }

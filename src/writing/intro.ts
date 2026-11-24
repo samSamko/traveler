@@ -12,17 +12,16 @@ export interface IntroBeat {
 export function getIntroBeat(state: GameState, beatIndex: number): IntroBeat {
   const p = state.player;
   const pr = pronouns(p.sex);
-  const race = RACES[p.race];
   const bg = BACKGROUNDS[p.background];
   const heirloom = HEIRLOOMS[p.heirloom];
   const a = p.anatomy;
 
   if (beatIndex === 0) {
     return {
-      title: 'THE CRACKED VALLEY',
+      title: 'THE FAR NORTH',
       body: [
-        'Seven generations ago, the rulers of this valley dug too deep and cracked open a vast underground furnace to burn glowing amber sap from the roots beneath the earth. Their fire built an empire, and their greed left a poisoned wound under the hills.',
-        'Now the frontier is rotting from below. Pale, chalky roots split the old stone roads, sunken bronze bells ring on their own in the fog, and a spreading fungal blight creeps outward from a flooded bell-tower in the lowlands.',
+        'In every southern city, town, and village, stories persist of the Far North: looming mountains with castles carved into rock, tundras so cold the air freezes your lungs, barren taigas where your own heartbeat carries for miles, jagged hills that tear through boots, and grim forests whose roots grip the earth.',
+        'Criminals with nowhere left to hide, soldiers without a cause, ruined peasants, and desperate wanderers flee there and are never heard from again. The farther north a traveler pushes, the stronger the compulsion grows, even as crops fail, food spoils, beasts turn vicious, and sickness spreads. Only scattered hermits, witches, heretics, and outcasts endure the cold.',
       ].join('\n\n'),
     };
   }
@@ -30,12 +29,12 @@ export function getIntroBeat(state: GameState, beatIndex: number): IntroBeat {
   if (beatIndex === 1) {
     const raceOpening =
       p.race === 'vaelorian'
-        ? `You walk these drowned roads as a ${p.sex === 'female' ? 'daughter' : 'son'} of the Vaelorians, the mortal human heirs of the fallen empire. Border garrisons still respect your old family seals, while older villagers whisper that your bloodline lit the fire that ruined the valley.`
+        ? `You walk north as a human outcast from the fractured southern kingdoms, where suspicion and iron laws leave no room for those cast out.`
         : p.race === 'ael_thalor'
-          ? `You are Ael-Thalor, a long-lived, silver-skinned exile from a forest whose ancient trees turned to stone. Even through damp earth and rain, your sharp ears catch the slow, wet hum of the spreading rot underground.`
+          ? `You are an elf, long-lived and silver-eyed, forced out of dwindling southern woods while mortal villagers whisper fears behind barred shutters.`
           : p.race === 'durnfolk'
-            ? `You are Durnfolk, stout, stone-ribbed smiths and tunnel-wardens from the deep mountain forges. Slate-hard patience lives in your bones from the bitter years your clans spent barring the lower iron gates against whatever crawls up from below.`
-            : `You are Grixi, a sharp-eared, nocturnal tinker from the underground tunnel-guilds. Surface guards often mistake your kind for feral scavengers until your guild papers audit their grain ledgers or your alchemy melts their iron locks.`;
+            ? `You are a dwarf of the stone-walled southern holds, broad-shouldered and unforgiving, carrying deep-forge endurance into the biting wind.`
+            : `You are a goblin—unlike the wild, brutal tribes hunted across southern roads, you mastered speech, barter, and alchemy, earning narrow-eyed distrust at every gate.`;
 
     const scarClause =
       a.facialScars === 'Unmarked'
@@ -46,42 +45,45 @@ export function getIntroBeat(state: GameState, beatIndex: number): IntroBeat {
       ? 'only road-dust and quiet watchfulness mark your bearing.'
       : `at any longer glance ${a.distinguishingMark.toLowerCase()} lingers in the memory.`;
 
-    const bodyPortrait = `${a.height} and ${a.weight.toLowerCase()}, you carry a ${a.musculature.toLowerCase()}, ${a.bodyShape.toLowerCase()} frame clad in ${a.skinColor.toLowerCase()} skin. ${a.eyeShape} ${a.eyeColor.toLowerCase()} eyes watch the rain beneath ${a.hairLength.toLowerCase()}, ${a.hairStyle.toLowerCase()} ${a.hairColor.toLowerCase()} hair. ${scarClause}, and ${markClause}`;
+    const bodyPortrait = `${a.height} and ${a.weight.toLowerCase()}, you carry a ${a.musculature.toLowerCase()}, ${a.bodyShape.toLowerCase()} frame clad in ${a.skinColor.toLowerCase()} skin. ${a.eyeShape} ${a.eyeColor.toLowerCase()} eyes watch the horizon beneath ${a.hairLength.toLowerCase()}, ${a.hairStyle.toLowerCase()} ${a.hairColor.toLowerCase()} hair. ${scarClause}, and ${markClause}`;
 
-    const socialNote =
+    const frictionNote =
       p.sex === 'female'
-        ? 'On this harsh border, custom divides the watch from the cloister: soldiers on the wall test a woman twice before trusting her blade, while the blind weavers sheltering beneath the marsh welcome sisters behind their silk curtains.'
-        : 'On this harsh border, custom divides the watch from the cloister: garrison officers muster a man swiftly onto the wall, while the blind weavers sheltering beneath the marsh bar male footsteps from their inner halls.';
+        ? 'Between the southern holds, old feuds divide every bloodline, and border watches measure a woman twice before trusting steel in her hand.'
+        : 'Between the southern holds, old feuds divide every bloodline, and garrison watches eye any solitary wanderer like a deserting criminal.';
 
     return {
       title: `BLOOD AND FORM - ${p.name.toUpperCase()}`,
-      body: [raceOpening, bodyPortrait, socialNote].join('\n\n'),
+      body: [raceOpening, bodyPortrait, frictionNote].join('\n\n'),
     };
   }
 
   if (beatIndex === 2) {
     const bgBeat =
       p.background === 'ashen_blade'
-        ? `Once sworn to a noble banner, you broke orders to spare a burning village. Stripped of rank yet unbroken, you wear scarred mail and answer only to the weight of steel in ${pr.poss} hand.`
+        ? `Fleeing southern execution after breaking a lord's command, you wear scarred mail and answer only to the steel in ${pr.poss} hand.`
         : p.background === 'root_scholar'
-          ? `Expelled from the city archives for copying forbidden notes on the underground blight, you came north to study the spreading roots at their source before the valley falls silent.`
+          ? `Cast out from southern cloisters for chasing forbidden tales of northern waystones, obsession dragged you past the snowline.`
           : p.background === 'barrow_stalker'
-            ? `Years guiding desperate caravans through fog-choked marshes and old burial mounds taught you where dead kings hide their silver, and how to step lightly where pale fungi listen.`
-            : `Bound in iron chains to quiet a family curse, you carry heavy counter-chimes down into the fog, trading your own blood and breath to hold back the sickness.`;
+            ? `Chased north by crushing debt and bounties, you followed rumors of sharp-edged black coins surviving intact inside frozen vaults.`
+            : `Driven from southern parishes for apostasy, you haul penitent iron into the frost where no bell calls your name.`;
 
-    const heirloomBeat = `Secured at your belt rests the ${heirloom.name}: ${heirloom.description}`;
+    const gateBeat =
+      'At last the jagged peaks narrow to a single towering gate of carved black stone. With every step, freezing air locks your breath and the pull turns violent. Frozen figures line the path where weaker travelers turned to ice at first touch. You brace your shoulder, force the heavy stone doors apart, and step through.';
+
+    const heirloomBeat = `At your belt rests the ${heirloom.name}: ${heirloom.description}`;
 
     return {
-      title: `${bg.name.toUpperCase()} AND RELIC`,
-      body: [bgBeat, heirloomBeat].join('\n\n'),
+      title: `${bg.name.toUpperCase()} AND THE GATE`,
+      body: [bgBeat, gateBeat, heirloomBeat].join('\n\n'),
     };
   }
 
   return {
-    title: 'THE GATE OF CINDERFORD',
+    title: 'BEYOND THE THRESHOLD',
     body: [
-      `Cold rain hisses across wet ash as the blackened timber walls of Cinderford Keep rise through the fog ahead. Pitch-lanterns sway over the muddy courtyard where iron-armored border guards change the watch, and a low, wet hum drifts up from the marsh below.`,
-      `The frontier lies open before you, ${p.name}: flooded burial mounds, hidden underground workshops, ruined forges, and a sunken bell-tower waiting in the mist. Step through the gate.`,
+      `When you turn back, only empty wind and blank mountain cliff wait behind you—the black stone gate has vanished, cutting off every road back south.`,
+      `Before you stretches a forgotten, overgrown ruin-land unlike anything in the south: wide cracked marble avenues, monumental stone arches, shattered aqueducts, and carved waystones proportioned for taller folk. You bank a small fire behind a fallen plinth and set your Lone Camp, ${p.name}.`,
     ].join('\n\n'),
   };
 }

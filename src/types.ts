@@ -63,12 +63,32 @@ export type PaleShiftId =
   | 'root_bloom'
   | 'iron_frost';
 
+export type LunarPhaseId =
+  | 'new_moon'
+  | 'waxing_moon'
+  | 'full_moon'
+  | 'waning_moon';
+
+export type CreatureCategory =
+  | 'animal'
+  | 'beast'
+  | 'humanoid'
+  | 'orc_kin'
+  | 'husk'
+  | 'undead'
+  | 'construct'
+  | 'demonic'
+  | 'lunar'
+  | 'boss';
+
 export interface WorldClock {
   day: number;
   hour: number; // 0..23
   totalHours: number;
   weather: WeatherId;
   weatherHoursLeft: number;
+  lunarPhase: LunarPhaseId;
+  lunarCycleDay: number; // 0..11 (3 days per phase)
   paleShift: PaleShiftId;
   paleShiftDaysLeft: number;
 }
@@ -389,7 +409,7 @@ export interface EnemyTemplate {
   id: string;
   name: string;
   unidentifiedName: string;
-  category: 'husk' | 'beast' | 'humanoid' | 'construct' | 'boss';
+  category: CreatureCategory;
   maxHp: number;
   armor: number;
   stats: Stats;
@@ -415,7 +435,7 @@ export interface ActiveEnemy {
   name: string;
   unidentifiedName: string;
   suffix: string;
-  category: 'husk' | 'beast' | 'humanoid' | 'construct' | 'boss';
+  category: CreatureCategory;
   hp: number;
   maxHp: number;
   baseArmor: number;
@@ -441,7 +461,7 @@ export interface ActiveEnemy {
 export interface DownedEnemyEntry {
   templateId: string;
   displayName: string;
-  category: 'husk' | 'beast' | 'humanoid' | 'construct' | 'boss';
+  category: CreatureCategory;
   questioned: boolean;
   stripped: boolean;
   resolved: boolean;

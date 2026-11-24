@@ -630,4 +630,39 @@ describe('Core Frontier Loop: Hub, 10 Areas, Sub-Areas, Dungeons & Towns', () =>
     assert.equal(state.scene, 'location');
     assert.equal(state.locationId, 'weeping_barrow');
   });
+
+  it('cycles all 4 Lunar Phases over 12 days, shows Onyx currency, and keeps intro free of spoilers', () => {
+    const state = createNewGame({
+      name: 'Torin',
+      sex: 'male',
+      race: 'durnfolk',
+      background: 'barrow_stalker',
+      heirloom: 'kiln_lantern',
+      skipIntro: false,
+      stealthMode: true,
+      rngState: 21,
+    });
+
+    for (let i = 0; i < 4; i += 1) {
+      const beat = getIntroBeat(state, i);
+      assertNoParensOrBrackets(beat.body, `intro beat ${i}`);
+      assert.equal(/meteoric|philosopher|lunar entity/i.test(beat.body), false);
+    }
+
+    processInput(state, 'Skip');
+    const hubScreen = renderCurrentScreen(state, []);
+    assert.match(hubScreen, /Onyx 26/);
+    assert.match(hubScreen, /Waxing Moon/);
+
+    state.player.rations = 20;
+    const phasesSeen = new Set<string>([state.clock.lunarPhase]);
+    for (let d = 0; d < 12; d += 1) {
+      advanceHours(state, 24);
+      phasesSeen.add(state.clock.lunarPhase);
+    }
+    assert.ok(phasesSeen.has('new_moon'));
+    assert.ok(phasesSeen.has('waxing_moon'));
+    assert.ok(phasesSeen.has('full_moon'));
+    assert.ok(phasesSeen.has('waning_moon'));
+  });
 });
