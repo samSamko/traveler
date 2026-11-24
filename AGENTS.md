@@ -19,23 +19,28 @@ And verify CLI startup in stealth mode:
 ```
 
 ## Writing Framework & Writer Agent
-Read `docs/WRITER_AGENT.md` and `docs/lore/` before authoring new prose, creatures, NPCs, or locations. Every entity must supply `firstSightProse`, `unidentifiedName` / `unidentifiedLabel`, mirrored `AnatomyProfile`, and `ENTITY_LINKS` entries in `src/writing/links.ts`.
+Read `docs/WRITER_AGENT.md` and `docs/lore/` before authoring new prose, creatures, NPCs, or locations. Every entity must supply `firstSightProse`, `unidentifiedName` / `unidentifiedLabel`, mirrored `AnatomyProfile`, and `entityLinks` entries in `data/links.json`.
+
+## World Database Architecture (`data/*.json` -> `node:sqlite`)
+- All narrative prose, dialogue, places, NPCs, events, enemies, items, recipes, abilities, races, backgrounds, heirlooms, perks, body mods, injuries, NPC appearance reactions, and entity links live in human-readable `data/*.json` files (`characters.json`, `items.json`, `bodymods.json`, `enemies.json`, `places.json`, `events.json`, `links.json`), NOT hardcoded in `.ts` files.
+- At startup, `src/db/loader.ts` compiles `data/*.json` into an in-memory `node:sqlite` (`DatabaseSync(':memory:')`) relational database with `PRAGMA foreign_keys = ON` defined in `src/db/schema.ts`.
+- Conditional branches, prose variants, and choice outcomes use the declarative DSL (`ConditionSpec`, `ProseVariant`, `EffectSpec`) interpreted by `src/db/rules.ts`.
+- `src/content/*.ts`, `src/systems/bodymods.ts`, `src/systems/injuries.ts`, and `src/writing/links.ts` are thin adapters over `loadWorldDatabase()`.
 
 ## Architecture Overview
 - `src/types.ts`: Domain contracts for characters, combat, memory flags, factions, locations, events, and saves.
+- `src/db/schema.ts`: 21-table SQLite DDL (`WORLD_DB_SCHEMA`) with `PRAGMA foreign_keys = ON`.
+- `src/db/rules.ts`: Declarative `ConditionSpec`, `ProseVariant`, and `EffectSpec` evaluator/executor.
+- `src/db/loader.ts`: Compiles `data/*.json` into SQLite `:memory:` and exposes `loadWorldDatabase()` / `getWorldDatabase()`.
 - `src/dice.ts`: Transparent `d20 + stat + bonus vs DC` check resolution and dice roller.
 - `src/memory.ts`: WorldMemory flags, faction reputation (`-5` to `+5`), chronicle log, and reactive epilogue synthesizer.
 - `src/ui.ts`: Output formatting, compact status bar, ASCII map renderer, and `--stealth` plain-text toggle.
-- `src/content/characters.ts`: 2 binary sexes, 4 original races (`vaelorian`, `ael_thalor`, `durnfolk`, `grixi`), 4 backgrounds, 4 active heirlooms, spells/cantrips/skills, and level-up perks.
-- `src/content/items.ts`: Weapons, armor, trinkets, consumables, and relics.
-- `src/content/enemies.ts`: Frontier monsters, mini-bosses (including Sir Vorne and Husk-Stalker Kale), and final boss Malakor.
-- `src/content/locations.ts`: 9 interconnected locations of the Gloaming Reach with sex/race/memory-reactive dialogue and shops.
-- `src/content/events.ts`: Non-repeating frontier event deck with asymmetric sex/race/background/spell branches.
+- `src/content/*.ts`: Thin adapters over `loadWorldDatabase()` for characters, items, enemies, locations, and events.
 - `src/combat.ts`: Turn-based combat with telegraphed enemy intents, stances, stamina/focus abilities, status effects, and XP leveling.
 - `src/save.ts`: Atomic save/load (`temp -> rename`) in `.traveler-saves/` for permadeath runs and meta-profile unlocks.
 - `src/engine.ts`: Hybrid command parser (`1/2/3` numbered choices + CLI commands) and deterministic state machine.
 - `src/index.ts`: Interactive readline entrypoint.
 
 ## Extending Content
-- **New Race / Spell**: Add ID to `src/types.ts`, register definition and abilities in `src/content/characters.ts`, and add `[Race-Only]` branches in `src/content/events.ts` and `src/content/locations.ts`.
-- **New Event**: Add an `EventCard` entry in `src/content/events.ts` with `requiredLocations` / `condition` / `choices`. Use `setFlag`, `adjustFaction`, and `recordChronicle` so player choices leave lasting scars on the world.
+- **New Race / Spell / Item / Enemy / Body Mod / Injury**: Add ID to `src/types.ts` if needed, then add the normalized record to the corresponding `data/*.json` file (`data/characters.json`, `data/items.json`, `data/enemies.json`, `data/bodymods.json`).
+- **New Place / NPC / Event**: Add the record and its `ConditionSpec` / `ProseVariant[]` / `EffectSpec` entries to `data/places.json` or `data/events.json`, and register cross-references in `data/links.json`. Use `setFlags`, `adjustFactions`, and `chronicles` in `EffectSpec` so player choices leave lasting scars on the world.

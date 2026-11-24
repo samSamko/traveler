@@ -6,67 +6,9 @@ import { resolveCheck } from '../dice.ts';
 import { advanceHours } from './clock.ts';
 import { installBodyMod } from './bodymods.ts';
 import { addItemToInventory, consumeInventoryItem } from '../combat.ts';
+import { loadWorldDatabase } from '../db/loader.ts';
 
-export const INJURIES: Record<string, InjuryDef> = {
-  fractured_ribs: {
-    id: 'fractured_ribs',
-    name: 'Fractured Ribs',
-    severity: 'severe',
-    description: 'Sharp bone pain catches every breath and heavy swing.',
-    statPenalty: { might: -1 },
-    maxHpPenalty: 4,
-    healDc: 13,
-    scarOnHeal: 'Crooked Rib-Seam',
-  },
-  torn_tendon: {
-    id: 'torn_tendon',
-    name: 'Torn Tendon',
-    severity: 'severe',
-    description: 'A ragged tear behind knee or shoulder slows footwork.',
-    statPenalty: { agility: -1 },
-    maxStaminaPenalty: 2,
-    healDc: 13,
-    scarOnHeal: 'Ragged Tendon-Scar',
-  },
-  deep_laceration: {
-    id: 'deep_laceration',
-    name: 'Deep Laceration',
-    severity: 'minor',
-    description: 'An open slash that weeps whenever armor shifts.',
-    maxHpPenalty: 3,
-    healDc: 11,
-    scarOnHeal: 'Jagged Blade-Scar',
-  },
-  concussion: {
-    id: 'concussion',
-    name: 'Cracked Crown',
-    severity: 'minor',
-    description: 'Ringing skull pain blurs concentration and spellcraft.',
-    statPenalty: { wit: -1 },
-    maxResolvePenalty: 3,
-    healDc: 12,
-    scarOnHeal: 'Temple Dent',
-  },
-  spore_burn: {
-    id: 'spore_burn',
-    name: 'Spore Burn',
-    severity: 'severe',
-    description: 'Chalky mycelial blisters sear flesh beneath bandages.',
-    statPenalty: { grit: -1 },
-    maxHpPenalty: 3,
-    healDc: 14,
-    scarOnHeal: 'Pale Spore-Pits',
-  },
-  shattered_nerve: {
-    id: 'shattered_nerve',
-    name: 'Shattered Nerve',
-    severity: 'minor',
-    description: 'Phantom bell-tones leave hands trembling under threat.',
-    maxResolvePenalty: 4,
-    healDc: 12,
-    scarOnHeal: 'Cold Unblinking Gaze',
-  },
-};
+export const INJURIES: Record<string, InjuryDef> = loadWorldDatabase().injuries;
 
 export function inflictInjury(state: GameState, injuryId: string): string | null {
   const inj = INJURIES[injuryId];

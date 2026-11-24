@@ -6,6 +6,8 @@ import type {
   RaceId,
   SexId,
 } from '../types.ts';
+import { loadWorldDatabase } from '../db/loader.ts';
+import { evaluateCondition } from '../db/rules.ts';
 
 export interface AppearanceOptionSet {
   height: string[];
@@ -253,62 +255,11 @@ export function renderAnatomyProse(
 }
 
 export function getNpcAppearanceReaction(state: GameState, npcId: string): string | null {
-  const tags = state.player.anatomy.visibleTags;
-  const def = state.player.defilement;
-
-  if (npcId === 'captain_vane') {
-    if (tags.includes('chitin_plated') || tags.includes('mutated') || def >= 45) {
-      return 'His hand shifts instinctively toward his sword hilt as he takes in the unnatural alterations upon your flesh.';
-    }
-    if (tags.includes('scarred_face') && tags.includes('muscular')) {
-      return 'His eyes linger on the scar across your face and the corded bulk of your shoulders, measuring a veteran.';
-    }
-    if (tags.includes('towering')) {
-      return 'He tilts his chin slightly to meet your towering height without yielding ground.';
-    }
-    if (tags.includes('gaunt') || tags.includes('frail')) {
-      return 'He frowns at your lean, hollow-cheeked frame as though doubting you could bear a pike.';
-    }
-    if (tags.includes('kiln_branded')) {
-      return 'His gaze catches the kiln-brand on your skin and narrows with grudging recognition.';
+  const reactions = loadWorldDatabase().npcReactions.filter((rx) => rx.npcId === npcId);
+  for (const rx of reactions) {
+    if (evaluateCondition(state, rx.cond)) {
+      return rx.text;
     }
   }
-
-  if (npcId === 'matron_veyra') {
-    if (tags.includes('star_eyed') || tags.includes('implanted')) {
-      return 'Her blind gaze turns sharply toward the subtle arcane hum of your implanted flesh.';
-    }
-    if (tags.includes('root_veined') || def >= 45) {
-      return 'Her blind head cocks sharply as if hearing the defilement resonating beneath your skin.';
-    }
-    if (tags.includes('kiln_branded')) {
-      return 'Her fingers twitch at the faint smell of old kiln-burn upon your flesh.';
-    }
-    if (tags.includes('scarred_face')) {
-      return 'She inclines her veiled face toward the ragged seam across your cheek, murmuring of iron debts.';
-    }
-    if (tags.includes('pale_skin')) {
-      return 'The luminous cavern silk reflects softly off your pale skin.';
-    }
-  }
-
-  if (npcId === 'innkeeper_martha') {
-    if (tags.includes('gaunt')) {
-      return 'She clucks softly at the gaunt hollows beneath your cheekbones and reaches for a fuller ladle.';
-    }
-    if (tags.includes('battle_worn') || tags.includes('scarred_face')) {
-      return 'She eyes your scars with the tired sympathy of a border innkeeper who has bandaged too many rangers.';
-    }
-  }
-
-  if (npcId === 'sir_vorne_npc') {
-    if (tags.includes('towering') || tags.includes('muscular')) {
-      return 'His bronze bell-helm tilts as he weighs your heavy frame against his own.';
-    }
-    if (tags.includes('battle_worn')) {
-      return 'Through the visor slit, his gaze rests on the old scars showing beneath your collar.';
-    }
-  }
-
   return null;
 }

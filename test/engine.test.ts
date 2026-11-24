@@ -19,6 +19,8 @@ import { computeDamageAfterResistance, getEffectivePlayerResistances } from '../
 import { exciseBodyMod, installBodyMod } from '../src/systems/bodymods.ts';
 import { inflictInjury, resolvePlayerDefeat, tendInjury } from '../src/systems/injuries.ts';
 import { getEffectiveStat } from '../src/dice.ts';
+import { getWorldDatabase } from '../src/db/loader.ts';
+import { evaluateCondition, executeEffect, selectProseVariant } from '../src/db/rules.ts';
 import type { BackgroundId, HeirloomId, RaceId, SexId } from '../src/types.ts';
 
 function assertNoParensOrBrackets(text: string, context: string): void {
@@ -339,5 +341,44 @@ describe('Combat Qualitative UI, Appraisal, Mid-Combat Journal & Persistence', (
     } finally {
       rmSync(tempDir, { recursive: true, force: true });
     }
+  });
+
+  it('compiles world JSON into SQLite with intact foreign keys and evaluates Condition/Effect DSL', () => {
+    const db = getWorldDatabase();
+    const fkCheck = db.prepare('PRAGMA foreign_key_check').all();
+    assert.equal(fkCheck.length, 0);
+
+    const placeCount = db.prepare('SELECT COUNT(*) AS cnt FROM places').get() as { cnt: number };
+    const eventCount = db.prepare('SELECT COUNT(*) AS cnt FROM events').get() as { cnt: number };
+    assert.equal(placeCount.cnt, 9);
+    assert.equal(eventCount.cnt, 18);
+
+    const state = createNewGame({
+      name: 'Kael',
+      sex: 'male',
+      race: 'grixi',
+      background: 'barrow_stalker',
+      heirloom: 'grixi_chronometer',
+      skipIntro: true,
+      rngState: 99,
+    });
+
+    assert.equal(evaluateCondition(state, { races: ['grixi', 'durnfolk'] }), true);
+    assert.equal(evaluateCondition(state, { sex: 'female' }), false);
+
+    const prose = selectProseVariant(state, [
+      { when: { race: 'ael_thalor' }, text: 'Elf prose' },
+      { text: 'Default prose for {name}' },
+    ]);
+    assert.equal(prose, 'Default prose for Kael');
+
+    const outcome = executeEffect(state, {
+      setFlags: { dsl_test_flag: true },
+      giveCrowns: 15,
+      giveItems: [{ id: 'poultice', qty: 1 }],
+      messages: ['DSL executed cleanly.'],
+    });
+    assert.equal(hasFlag(state, 'dsl_test_flag'), true);
+    assert.equal(outcome.messages[0], 'DSL executed cleanly.');
   });
 });

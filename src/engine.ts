@@ -16,7 +16,9 @@ import { BACKGROUNDS, PERKS, RACES } from './content/characters.ts';
 import { ITEMS, RECIPES } from './content/items.ts';
 import { LOCATIONS } from './content/locations.ts';
 import { EVENTS } from './content/events.ts';
-import { nextRandom } from './dice.ts';
+import { nextRandom, resolveCheck } from './dice.ts';
+import { registerRuleRuntime } from './db/rules.ts';
+import { renderProse } from './writing/prose.ts';
 import { hasFlag, recordChronicle, setFlag, synthesizeEpilogue } from './memory.ts';
 import {
   addItemToInventory,
@@ -56,6 +58,13 @@ import {
 import { BODY_MODS, exciseBodyMod, installBodyMod } from './systems/bodymods.ts';
 import { executeAftermathAction, getAftermathChoices, tendInjury } from './systems/injuries.ts';
 import { enterMobileCamp, executeCampAction, getCampChoices } from './systems/camp.ts';
+
+registerRuleRuntime({
+  resolveCheck,
+  addItem: addItemToInventory,
+  consumeItem: consumeInventoryItem,
+  renderProse,
+});
 
 const SHORT_LOCATION_NAMES: Record<string, string> = {
   cinderford: 'Cinderford Keep',

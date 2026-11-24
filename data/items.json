@@ -1,0 +1,478 @@
+{
+  "items": {
+    "notched_broadsword": {
+      "id": "notched_broadsword",
+      "name": "Notched Broadsword",
+      "slot": "weapon",
+      "value": 18,
+      "damageType": "slashing",
+      "damageDice": [
+        2,
+        5
+      ],
+      "bonusDamage": 1,
+      "statScaling": "might",
+      "description": "Slashing steel, pitted by frontier rains."
+    },
+    "ash_staff": {
+      "id": "ash_staff",
+      "name": "Whispering Ash-Staff",
+      "slot": "weapon",
+      "value": 18,
+      "damageType": "bludgeoning",
+      "damageDice": [
+        1,
+        8
+      ],
+      "bonusDamage": 1,
+      "statScaling": "wit",
+      "maxFocusBonus": 1,
+      "description": "Chiseled from scorched star-ash; delivers bludgeoning blows and steadies focus."
+    },
+    "horn_bow": {
+      "id": "horn_bow",
+      "name": "Horn-Bow & Knife",
+      "slot": "weapon",
+      "value": 18,
+      "damageType": "piercing",
+      "damageDice": [
+        2,
+        5
+      ],
+      "bonusDamage": 1,
+      "statScaling": "agility",
+      "description": "Silent piercing draw built for barrow paths."
+    },
+    "flanged_mace": {
+      "id": "flanged_mace",
+      "name": "Sanctified Mace",
+      "slot": "weapon",
+      "value": 18,
+      "damageType": "bludgeoning",
+      "damageDice": [
+        1,
+        10
+      ],
+      "bonusDamage": 1,
+      "statScaling": "might",
+      "description": "Heavy bludgeoning iron engraved with old bell-warding prayers."
+    },
+    "runic_warhammer": {
+      "id": "runic_warhammer",
+      "name": "Runic Warhammer",
+      "slot": "weapon",
+      "value": 55,
+      "damageType": "bludgeoning",
+      "damageDice": [
+        2,
+        7
+      ],
+      "bonusDamage": 2,
+      "statScaling": "might",
+      "statBonus": {
+        "grit": 1
+      },
+      "description": "Heavy Khaz-Durn warhammer forged before the Kiln fell."
+    },
+    "star_glaive": {
+      "id": "star_glaive",
+      "name": "Star-Glaive",
+      "slot": "weapon",
+      "value": 52,
+      "damageType": "cold",
+      "damageDice": [
+        2,
+        6
+      ],
+      "bonusDamage": 2,
+      "statScaling": "agility",
+      "statBonus": {
+        "wit": 1
+      },
+      "description": "Frost-cold silver leaf-blade of the Ael-Thalor."
+    },
+    "bell_cleaver": {
+      "id": "bell_cleaver",
+      "name": "Bell-Cleaver",
+      "slot": "weapon",
+      "value": 65,
+      "damageType": "resonant",
+      "damageDice": [
+        2,
+        8
+      ],
+      "bonusDamage": 3,
+      "statScaling": "might",
+      "statBonus": {
+        "grit": 1
+      },
+      "description": "Vorne's heavy bronze blade; tolls with resonant force on every swing."
+    },
+    "vesper_needle": {
+      "id": "vesper_needle",
+      "name": "Vesper Stiletto",
+      "slot": "weapon",
+      "value": 54,
+      "damageType": "piercing",
+      "damageDice": [
+        2,
+        6
+      ],
+      "bonusDamage": 2,
+      "statScaling": "agility",
+      "statBonus": {
+        "wit": 2
+      },
+      "description": "Amber-glass piercing blade that hums near soul-amber."
+    },
+    "chain_hauberk": {
+      "id": "chain_hauberk",
+      "name": "Chain Hauberk",
+      "slot": "armor",
+      "value": 20,
+      "armorBonus": 2,
+      "resistances": {
+        "slashing": "resistant",
+        "lightning": "vulnerable"
+      },
+      "description": "Heavy Iron-Vow links greased against mire-rot."
+    },
+    "warded_greatcloak": {
+      "id": "warded_greatcloak",
+      "name": "Scribe-Cloak",
+      "slot": "armor",
+      "value": 20,
+      "armorBonus": 1,
+      "maxFocusBonus": 2,
+      "resistances": {
+        "resonant": "resistant",
+        "cold": "resistant"
+      },
+      "description": "Hemmed with silver ward-thread to preserve focus and deflect chill."
+    },
+    "brigandine_coat": {
+      "id": "brigandine_coat",
+      "name": "Brigandine Coat",
+      "slot": "armor",
+      "value": 20,
+      "armorBonus": 1,
+      "statBonus": {
+        "agility": 1
+      },
+      "resistances": {
+        "piercing": "resistant"
+      },
+      "description": "Supple hide pinned with brass rivets for swift footing."
+    },
+    "penitent_wrap": {
+      "id": "penitent_wrap",
+      "name": "Iron-Wrap",
+      "slot": "armor",
+      "value": 20,
+      "armorBonus": 2,
+      "maxHpBonus": 3,
+      "maxResolveBonus": 3,
+      "resistances": {
+        "blight": "resistant"
+      },
+      "description": "Heavy chains worn over boiled leather that steel both flesh and will."
+    },
+    "basalt_plate": {
+      "id": "basalt_plate",
+      "name": "Basalt Cuirass",
+      "slot": "armor",
+      "value": 60,
+      "armorBonus": 4,
+      "maxHpBonus": 4,
+      "resistances": {
+        "slashing": "resistant",
+        "fire": "resistant",
+        "lightning": "vulnerable"
+      },
+      "description": "Slate-forged plate of the deep gates."
+    },
+    "chitin_mantle": {
+      "id": "chitin_mantle",
+      "name": "Silk Mantle",
+      "slot": "armor",
+      "value": 48,
+      "armorBonus": 2,
+      "statBonus": {
+        "agility": 1,
+        "wit": 1
+      },
+      "resistances": {
+        "acid": "resistant",
+        "poison": "resistant",
+        "fire": "vulnerable"
+      },
+      "description": "Woven by the blind Matrons of the Silken Cistern."
+    },
+    "imperial_signet": {
+      "id": "imperial_signet",
+      "name": "Kiln Signet",
+      "slot": "trinket",
+      "value": 30,
+      "statBonus": {
+        "might": 1
+      },
+      "maxHpBonus": 2,
+      "description": "Old Vaelish bronze seal that steadies the sword arm."
+    },
+    "echo_shell": {
+      "id": "echo_shell",
+      "name": "Echo-Shell",
+      "slot": "trinket",
+      "value": 35,
+      "maxFocusBonus": 2,
+      "resistances": {
+        "resonant": "resistant"
+      },
+      "description": "Resonant spiral sought by the blind Matrons of the Cistern."
+    },
+    "grixi_loupe": {
+      "id": "grixi_loupe",
+      "name": "Brass Loupe",
+      "slot": "trinket",
+      "value": 28,
+      "statBonus": {
+        "wit": 1,
+        "agility": 1
+      },
+      "description": "Spots hairline fractures and ward traps."
+    },
+    "silken_veil": {
+      "id": "silken_veil",
+      "name": "Oracle Veil",
+      "slot": "trinket",
+      "value": 45,
+      "maxFocusBonus": 3,
+      "maxResolveBonus": 4,
+      "armorBonus": 1,
+      "resistances": {
+        "resonant": "resistant",
+        "blight": "resistant"
+      },
+      "description": "Silken shroud that quietens the Pale Choir."
+    },
+    "poultice": {
+      "id": "poultice",
+      "name": "Herb Poultice",
+      "slot": "consumable",
+      "value": 10,
+      "healHp": 12,
+      "cureNegative": true,
+      "tendsInjury": true,
+      "description": "Mends wounds, closes lasting injuries at camp, and clears bleeding or blight."
+    },
+    "vesper_tonic": {
+      "id": "vesper_tonic",
+      "name": "Vesper Tonic",
+      "slot": "consumable",
+      "value": 14,
+      "healHp": 4,
+      "restoreFocus": 6,
+      "restoreResolve": 4,
+      "description": "Liquid amber-distillate that restores focus, resolve, and vigor."
+    },
+    "stamina_draught": {
+      "id": "stamina_draught",
+      "name": "Root Draught",
+      "slot": "consumable",
+      "value": 12,
+      "healHp": 2,
+      "restoreStamina": 6,
+      "description": "Bitter frontier stimulant that restores stamina."
+    },
+    "fire_pot": {
+      "id": "fire_pot",
+      "name": "Fire-Pot",
+      "slot": "consumable",
+      "value": 14,
+      "throwDamage": 12,
+      "throwDamageType": "fire",
+      "throwStatus": {
+        "type": "burned",
+        "turns": 3,
+        "power": 3
+      },
+      "description": "Alchemical flask hurled to ignite a foe in combat."
+    },
+    "storm_vial": {
+      "id": "storm_vial",
+      "name": "Storm Vial",
+      "slot": "consumable",
+      "value": 16,
+      "throwDamage": 11,
+      "throwDamageType": "lightning",
+      "throwStatus": {
+        "type": "shocked",
+        "turns": 2,
+        "power": 2
+      },
+      "description": "Coiled copper-salt flask that bursts with blinding lightning."
+    },
+    "antitoxin": {
+      "id": "antitoxin",
+      "name": "Antitoxin",
+      "slot": "consumable",
+      "value": 10,
+      "healHp": 4,
+      "restoreResolve": 3,
+      "cureNegative": true,
+      "description": "Purges spore blight, poison, and bleeding while steadying nerves."
+    },
+    "star_sap_drop": {
+      "id": "star_sap_drop",
+      "name": "Star-Sap Drop",
+      "slot": "consumable",
+      "value": 34,
+      "grantsBodyModId": "star_sap_eyes",
+      "description": "Crystallized eye-dropper implanting Star-Sap Lenses directly into the irises."
+    },
+    "chitin_serum": {
+      "id": "chitin_serum",
+      "name": "Chitin Serum",
+      "slot": "consumable",
+      "value": 32,
+      "grantsBodyModId": "chitin_skin",
+      "description": "Mutagenic distillate that hardens pale carapace plates across skin and ribs."
+    },
+    "iron_wire_kit": {
+      "id": "iron_wire_kit",
+      "name": "Tendon Wire-Kit",
+      "slot": "consumable",
+      "value": 36,
+      "grantsBodyModId": "iron_tendon_arms",
+      "description": "Durnfolk surgical coil for stitching iron-wire reinforcement into forearms."
+    },
+    "husk_gland": {
+      "id": "husk_gland",
+      "name": "Spore Gland",
+      "slot": "reagent",
+      "value": 20,
+      "description": "Calcified spore organ used in tonics, serums, or black-market trade."
+    },
+    "bog_herb": {
+      "id": "bog_herb",
+      "name": "Bog Herb",
+      "slot": "reagent",
+      "value": 6,
+      "description": "Silver-veined marsh leaf harvested for poultices and antitoxins."
+    },
+    "ash_resin": {
+      "id": "ash_resin",
+      "name": "Ash Resin",
+      "slot": "reagent",
+      "value": 7,
+      "description": "Volatile amber sap scraped from petrified timber."
+    }
+  },
+  "recipes": [
+    {
+      "id": "craft_poultice",
+      "name": "Poultice",
+      "outputItemId": "poultice",
+      "outputQty": 1,
+      "ingredients": [
+        {
+          "itemId": "bog_herb",
+          "qty": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_fire_pot",
+      "name": "Fire-Pot",
+      "outputItemId": "fire_pot",
+      "outputQty": 1,
+      "ingredients": [
+        {
+          "itemId": "ash_resin",
+          "qty": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_antitoxin",
+      "name": "Antitoxin",
+      "outputItemId": "antitoxin",
+      "outputQty": 1,
+      "ingredients": [
+        {
+          "itemId": "bog_herb",
+          "qty": 1
+        },
+        {
+          "itemId": "husk_gland",
+          "qty": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_vesper_tonic",
+      "name": "Vesper Tonic",
+      "outputItemId": "vesper_tonic",
+      "outputQty": 1,
+      "ingredients": [
+        {
+          "itemId": "husk_gland",
+          "qty": 1
+        },
+        {
+          "itemId": "ash_resin",
+          "qty": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_storm_vial",
+      "name": "Storm Vial",
+      "outputItemId": "storm_vial",
+      "outputQty": 1,
+      "ingredients": [
+        {
+          "itemId": "ash_resin",
+          "qty": 1
+        },
+        {
+          "itemId": "bog_herb",
+          "qty": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_chitin_serum",
+      "name": "Chitin Serum",
+      "outputItemId": "chitin_serum",
+      "outputQty": 1,
+      "ingredients": [
+        {
+          "itemId": "husk_gland",
+          "qty": 2
+        },
+        {
+          "itemId": "bog_herb",
+          "qty": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_twin_fire",
+      "name": "Twin Fire-Pots",
+      "outputItemId": "fire_pot",
+      "outputQty": 2,
+      "ingredients": [
+        {
+          "itemId": "ash_resin",
+          "qty": 1
+        },
+        {
+          "itemId": "husk_gland",
+          "qty": 1
+        }
+      ],
+      "grixiOrScholarOnly": true
+    }
+  ]
+}

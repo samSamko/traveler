@@ -8,6 +8,7 @@ import { BODY_MODS } from '../src/systems/bodymods.ts';
 import { INJURIES } from '../src/systems/injuries.ts';
 import { DAMAGE_TYPE_META } from '../src/systems/damage.ts';
 import { createNewGame } from '../src/engine.ts';
+import { getWorldDatabase } from '../src/db/loader.ts';
 import type { AnatomyProfile } from '../src/types.ts';
 
 const errors: string[] = [];
@@ -163,6 +164,42 @@ for (const link of ENTITY_LINKS) {
     errors.push(`Broken ENTITY_LINKS.to reference: "${link.to}"`);
   }
   checkNoBracketsOrParens(link.note, `link:${link.from}->${link.to}`);
+}
+
+// 5. Validate SQLite database integrity & foreign keys
+const db = getWorldDatabase();
+const fkViolations = db.prepare('PRAGMA foreign_key_check').all();
+if (fkViolations.length > 0) {
+  errors.push(`SQLite foreign_key_check returned ${fkViolations.length} violations: ${JSON.stringify(fkViolations)}`);
+}
+const requiredTables = [
+  'races',
+  'backgrounds',
+  'heirlooms',
+  'abilities',
+  'perks',
+  'items',
+  'recipes',
+  'body_mods',
+  'injuries',
+  'enemies',
+  'enemy_intents',
+  'enemy_loot',
+  'places',
+  'place_connections',
+  'place_actions',
+  'npcs',
+  'npc_topics',
+  'events',
+  'event_choices',
+  'entity_links',
+  'npc_reactions',
+];
+for (const table of requiredTables) {
+  const row = db.prepare(`SELECT COUNT(*) AS cnt FROM ${table}`).get() as { cnt: number };
+  if (!row || row.cnt <= 0) {
+    errors.push(`SQLite table "${table}" is empty`);
+  }
 }
 
 if (errors.length > 0) {
