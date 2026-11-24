@@ -1,0 +1,539 @@
+{
+  "subAreas": [
+    {
+      "id": "barrow_crypt_ledge",
+      "parentAreaId": "weeping_barrow",
+      "name": "Collapsed Crypt Ledge",
+      "description": "A dry stone shelf behind a fallen lintel where old grave-robbers hid brass lanterns and bronze offerings.",
+      "dangerBonus": 1
+    },
+    {
+      "id": "fen_sunken_shrine",
+      "parentAreaId": "ash_fen",
+      "name": "Sunken Peat Shrine",
+      "description": "Half-drowned boundary stones circling a quiet pool where bitter herbs and pale stalkers gather.",
+      "dangerBonus": 1
+    },
+    {
+      "id": "starwood_glass_hollow",
+      "parentAreaId": "petrified_starwood",
+      "name": "Glass-Sap Hollow",
+      "description": "A windless bowl of crystalized tree-trunks humming softly with trapped resonance.",
+      "dangerBonus": 1
+    },
+    {
+      "id": "quarry_deep_vein",
+      "parentAreaId": "iron_quarry",
+      "name": "Flooded Seam Gallery",
+      "description": "A narrow adit cut into wet slate where forgotten mining tools and iron-armored constructs still wait.",
+      "dangerBonus": 1
+    }
+  ],
+  "encounters": [
+    {
+      "id": "hub_unlock_causeway",
+      "scopeType": "camp_hub",
+      "scopeId": "camp_hub",
+      "kind": "unlock_area",
+      "weight": 18,
+      "label": "Broken Road",
+      "prose": "Beyond a ridge of wet heather, you spot cracked flagstones winding north toward a ruined stone road.",
+      "targetUnlockId": "kings_causeway"
+    },
+    {
+      "id": "hub_unlock_cinderford",
+      "scopeType": "camp_hub",
+      "scopeId": "camp_hub",
+      "kind": "unlock_town",
+      "weight": 18,
+      "label": "Timber Palisade",
+      "prose": "Peat smoke and lantern-glow mark a fortified timber keep perched above the marshland.",
+      "targetUnlockId": "cinderford"
+    },
+    {
+      "id": "hub_unlock_barrow",
+      "scopeType": "camp_hub",
+      "scopeId": "camp_hub",
+      "kind": "unlock_area",
+      "weight": 14,
+      "label": "Mound Trail",
+      "prose": "An overgrown sheep-track leads toward a moss-covered stone burial mound weeping pale water.",
+      "targetUnlockId": "weeping_barrow"
+    },
+    {
+      "id": "hub_unlock_fen",
+      "scopeType": "camp_hub",
+      "scopeId": "camp_hub",
+      "kind": "unlock_area",
+      "weight": 12,
+      "label": "Reed Causeway",
+      "prose": "Sunken wooden planks mark a treacherous path across steaming grey peat marshes.",
+      "targetUnlockId": "ash_fen"
+    },
+    {
+      "id": "hub_unlock_orchard",
+      "scopeType": "camp_hub",
+      "scopeId": "camp_hub",
+      "kind": "unlock_area",
+      "weight": 10,
+      "label": "Dead Orchard",
+      "prose": "You map a narrow ridge overlooking rows of drowned apple trees hung with bone-lanterns.",
+      "targetUnlockId": "sunken_orchard"
+    },
+    {
+      "id": "hub_unlock_cistern",
+      "scopeType": "camp_hub",
+      "scopeId": "camp_hub",
+      "kind": "unlock_town",
+      "weight": 8,
+      "label": "Silk Cavern",
+      "prose": "A hidden chalk stair descends beneath the reeds toward glowing subterranean cistern halls.",
+      "targetUnlockId": "silken_cistern"
+    },
+    {
+      "id": "hub_unlock_starwood",
+      "scopeType": "camp_hub",
+      "scopeId": "camp_hub",
+      "kind": "unlock_area",
+      "weight": 8,
+      "label": "Stone Trees",
+      "prose": "Pale, petrified trunks rise like glass pillars beyond the northern fog.",
+      "targetUnlockId": "petrified_starwood"
+    },
+    {
+      "id": "hub_unlock_kiln_scars",
+      "scopeType": "camp_hub",
+      "scopeId": "camp_hub",
+      "kind": "unlock_area",
+      "weight": 7,
+      "label": "Steam Fissures",
+      "prose": "Warm sulfur mist guides your compass toward jagged black glass trenches.",
+      "targetUnlockId": "kiln_scars"
+    },
+    {
+      "id": "hub_unlock_forge",
+      "scopeType": "camp_hub",
+      "scopeId": "camp_hub",
+      "kind": "unlock_town",
+      "weight": 6,
+      "label": "Flooded Gate",
+      "prose": "Half-submerged dwarf stonework marks the entrance to an ancient flooded forge hall.",
+      "targetUnlockId": "drowned_forge"
+    },
+    {
+      "id": "hub_unlock_catacombs",
+      "scopeType": "camp_hub",
+      "scopeId": "camp_hub",
+      "kind": "unlock_area",
+      "weight": 5,
+      "label": "Salt Galleries",
+      "prose": "A collapsed hillside reveals dry, salt-crusted burial arches beneath the ridge.",
+      "targetUnlockId": "salt_catacombs"
+    },
+    {
+      "id": "hub_unlock_quarry",
+      "scopeType": "camp_hub",
+      "scopeId": "camp_hub",
+      "kind": "unlock_area",
+      "weight": 5,
+      "label": "Slate Pit",
+      "prose": "Rusted winch-chains silhouette a stepped black slate quarry pit in the distance.",
+      "targetUnlockId": "iron_quarry"
+    },
+    {
+      "id": "hub_unlock_watchtower",
+      "scopeType": "camp_hub",
+      "scopeId": "camp_hub",
+      "kind": "unlock_area",
+      "weight": 4,
+      "label": "High Ruin",
+      "prose": "A shattered stone watchtower perches atop the highest crag overlooking the valley.",
+      "targetUnlockId": "crown_watchtower"
+    },
+    {
+      "id": "hub_unlock_belfry",
+      "scopeType": "camp_hub",
+      "scopeId": "camp_hub",
+      "kind": "unlock_area",
+      "weight": 3,
+      "label": "Drowned Spire",
+      "prose": "Far in the mist, a half-sunken bronze bell-tower tolls once through heavy fog.",
+      "targetUnlockId": "sunken_belfry"
+    },
+    {
+      "id": "hub_enemy_hound",
+      "scopeType": "camp_hub",
+      "scopeId": "camp_hub",
+      "kind": "enemy",
+      "weight": 12,
+      "label": "Hound Ambush",
+      "prose": "Low growls rattle in the wet brush as a gaunt cinder-mouthed beast stalks into view.",
+      "enemyIds": ["ash_hound"]
+    },
+    {
+      "id": "hub_merchant_tinker",
+      "scopeType": "camp_hub",
+      "scopeId": "camp_hub",
+      "kind": "merchant",
+      "weight": 8,
+      "label": "Wandering Tinker",
+      "prose": "A hooded tinker pushing a squeaking handcart halts by your trail-markers and opens a oilcloth pack.",
+      "shop": {
+        "name": "Trail Tinker's Cart",
+        "keeper": "Old Brin",
+        "items": [
+          { "itemId": "poultice", "price": 11 },
+          { "itemId": "amber_tonic", "price": 19 },
+          { "itemId": "kiln_pitch", "price": 14 },
+          { "itemId": "tallow_lantern", "price": 15 },
+          { "itemId": "ash_mantle", "price": 25 }
+        ]
+      }
+    },
+    {
+      "id": "hub_item_satchel",
+      "scopeType": "camp_hub",
+      "scopeId": "camp_hub",
+      "kind": "item",
+      "weight": 8,
+      "label": "Lost Satchel",
+      "prose": "Half-buried beside a milestone, a rotted leather satchel still holds dry bandages.",
+      "itemId": "poultice",
+      "crownsMin": 3,
+      "crownsMax": 8
+    },
+    {
+      "id": "hub_landscape_ridge",
+      "scopeType": "camp_hub",
+      "scopeId": "camp_hub",
+      "kind": "landscape",
+      "weight": 7,
+      "label": "Ash Overlook",
+      "prose": "From a windswept granite shelf you watch grey rain sweep across the drowned valley floor."
+    },
+    {
+      "id": "hub_curiosity_bell",
+      "scopeType": "camp_hub",
+      "scopeId": "camp_hub",
+      "kind": "curiosity",
+      "weight": 6,
+      "label": "Bronze Marker",
+      "prose": "A small bronze bell hangs from a dead hawthorn branch, its clapper wrapped tight in waxed linen.",
+      "crownsMin": 2,
+      "crownsMax": 6
+    },
+    {
+      "id": "hub_nothing_quiet",
+      "scopeType": "camp_hub",
+      "scopeId": "camp_hub",
+      "kind": "nothing",
+      "weight": 6,
+      "label": "Quiet Scrub",
+      "prose": "You beat through wet scrub and cold ash for two hours without crossing a living soul."
+    },
+
+    {
+      "id": "kc_enemy_bandit",
+      "scopeType": "area",
+      "scopeId": "kings_causeway",
+      "kind": "enemy",
+      "weight": 20,
+      "label": "Road Cutthroat",
+      "prose": "A ragged highwayman steps from behind an overturned wagon with rust-flecked steel.",
+      "enemyIds": ["mire_bandit"]
+    },
+    {
+      "id": "kc_item_resin",
+      "scopeType": "area",
+      "scopeId": "kings_causeway",
+      "kind": "item",
+      "weight": 12,
+      "label": "Cart Salvage",
+      "prose": "Inside a splintered supply chest you find a jar of amber resin and scattered coins.",
+      "itemId": "ash_resin",
+      "crownsMin": 4,
+      "crownsMax": 10
+    },
+    {
+      "id": "kc_landscape_stones",
+      "scopeType": "area",
+      "scopeId": "kings_causeway",
+      "kind": "landscape",
+      "weight": 10,
+      "label": "Broken Milestones",
+      "prose": "Mossy stone markers lean sideways along the sunken flagstones, pointing toward older roads."
+    },
+
+    {
+      "id": "wb_unlock_subarea",
+      "scopeType": "area",
+      "scopeId": "weeping_barrow",
+      "kind": "unlock_sub_area",
+      "weight": 14,
+      "label": "Hidden Ledge",
+      "prose": "Behind a slipped lintel stone you uncover a narrow dry shelf above the barrow ditch.",
+      "targetUnlockId": "barrow_crypt_ledge"
+    },
+    {
+      "id": "wb_unlock_dungeon",
+      "scopeType": "area",
+      "scopeId": "weeping_barrow",
+      "kind": "unlock_dungeon",
+      "weight": 14,
+      "label": "Crypt Stair",
+      "prose": "Clearing wet brambles reveals a sunken stone stair descending beneath the Weeping Barrow.",
+      "targetUnlockId": "barrow_undercroft"
+    },
+    {
+      "id": "wb_enemy_husk",
+      "scopeType": "area",
+      "scopeId": "weeping_barrow",
+      "kind": "enemy",
+      "weight": 18,
+      "label": "Barrow Stalker",
+      "prose": "Pale roots crackle behind a stone pillar as a spore-choked figure lurches forward.",
+      "enemyIds": ["root_husk"]
+    },
+    {
+      "id": "wb_sub_enemy_wight",
+      "scopeType": "sub_area",
+      "scopeId": "barrow_crypt_ledge",
+      "kind": "enemy",
+      "weight": 20,
+      "label": "Ledge Guardian",
+      "prose": "An armored husk rattling with bronze charms rises from a stone alcove.",
+      "enemyIds": ["bell_acolyte"]
+    },
+    {
+      "id": "wb_sub_item_oil",
+      "scopeType": "sub_area",
+      "scopeId": "barrow_crypt_ledge",
+      "kind": "item",
+      "weight": 15,
+      "label": "Silver-Ash Oil",
+      "prose": "Tucked behind a collapsed urn sits an untouched vial of silver-ash weapon oil.",
+      "itemId": "silver_ash_oil",
+      "crownsMin": 8,
+      "crownsMax": 16
+    },
+
+    {
+      "id": "af_unlock_subarea",
+      "scopeType": "area",
+      "scopeId": "ash_fen",
+      "kind": "unlock_sub_area",
+      "weight": 14,
+      "label": "Peat Shrine",
+      "prose": "Parting tall marsh reeds reveals a ring of half-drowned boundary stones around a clear spring.",
+      "targetUnlockId": "fen_sunken_shrine"
+    },
+    {
+      "id": "af_unlock_dungeon",
+      "scopeType": "area",
+      "scopeId": "ash_fen",
+      "kind": "unlock_dungeon",
+      "weight": 14,
+      "label": "Sluice Gate",
+      "prose": "Beneath a willow root you spot rusted iron sluice-bars leading into flooded cistern vaults.",
+      "targetUnlockId": "cistern_sluice"
+    },
+    {
+      "id": "af_enemy_weaver",
+      "scopeType": "area",
+      "scopeId": "ash_fen",
+      "kind": "enemy",
+      "weight": 18,
+      "label": "Chitin Lurker",
+      "prose": "Bubbles break the black peat water as a pale-shelled ambush predator lunges.",
+      "enemyIds": ["chitin_weaver"]
+    },
+    {
+      "id": "af_sub_item_draught",
+      "scopeType": "sub_area",
+      "scopeId": "fen_sunken_shrine",
+      "kind": "item",
+      "weight": 15,
+      "label": "Shrine Offering",
+      "prose": "On a dry plinth above the dark water rests a stoppered purge draught.",
+      "itemId": "ash_purge_draught",
+      "crownsMin": 6,
+      "crownsMax": 14
+    },
+
+    {
+      "id": "so_enemy_stalker",
+      "scopeType": "area",
+      "scopeId": "sunken_orchard",
+      "kind": "enemy",
+      "weight": 20,
+      "label": "Orchard Hound",
+      "prose": "Bone-lanterns clack overhead as an ember-jawed beast splashes through the flooded rows.",
+      "enemyIds": ["ash_hound", "root_husk"]
+    },
+    {
+      "id": "so_item_herb",
+      "scopeType": "area",
+      "scopeId": "sunken_orchard",
+      "kind": "item",
+      "weight": 15,
+      "label": "Orchard Herbs",
+      "prose": "Silver-veined marsh leaves sprout thick along a dry stone wall.",
+      "itemId": "bog_herb",
+      "crownsMin": 3,
+      "crownsMax": 7
+    },
+
+    {
+      "id": "sw_unlock_subarea",
+      "scopeType": "area",
+      "scopeId": "petrified_starwood",
+      "kind": "unlock_sub_area",
+      "weight": 15,
+      "label": "Glass Hollow",
+      "prose": "Between fused crystal trunks, a narrow crack opens into a resonant hollow.",
+      "targetUnlockId": "starwood_glass_hollow"
+    },
+    {
+      "id": "sw_enemy_acolyte",
+      "scopeType": "area",
+      "scopeId": "petrified_starwood",
+      "kind": "enemy",
+      "weight": 20,
+      "label": "Choir Sentinel",
+      "prose": "A bronze-masked figure steps noiselessly from behind a petrified trunk.",
+      "enemyIds": ["bell_acolyte"]
+    },
+    {
+      "id": "sw_sub_item_writ",
+      "scopeType": "sub_area",
+      "scopeId": "starwood_glass_hollow",
+      "kind": "item",
+      "weight": 14,
+      "label": "Silver Writ",
+      "prose": "Wedged inside a split crystal root lies an intact Ash-Text scroll.",
+      "itemId": "writ_star_ward",
+      "crownsMin": 10,
+      "crownsMax": 20
+    },
+
+    {
+      "id": "ks_unlock_dungeon",
+      "scopeType": "area",
+      "scopeId": "kiln_scars",
+      "kind": "unlock_dungeon",
+      "weight": 15,
+      "label": "Kiln Shaft",
+      "prose": "Warm air rises from an iron ladder bolted down into a collapsed furnace shaft.",
+      "targetUnlockId": "collapsed_kiln_shaft"
+    },
+    {
+      "id": "ks_enemy_cinder",
+      "scopeType": "area",
+      "scopeId": "kiln_scars",
+      "kind": "enemy",
+      "weight": 20,
+      "label": "Vent Stalker",
+      "prose": "Ash-crusted predators dart out from a steaming obsidian trench.",
+      "enemyIds": ["ash_hound", "ash_hound"]
+    },
+
+    {
+      "id": "sc_enemy_crypt",
+      "scopeType": "area",
+      "scopeId": "salt_catacombs",
+      "kind": "enemy",
+      "weight": 20,
+      "label": "Salt Patrol",
+      "prose": "Heavy bronze bells echo down the salt-white corridor as two figures close in.",
+      "enemyIds": ["bell_acolyte", "root_husk"]
+    },
+    {
+      "id": "sc_item_tonic",
+      "scopeType": "area",
+      "scopeId": "salt_catacombs",
+      "kind": "item",
+      "weight": 12,
+      "label": "Altar Cache",
+      "prose": "Behind a salt-sealed niche you uncover a vial of amber draught.",
+      "itemId": "amber_tonic",
+      "crownsMin": 12,
+      "crownsMax": 22
+    },
+
+    {
+      "id": "iq_unlock_subarea",
+      "scopeType": "area",
+      "scopeId": "iron_quarry",
+      "kind": "unlock_sub_area",
+      "weight": 14,
+      "label": "Seam Gallery",
+      "prose": "Behind a derailed ore-cart you spot a braced timber adit cut deep into wet slate.",
+      "targetUnlockId": "quarry_deep_vein"
+    },
+    {
+      "id": "iq_enemy_sentinel",
+      "scopeType": "area",
+      "scopeId": "iron_quarry",
+      "kind": "enemy",
+      "weight": 20,
+      "label": "Slate Construct",
+      "prose": "Gears grind beneath wet stone as a heavy forge-warden lumbers across the terrace.",
+      "enemyIds": ["iron_sentinel"]
+    },
+    {
+      "id": "iq_sub_item_buckler",
+      "scopeType": "sub_area",
+      "scopeId": "quarry_deep_vein",
+      "kind": "item",
+      "weight": 14,
+      "label": "Guard Locker",
+      "prose": "Inside an iron locker sits a bossed buckler wrapped in oiled cloth.",
+      "itemId": "iron_buckler",
+      "crownsMin": 12,
+      "crownsMax": 24
+    },
+
+    {
+      "id": "cw_enemy_watch",
+      "scopeType": "area",
+      "scopeId": "crown_watchtower",
+      "kind": "enemy",
+      "weight": 20,
+      "label": "Tower Guard",
+      "prose": "Armed deserters and bell-bound zealots block the broken parapet stair.",
+      "enemyIds": ["bell_acolyte", "mire_bandit"]
+    },
+    {
+      "id": "cw_curiosity_beacon",
+      "scopeType": "area",
+      "scopeId": "crown_watchtower",
+      "kind": "curiosity",
+      "weight": 10,
+      "label": "Cold Beacon",
+      "prose": "The stone brazier atop the tower holds dead silver ash that still hums softly in the wind.",
+      "crownsMin": 10,
+      "crownsMax": 18
+    },
+
+    {
+      "id": "sb_unlock_dungeon",
+      "scopeType": "area",
+      "scopeId": "sunken_belfry",
+      "kind": "unlock_dungeon",
+      "weight": 18,
+      "label": "Choir Descent",
+      "prose": "Beneath the cracked bronze bell, flooded steps spiral down into the Choir-Pit.",
+      "targetUnlockId": "belfry_choir_pit"
+    },
+    {
+      "id": "sb_enemy_choir",
+      "scopeType": "area",
+      "scopeId": "sunken_belfry",
+      "kind": "enemy",
+      "weight": 20,
+      "label": "Belfry Guard",
+      "prose": "Two bronze-masked zealots step out of the knee-deep water with raised censers.",
+      "enemyIds": ["bell_acolyte", "bell_acolyte"]
+    }
+  ]
+}

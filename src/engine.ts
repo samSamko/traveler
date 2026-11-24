@@ -64,6 +64,20 @@ import {
   drinkDraught,
   getEquippedVisibleTags,
 } from './systems/frontier.ts';
+import {
+  createInitialFrontierState,
+  returnToCampHub,
+  rollAreaExplore,
+  rollCampExplore,
+  travelFromCamp,
+} from './systems/frontierLoop.ts';
+import {
+  enterDungeon,
+  executeDungeonAction,
+  getDungeonChoices,
+  renderDungeonMap,
+} from './systems/dungeon.ts';
+import { loadWorldDatabase } from './db/loader.ts';
 
 registerRuleRuntime({
   resolveCheck,
@@ -83,6 +97,10 @@ const SHORT_LOCATION_NAMES: Record<string, string> = {
   drowned_forge: 'Drowned Forge',
   crown_watchtower: 'Crown Watchtower',
   sunken_belfry: 'Sunken Belfry',
+  sunken_orchard: 'Sunken Orchard',
+  kiln_scars: 'Kiln Scars',
+  salt_catacombs: 'Salt Catacombs',
+  iron_quarry: 'Iron Quarry',
 };
 
 export interface CreateCharacterInput {
@@ -198,8 +216,8 @@ export function createNewGame(input: CreateCharacterInput): GameState {
       statuses: [],
       determinationAvailable: true,
     },
-    locationId: 'cinderford',
-    visitedLocations: ['cinderford'],
+    locationId: 'camp_hub',
+    visitedLocations: [],
     seenEvents: [],
     eventCooldowns: {},
     memory: {
@@ -213,7 +231,7 @@ export function createNewGame(input: CreateCharacterInput): GameState {
       chronicle: [],
     },
     discovery: createInitialDiscovery(startingKnownItems),
-    scene: skipIntro ? 'location' : 'intro',
+    scene: skipIntro ? 'camp_hub' : 'intro',
     subMenu: 'root',
     introBeat: 0,
     journalTab: 'root',
@@ -224,10 +242,12 @@ export function createNewGame(input: CreateCharacterInput): GameState {
     combat: null,
     aftermath: null,
     camp: null,
+    frontier: createInitialFrontierState(),
+    activeMerchant: null,
     pendingPerkIds: [],
     endingSummary: null,
     lastMessages: skipIntro
-      ? ['You step through the rain-slicked timber gate of Cinderford Keep.']
+      ? ['Cold ash settles around your lone camp in the scrub.']
       : [],
     rngState: input.rngState,
   };
@@ -285,14 +305,123 @@ export function getSceneChoices(state: GameState): MenuEntry[] {
     return getAftermathChoices(state);
   }
 
-  if (state.scene === 'location') {
+  if (state.scene === 'dungeon') {
+    return getDungeonChoices(state);
+  }
+
+  if (state.scene === 'camp_hub') {
+    if (state.subMenu === 'root') {
+      entries.push({ index: 1, id: 'hub:explore', label: 'Explore', enabled: true });
+      const destinations = [...state.frontier.unlockedAreas, ...state.frontier.unlockedTowns];
+      entries.push({
+        index: 2,
+        id: 'sub:travel',
+        label: 'Travel',
+        enabled: destinations.length > 0,
+        reason: destinations.length > 0 ? undefined : 'Explore to find areas first',
+      });
+      entries.push({ index: 3, id: 'camp_action', label: 'Rest', enabled: true });
+      entries.push({ index: 4, id: 'sub:stash', label: 'Stash', enabled: true });
+      entries.push({ index: 5, id: 'sub:pack', label: 'Pack', enabled: true });
+      entries.push({ index: 6, id: 'open_journal', label: 'Journal', enabled: true });
+      return entries;
+    }
+
+    if (state.subMenu === 'travel') {
+      const destinations = [...state.frontier.unlockedAreas, ...state.frontier.unlockedTowns];
+      for (const destId of destinations) {
+        const destName = SHORT_LOCATION_NAMES[destId] ?? LOCATIONS[destId]?.name ?? destId;
+        entries.push({
+          index: entries.length + 1,
+          id: `hub:travel:${destId}`,
+          label: destName,
+          enabled: true,
+        });
+      }
+      entries.push({ index: entries.length + 1, id: 'sub:root', label: 'Back', enabled: true });
+      return entries;
+    }
+
+    if (state.subMenu === 'stash') {
+      entries.push({ index: 1, id: 'sub:stash_put', label: 'Store', enabled: true });
+      entries.push({ index: 2, id: 'sub:stash_take', label: 'Take', enabled: true });
+      entries.push({ index: 3, id: 'sub:root', label: 'Back', enabled: true });
+      return entries;
+    }
+
+    if (state.subMenu === 'stash_put') {
+      for (const entry of state.player.inventory) {
+        if (entry.qty <= 0) continue;
+        const item = ITEMS[entry.id];
+        if (!item) continue;
+        entries.push({
+          index: entries.length + 1,
+          id: `stash:put:${item.id}`,
+          label: item.name,
+          enabled: true,
+        });
+      }
+      entries.push({ index: entries.length + 1, id: 'sub:stash', label: 'Back', enabled: true });
+      return entries;
+    }
+
+    if (state.subMenu === 'stash_take') {
+      for (const entry of state.frontier.stash) {
+        if (entry.qty <= 0) continue;
+        const item = ITEMS[entry.id];
+        if (!item) continue;
+        entries.push({
+          index: entries.length + 1,
+          id: `stash:take:${item.id}`,
+          label: item.name,
+          enabled: true,
+        });
+      }
+      entries.push({ index: entries.length + 1, id: 'sub:stash', label: 'Back', enabled: true });
+      return entries;
+    }
+  }
+
+  if (state.scene === 'location' || state.scene === 'camp_hub') {
     const loc = LOCATIONS[state.locationId];
 
-    if (state.subMenu === 'root') {
-      const hasExplore = loc.actions.some((a) => !a.visible || a.visible(state));
-      if (hasExplore) {
-        entries.push({ index: entries.length + 1, id: 'sub:explore', label: 'Explore', enabled: true });
+    if (state.scene === 'location' && state.subMenu === 'root') {
+      if (loc.regionType === 'area') {
+        entries.push({ index: entries.length + 1, id: 'area:explore', label: 'Explore', enabled: true });
+        const areaSubs = Object.values(loadWorldDatabase().subAreas).filter(
+          (sa) => sa.parentAreaId === loc.id && state.frontier.unlockedSubAreas.includes(sa.id),
+        );
+        if (areaSubs.length > 0) {
+          entries.push({
+            index: entries.length + 1,
+            id: 'area:toggle_subarea',
+            label: state.frontier.activeSubArea[loc.id] ? 'Main Area' : 'Sub-Area',
+            enabled: true,
+          });
+        }
+        const areaDungeons = Object.values(loadWorldDatabase().dungeons).filter(
+          (d) => d.parentAreaId === loc.id && state.frontier.unlockedDungeons.includes(d.id),
+        );
+        for (const d of areaDungeons) {
+          entries.push({
+            index: entries.length + 1,
+            id: `area:enter_dungeon:${d.id}`,
+            label: 'Dungeon',
+            enabled: true,
+          });
+        }
       }
+
+      const hasSiteActions = loc.actions.some((a) => !a.visible || a.visible(state));
+      if (hasSiteActions) {
+        entries.push({
+          index: entries.length + 1,
+          id: 'sub:explore',
+          label: loc.regionType === 'area' ? 'Search' : 'Interact',
+          enabled: true,
+        });
+      }
+
       const hasNpcs = Boolean(loc.npcs?.some((n) => !n.visible || n.visible(state)));
       if (hasNpcs) {
         entries.push({ index: entries.length + 1, id: 'sub:talk', label: 'Talk', enabled: true });
@@ -300,18 +429,18 @@ export function getSceneChoices(state: GameState): MenuEntry[] {
       if (loc.shop && !hasFlag(state, 'cinderford_fallen') && !hasFlag(state, 'stole_cistern_vesper')) {
         entries.push({ index: entries.length + 1, id: 'open_shop', label: 'Trade', enabled: true });
       }
-      if (loc.regionType === 'settlement' && !hasFlag(state, 'cinderford_fallen')) {
+      if (loc.regionType === 'town' && !hasFlag(state, 'cinderford_fallen')) {
         entries.push({ index: entries.length + 1, id: 'rest_action', label: 'Rest', enabled: true });
       } else {
         entries.push({ index: entries.length + 1, id: 'camp_action', label: 'Camp', enabled: true });
       }
       entries.push({ index: entries.length + 1, id: 'sub:pack', label: 'Pack', enabled: true });
       entries.push({ index: entries.length + 1, id: 'open_journal', label: 'Journal', enabled: true });
-      entries.push({ index: entries.length + 1, id: 'sub:travel', label: 'Travel', enabled: true });
+      entries.push({ index: entries.length + 1, id: 'return_camp', label: 'Return', enabled: true });
       return entries;
     }
 
-    if (state.subMenu === 'explore') {
+    if (state.scene === 'location' && state.subMenu === 'explore') {
       for (const action of loc.actions) {
         if (!action.visible || action.visible(state)) {
           entries.push({
@@ -386,7 +515,15 @@ export function getSceneChoices(state: GameState): MenuEntry[] {
     if (state.subMenu === 'pack_use') {
       for (const entry of state.player.inventory) {
         const item = ITEMS[entry.id];
-        if (item && item.slot === 'consumable' && !item.throwDamage && entry.qty > 0) {
+        if (
+          item &&
+          (item.slot === 'consumable' ||
+            item.slot === 'draught' ||
+            item.slot === 'coating' ||
+            item.slot === 'ash_text') &&
+          !item.throwDamage &&
+          entry.qty > 0
+        ) {
           entries.push({
             index: entries.length + 1,
             id: `use_item:${item.id}`,
@@ -402,7 +539,15 @@ export function getSceneChoices(state: GameState): MenuEntry[] {
     if (state.subMenu === 'pack_equip') {
       for (const entry of state.player.inventory) {
         const item = ITEMS[entry.id];
-        if (item && (item.slot === 'weapon' || item.slot === 'armor' || item.slot === 'trinket') && entry.qty > 0) {
+        if (
+          item &&
+          (item.slot === 'mainHand' ||
+            item.slot === 'offHand' ||
+            item.slot === 'armor' ||
+            item.slot === 'cloak' ||
+            item.slot === 'trinket') &&
+          entry.qty > 0
+        ) {
           entries.push({
             index: entries.length + 1,
             id: `equip_item:${item.id}`,
@@ -472,7 +617,7 @@ export function getSceneChoices(state: GameState): MenuEntry[] {
     return getCombatMenuOptions(state);
   } else if (state.scene === 'shop') {
     const loc = LOCATIONS[state.locationId];
-    const shop = loc.shop;
+    const shop = state.activeMerchant ?? loc?.shop;
     if (shop) {
       const hasBlackMarket =
         state.player.race === 'grixi' || state.memory.factions.under_warren >= 1;
@@ -875,14 +1020,17 @@ function handleBackShortcut(state: GameState): boolean {
     return true;
   }
   if (state.scene === 'shop') {
-    state.scene = 'location';
+    state.activeMerchant = null;
+    state.scene = state.locationId === 'camp_hub' ? 'camp_hub' : 'location';
     state.subMenu = 'root';
     return true;
   }
-  if (state.scene === 'location' && state.subMenu !== 'root') {
+  if ((state.scene === 'location' || state.scene === 'camp_hub') && state.subMenu !== 'root') {
     if (state.subMenu === 'dialogue') {
       state.subMenu = 'talk';
       state.activeNpcId = null;
+    } else if (state.subMenu === 'stash_put' || state.subMenu === 'stash_take') {
+      state.subMenu = 'stash';
     } else if (
       state.subMenu === 'pack_use' ||
       state.subMenu === 'pack_equip' ||
@@ -1025,14 +1173,14 @@ export function processInput(
       state.introBeat += 1;
       return { messages: [], shouldQuit: false };
     }
-    state.scene = 'location';
+    state.scene = 'camp_hub';
     state.subMenu = 'root';
-    return { messages: [LOCATIONS.cinderford.firstSightProse(state)], shouldQuit: false };
+    return { messages: ['Cold ash settles around your lone camp in the scrub. Explore to chart the frontier.'], shouldQuit: false };
   }
   if (chosen.id === 'intro:skip') {
-    state.scene = 'location';
+    state.scene = 'camp_hub';
     state.subMenu = 'root';
-    return { messages: [LOCATIONS.cinderford.firstSightProse(state)], shouldQuit: false };
+    return { messages: ['Cold ash settles around your lone camp in the scrub. Explore to chart the frontier.'], shouldQuit: false };
   }
 
   // Journal
@@ -1097,6 +1245,74 @@ export function processInput(
   if (chosen.id === 'sub:travel') {
     state.subMenu = 'travel';
     return { messages: [], shouldQuit: false };
+  }
+  if (chosen.id === 'sub:stash') {
+    state.subMenu = 'stash';
+    return { messages: [], shouldQuit: false };
+  }
+  if (chosen.id === 'sub:stash_put') {
+    state.subMenu = 'stash_put';
+    return { messages: [], shouldQuit: false };
+  }
+  if (chosen.id === 'sub:stash_take') {
+    state.subMenu = 'stash_take';
+    return { messages: [], shouldQuit: false };
+  }
+  if (chosen.id === 'hub:explore') {
+    return { messages: rollCampExplore(state), shouldQuit: false };
+  }
+  if (chosen.id.startsWith('hub:travel:')) {
+    return { messages: travelFromCamp(state, chosen.id.slice(11)), shouldQuit: false };
+  }
+  if (chosen.id === 'area:explore') {
+    return { messages: rollAreaExplore(state, state.locationId), shouldQuit: false };
+  }
+  if (chosen.id === 'area:toggle_subarea') {
+    const subs = Object.values(loadWorldDatabase().subAreas).filter(
+      (sa) => sa.parentAreaId === state.locationId && state.frontier.unlockedSubAreas.includes(sa.id),
+    );
+    const cur = state.frontier.activeSubArea[state.locationId];
+    if (cur) {
+      state.frontier.activeSubArea[state.locationId] = null;
+      return { messages: ['Shifted exploration back to the main area.'], shouldQuit: false };
+    }
+    if (subs.length > 0) {
+      state.frontier.activeSubArea[state.locationId] = subs[0].id;
+      return { messages: [`Shifted exploration to ${subs[0].name}.`], shouldQuit: false };
+    }
+    return { messages: ['No secret sub-area unlocked here.'], shouldQuit: false };
+  }
+  if (chosen.id.startsWith('area:enter_dungeon:')) {
+    return { messages: enterDungeon(state, chosen.id.slice(19)), shouldQuit: false };
+  }
+  if (chosen.id === 'return_camp') {
+    return { messages: returnToCampHub(state), shouldQuit: false };
+  }
+  if (chosen.id.startsWith('stash:put:')) {
+    const itemId = chosen.id.slice(10);
+    if (consumeInventoryItem(state, itemId, 1)) {
+      const existing = state.frontier.stash.find((e) => e.id === itemId);
+      if (existing) existing.qty += 1;
+      else state.frontier.stash.push({ id: itemId, qty: 1 });
+      state.subMenu = 'stash';
+      return { messages: [`Stored ${ITEMS[itemId]?.name ?? itemId} at camp.`], shouldQuit: false };
+    }
+    return { messages: ['Item not found in pack.'], shouldQuit: false };
+  }
+  if (chosen.id.startsWith('stash:take:')) {
+    const itemId = chosen.id.slice(11);
+    const idx = state.frontier.stash.findIndex((e) => e.id === itemId);
+    if (idx >= 0 && state.frontier.stash[idx].qty > 0) {
+      state.frontier.stash[idx].qty -= 1;
+      if (state.frontier.stash[idx].qty <= 0) state.frontier.stash.splice(idx, 1);
+      addItemToInventory(state, itemId, 1);
+      state.subMenu = 'stash';
+      return { messages: [`Retrieved ${ITEMS[itemId]?.name ?? itemId} into pack.`], shouldQuit: false };
+    }
+    return { messages: ['Item not found in stash.'], shouldQuit: false };
+  }
+  if (state.scene === 'dungeon') {
+    return { messages: executeDungeonAction(state, chosen.id), shouldQuit: false };
   }
   if (chosen.id === 'sub:pack') {
     state.subMenu = 'pack';
@@ -1204,7 +1420,8 @@ export function processInput(
   }
 
   if (chosen.id === 'leave_shop') {
-    state.scene = 'location';
+    state.activeMerchant = null;
+    state.scene = state.locationId === 'camp_hub' ? 'camp_hub' : 'location';
     state.subMenu = 'root';
     return { messages: [], shouldQuit: false };
   }
@@ -1235,7 +1452,11 @@ export function processInput(
 
   if (chosen.id === 'event_continue') {
     state.activeEvent = null;
-    state.scene = 'location';
+    state.scene = state.frontier.activeDungeonId
+      ? 'dungeon'
+      : state.locationId === 'camp_hub'
+        ? 'camp_hub'
+        : 'location';
     state.subMenu = 'root';
     return { messages: [], shouldQuit: false };
   }
@@ -1285,7 +1506,11 @@ export function processInput(
       state.player.resolve += perk.maxResolveBonus;
     }
     state.pendingPerkIds = [];
-    state.scene = 'location';
+    state.scene = state.frontier.activeDungeonId
+      ? 'dungeon'
+      : state.locationId === 'camp_hub'
+        ? 'camp_hub'
+        : 'location';
     state.subMenu = 'root';
     return { messages: [`Gained ${perk.name}.`], shouldQuit: false };
   }
@@ -1354,11 +1579,59 @@ export function renderCurrentScreen(state: GameState, messages: string[]): strin
         ),
       );
     }
+  } else if (state.scene === 'camp_hub') {
+    if (state.subMenu === 'root') {
+      out.push(paint('LONE CAMP', 'cyan', s));
+      out.push(
+        wrapText(
+          'A sheltered hollow of grey stone and banked embers marks your lone outpost at the edge of the drowned valley.',
+        ),
+      );
+    } else if (state.subMenu === 'travel') {
+      out.push(paint('TRAVEL FROM CAMP', 'cyan', s));
+    } else if (state.subMenu === 'stash' || state.subMenu === 'stash_put' || state.subMenu === 'stash_take') {
+      out.push(paint('CAMP STASH', 'cyan', s));
+      if (state.frontier.stash.length === 0) {
+        out.push('Your camp chest is empty.');
+      } else {
+        for (const st of state.frontier.stash) {
+          out.push(`  - ${ITEMS[st.id]?.name ?? st.id} x${st.qty}`);
+        }
+      }
+    } else if (state.subMenu === 'pack') {
+      out.push(paint('PACK', 'cyan', s));
+    } else if (state.subMenu === 'pack_use') {
+      out.push(paint('USE ITEM', 'cyan', s));
+    } else if (state.subMenu === 'pack_equip') {
+      out.push(paint('EQUIP GEAR', 'cyan', s));
+    } else if (state.subMenu === 'pack_craft') {
+      out.push(paint('CRAFT', 'cyan', s));
+    } else if (state.subMenu === 'pack_mods') {
+      out.push(paint('BODY MODIFICATIONS', 'cyan', s));
+    }
+  } else if (state.scene === 'dungeon' && state.frontier.activeDungeonId) {
+    out.push(paint('DUNGEON', 'red', s));
+    out.push(renderDungeonMap(state));
+    const dDef = loadWorldDatabase().dungeons[state.frontier.activeDungeonId];
+    const rt = state.frontier.dungeonStates[state.frontier.activeDungeonId];
+    if (dDef && rt) {
+      const rm = dDef.rooms[rt.currentRoomId];
+      out.push('');
+      out.push(paint(rm.name.toUpperCase(), 'cyan', s));
+      out.push(wrapText(rm.description));
+    }
   } else if (state.scene === 'location') {
     const loc = LOCATIONS[state.locationId];
     if (state.subMenu === 'root') {
       out.push(paint(loc.name.toUpperCase(), 'cyan', s));
       out.push(wrapText(loc.description(state)));
+      const activeSub = state.frontier.activeSubArea[loc.id];
+      if (activeSub) {
+        const subDef = loadWorldDatabase().subAreas[activeSub];
+        if (subDef) {
+          out.push(paint(`Exploring Sub-Area: ${subDef.name}`, 'yellow', s));
+        }
+      }
     } else if (state.subMenu === 'explore') {
       out.push(paint(`${loc.name.toUpperCase()} - EXPLORE`, 'cyan', s));
     } else if (state.subMenu === 'talk') {
@@ -1409,10 +1682,14 @@ export function renderCurrentScreen(state: GameState, messages: string[]): strin
       }
     }
   } else if (state.scene === 'shop') {
-    const shop = LOCATIONS[state.locationId].shop;
+    const shop = state.activeMerchant ?? LOCATIONS[state.locationId]?.shop;
     if (shop) {
       out.push(paint(shop.name.toUpperCase(), 'cyan', s));
-      out.push(wrapText(shop.greeting(state)));
+      if ('greeting' in shop && typeof shop.greeting === 'function') {
+        out.push(wrapText(shop.greeting(state)));
+      } else {
+        out.push(wrapText(`${shop.keeper} spreads wares across an oiled cloth.`));
+      }
     }
   } else if (state.scene === 'level_up') {
     out.push(paint(`LEVEL ${state.player.level} - CHOOSE A PERK`, 'green', s));

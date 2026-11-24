@@ -8,8 +8,8 @@ import { addItemToInventory, startCombatEncounter } from '../combat.ts';
 
 export function enterMobileCamp(state: GameState): string[] {
   const loc = LOCATIONS[state.locationId];
-  if (loc.regionType === 'settlement') {
-    return ['You cannot pitch a wild camp inside settlement walls. Use Rest at the hearth instead.'];
+  if (loc?.regionType === 'town') {
+    return ['You cannot pitch a wild camp inside town walls. Use Rest at the hearth instead.'];
   }
   state.scene = 'camp';
   state.subMenu = 'root';
@@ -228,7 +228,7 @@ export function executeCampAction(state: GameState, actionId: string): string[] 
 
   if (actionId === 'camp:pack_up') {
     state.camp = null;
-    state.scene = 'location';
+    state.scene = state.locationId === 'camp_hub' ? 'camp_hub' : 'location';
     state.subMenu = 'root';
     return ['You kick ash over your camp and shoulder your pack.'];
   }

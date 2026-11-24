@@ -194,6 +194,11 @@ const requiredTables = [
   'event_choices',
   'entity_links',
   'npc_reactions',
+  'sub_areas',
+  'explore_encounters',
+  'dungeons',
+  'dungeon_rooms',
+  'dungeon_exits',
 ];
 for (const table of requiredTables) {
   const row = db.prepare(`SELECT COUNT(*) AS cnt FROM ${table}`).get() as { cnt: number };

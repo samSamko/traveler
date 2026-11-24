@@ -1,0 +1,233 @@
+{
+  "dungeons": [
+    {
+      "id": "barrow_undercroft",
+      "parentAreaId": "weeping_barrow",
+      "name": "Barrow Undercroft",
+      "description": "Low mossy burial vaults beneath the Weeping Barrow, dripping with cold groundwater.",
+      "entryRoomId": "bu_entry",
+      "danger": 2,
+      "rooms": [
+        {
+          "id": "bu_entry",
+          "name": "Mossy Stair",
+          "row": 1,
+          "col": 0,
+          "roomType": "entry",
+          "description": "Slick limestone steps drop into a low vaulted landing lit by pale root-glow.",
+          "exits": [
+            { "id": "bu_e1", "toRoomId": "bu_hall", "label": "East" }
+          ]
+        },
+        {
+          "id": "bu_hall",
+          "name": "Bone Corridor",
+          "row": 1,
+          "col": 1,
+          "roomType": "corridor",
+          "description": "Narrow alcoves packed with brittle ribs line a flooded stone passage.",
+          "enemyIds": ["root_husk"],
+          "trapDc": 11,
+          "trapDamage": 4,
+          "exits": [
+            { "id": "bu_e2", "toRoomId": "bu_entry", "label": "West" },
+            { "id": "bu_e3", "toRoomId": "bu_lever", "label": "North" },
+            { "id": "bu_e4", "toRoomId": "bu_vault", "label": "East", "lockedBySwitchId": "bu_gate_switch" }
+          ]
+        },
+        {
+          "id": "bu_lever",
+          "name": "Chain Alcove",
+          "row": 0,
+          "col": 1,
+          "roomType": "chamber",
+          "description": "A rusted iron counterweight chain hangs beside a damp relief of chained kings.",
+          "switchId": "bu_gate_switch",
+          "switchLabel": "Pull Chain",
+          "exits": [
+            { "id": "bu_e5", "toRoomId": "bu_hall", "label": "South" }
+          ]
+        },
+        {
+          "id": "bu_vault",
+          "name": "Sunken Reliquary",
+          "row": 1,
+          "col": 2,
+          "roomType": "boss",
+          "description": "An ancient bronze chest rests behind a cracked stone altar guarded by a towering husk.",
+          "enemyIds": ["root_husk", "ash_hound"],
+          "lootItemId": "echo_shell",
+          "crowns": 25,
+          "isBoss": true,
+          "exits": [
+            { "id": "bu_e6", "toRoomId": "bu_hall", "label": "West" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cistern_sluice",
+      "parentAreaId": "ash_fen",
+      "name": "Cistern Sluice-Vaults",
+      "description": "Echoing brick drainage tunnels linking the Ash-Fen to the old underground reservoirs.",
+      "entryRoomId": "cs_entry",
+      "danger": 3,
+      "rooms": [
+        {
+          "id": "cs_entry",
+          "name": "Sluice Landing",
+          "row": 1,
+          "col": 0,
+          "roomType": "entry",
+          "description": "Cold black water laps against brick walkways below rusted iron floodgates.",
+          "exits": [
+            { "id": "cs_e1", "toRoomId": "cs_drain", "label": "East" }
+          ]
+        },
+        {
+          "id": "cs_drain",
+          "name": "Flooded Culvert",
+          "row": 1,
+          "col": 1,
+          "roomType": "corridor",
+          "description": "Chitinous husks cling to the damp brick archways overhead.",
+          "enemyIds": ["chitin_weaver"],
+          "exits": [
+            { "id": "cs_e2", "toRoomId": "cs_entry", "label": "West" },
+            { "id": "cs_e3", "toRoomId": "cs_wheel", "label": "South" },
+            { "id": "cs_e4", "toRoomId": "cs_chamber", "label": "East", "lockedBySwitchId": "cs_sluice_wheel" }
+          ]
+        },
+        {
+          "id": "cs_wheel",
+          "name": "Valve Chamber",
+          "row": 2,
+          "col": 1,
+          "roomType": "chamber",
+          "description": "A heavy bronze sluice-wheel sits half-submerged in silt.",
+          "switchId": "cs_sluice_wheel",
+          "switchLabel": "Turn Wheel",
+          "crowns": 12,
+          "exits": [
+            { "id": "cs_e5", "toRoomId": "cs_drain", "label": "North" }
+          ]
+        },
+        {
+          "id": "cs_chamber",
+          "name": "Silk Drain",
+          "row": 1,
+          "col": 2,
+          "roomType": "boss",
+          "description": "Luminous pale threads drape over a flooded apothecary locker.",
+          "enemyIds": ["chitin_weaver", "root_husk"],
+          "lootItemId": "chitin_serum",
+          "crowns": 32,
+          "isBoss": true,
+          "exits": [
+            { "id": "cs_e6", "toRoomId": "cs_drain", "label": "West" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "collapsed_kiln_shaft",
+      "parentAreaId": "kiln_scars",
+      "name": "Collapsed Kiln-Shaft",
+      "description": "Scorched obsidian tunnels beneath the Kiln Scars humming with trapped heat.",
+      "entryRoomId": "ck_entry",
+      "danger": 4,
+      "rooms": [
+        {
+          "id": "ck_entry",
+          "name": "Ladder Pit",
+          "row": 1,
+          "col": 0,
+          "roomType": "entry",
+          "description": "An iron ladder drops into a smoky basalt gallery lined with cracked amber pipes.",
+          "exits": [
+            { "id": "ck_e1", "toRoomId": "ck_vent", "label": "East" }
+          ]
+        },
+        {
+          "id": "ck_vent",
+          "name": "Cinder Gallery",
+          "row": 1,
+          "col": 1,
+          "roomType": "corridor",
+          "description": "Heat shimmers along a narrow catwalk over glowing slag.",
+          "trapDc": 13,
+          "trapDamage": 6,
+          "enemyIds": ["ash_hound", "bell_acolyte"],
+          "exits": [
+            { "id": "ck_e2", "toRoomId": "ck_entry", "label": "West" },
+            { "id": "ck_e3", "toRoomId": "ck_crucible", "label": "East" }
+          ]
+        },
+        {
+          "id": "ck_crucible",
+          "name": "Ash Crucible",
+          "row": 1,
+          "col": 2,
+          "roomType": "boss",
+          "description": "A massive bronze forge-warden stands motionless before a cracked amber crucible.",
+          "enemyIds": ["iron_sentinel"],
+          "lootItemId": "writ_bone_shatter",
+          "crowns": 45,
+          "isBoss": true,
+          "exits": [
+            { "id": "ck_e4", "toRoomId": "ck_vent", "label": "West" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "belfry_choir_pit",
+      "parentAreaId": "sunken_belfry",
+      "name": "Belfry Choir-Pit",
+      "description": "The flooded subterranean amphitheater beneath the Sunken Belfry.",
+      "entryRoomId": "bc_entry",
+      "danger": 5,
+      "rooms": [
+        {
+          "id": "bc_entry",
+          "name": "Drowned Steps",
+          "row": 1,
+          "col": 0,
+          "roomType": "entry",
+          "description": "Cold black water rises to your knees beneath towering drowned arches.",
+          "exits": [
+            { "id": "bc_e1", "toRoomId": "bc_nave", "label": "East" }
+          ]
+        },
+        {
+          "id": "bc_nave",
+          "name": "Flooded Nave",
+          "row": 1,
+          "col": 1,
+          "roomType": "chamber",
+          "description": "Half-submerged pews ring a cracked stone aisle echoing with low bronze humming.",
+          "enemyIds": ["bell_acolyte", "bell_acolyte"],
+          "exits": [
+            { "id": "bc_e2", "toRoomId": "bc_entry", "label": "West" },
+            { "id": "bc_e3", "toRoomId": "bc_sanctum", "label": "East" }
+          ]
+        },
+        {
+          "id": "bc_sanctum",
+          "name": "Bell Sanctum",
+          "row": 1,
+          "col": 2,
+          "roomType": "boss",
+          "description": "Beneath a massive sunken bronze bell, pale roots twine around a silent reliquary.",
+          "enemyIds": ["iron_sentinel", "bell_acolyte"],
+          "lootItemId": "writ_blight_wave",
+          "crowns": 65,
+          "isBoss": true,
+          "exits": [
+            { "id": "bc_e4", "toRoomId": "bc_nave", "label": "West" }
+          ]
+        }
+      ]
+    }
+  ]
+}

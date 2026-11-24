@@ -57,6 +57,21 @@ export function loadGame(saveDir = DEFAULT_SAVE_DIR): GameState | null {
       if (!parsed.clock.paleShift) parsed.clock.paleShift = 'none';
       if (parsed.clock.paleShiftDaysLeft === undefined) parsed.clock.paleShiftDaysLeft = 0;
     }
+    if (!parsed.frontier) {
+      parsed.frontier = {
+        unlockedAreas: parsed.visitedLocations ? [...parsed.visitedLocations] : [],
+        unlockedTowns: ['cinderford'],
+        unlockedSubAreas: [],
+        unlockedDungeons: [],
+        activeSubArea: {},
+        stash: [],
+        dungeonStates: {},
+        activeDungeonId: null,
+      };
+    }
+    if (parsed.activeMerchant === undefined) {
+      parsed.activeMerchant = null;
+    }
     return parsed;
   } catch {
     return null;

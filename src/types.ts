@@ -622,10 +622,110 @@ export interface ShopListing {
   stockKey?: string;
 }
 
+export interface SecretSubAreaDef {
+  id: string;
+  parentAreaId: string;
+  name: string;
+  description: string;
+  dangerBonus: number;
+}
+
+export type ExploreEncounterKind =
+  | 'enemy'
+  | 'merchant'
+  | 'item'
+  | 'landscape'
+  | 'curiosity'
+  | 'nothing'
+  | 'unlock_area'
+  | 'unlock_town'
+  | 'unlock_sub_area'
+  | 'unlock_dungeon';
+
+export interface ExploreEncounterDef {
+  id: string;
+  scopeType: 'camp_hub' | 'area' | 'sub_area';
+  scopeId: string;
+  kind: ExploreEncounterKind;
+  weight: number;
+  label: string;
+  prose: string;
+  enemyIds?: string[];
+  itemId?: string;
+  crownsMin?: number;
+  crownsMax?: number;
+  targetUnlockId?: string;
+  shop?: {
+    name: string;
+    keeper: string;
+    items: ShopListing[];
+  };
+}
+
+export interface DungeonExitDef {
+  id: string;
+  fromRoomId: string;
+  toRoomId: string;
+  label: string;
+  lockedBySwitchId?: string;
+  lockedByItemId?: string;
+}
+
+export interface DungeonRoomDef {
+  id: string;
+  dungeonId: string;
+  name: string;
+  row: number;
+  col: number;
+  roomType: 'entry' | 'corridor' | 'chamber' | 'vault' | 'shrine' | 'boss';
+  description: string;
+  enemyIds?: string[];
+  lootItemId?: string;
+  crowns?: number;
+  trapDc?: number;
+  trapDamage?: number;
+  switchId?: string;
+  switchLabel?: string;
+  isBoss?: boolean;
+  exits: DungeonExitDef[];
+}
+
+export interface DungeonDef {
+  id: string;
+  parentAreaId: string;
+  name: string;
+  description: string;
+  entryRoomId: string;
+  danger: number;
+  rooms: Record<string, DungeonRoomDef>;
+}
+
+export interface DungeonRuntimeState {
+  dungeonId: string;
+  currentRoomId: string;
+  visitedRooms: string[];
+  clearedRooms: string[];
+  openedDoors: string[];
+  pulledSwitches: string[];
+  lootedRooms: string[];
+  disarmedTraps: string[];
+}
+
+export interface FrontierState {
+  unlockedAreas: string[];
+  unlockedTowns: string[];
+  unlockedSubAreas: string[];
+  unlockedDungeons: string[];
+  activeSubArea: Record<string, string | null>;
+  stash: InventoryEntry[];
+  dungeonStates: Record<string, DungeonRuntimeState>;
+  activeDungeonId: string | null;
+}
+
 export interface LocationNode {
   id: string;
   name: string;
-  regionType: 'settlement' | 'road' | 'ruin' | 'sanctuary' | 'belfry';
+  regionType: 'town' | 'special' | 'area';
   danger: number;
   dark?: boolean;
   neighbors: string[];
@@ -645,7 +745,9 @@ export interface LocationNode {
 
 export type SceneMode =
   | 'intro'
+  | 'camp_hub'
   | 'location'
+  | 'dungeon'
   | 'camp'
   | 'event'
   | 'combat'
@@ -662,6 +764,9 @@ export type LocationSubMenu =
   | 'talk'
   | 'dialogue'
   | 'travel'
+  | 'stash'
+  | 'stash_put'
+  | 'stash_take'
   | 'pack'
   | 'pack_use'
   | 'pack_equip'
@@ -746,6 +851,8 @@ export interface GameState {
   combat: CombatState | null;
   aftermath: AftermathState | null;
   camp: CampState | null;
+  frontier: FrontierState;
+  activeMerchant: { name: string; keeper: string; items: ShopListing[] } | null;
   pendingPerkIds: string[];
   endingSummary: string | null;
   lastMessages: string[];

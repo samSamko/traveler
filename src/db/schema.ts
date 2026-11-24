@@ -315,4 +315,64 @@ CREATE TABLE npc_reactions (
   cond_json TEXT NOT NULL,
   reaction_text TEXT NOT NULL
 );
+
+CREATE TABLE sub_areas (
+  id TEXT PRIMARY KEY,
+  parent_area_id TEXT NOT NULL REFERENCES places(id),
+  name TEXT NOT NULL,
+  description TEXT NOT NULL,
+  danger_bonus INTEGER NOT NULL DEFAULT 1
+);
+
+CREATE TABLE explore_encounters (
+  id TEXT PRIMARY KEY,
+  scope_type TEXT NOT NULL,
+  scope_id TEXT NOT NULL,
+  kind TEXT NOT NULL,
+  weight INTEGER NOT NULL DEFAULT 1,
+  label TEXT NOT NULL,
+  prose TEXT NOT NULL,
+  enemy_ids_json TEXT,
+  item_id TEXT REFERENCES items(id),
+  crowns_min INTEGER,
+  crowns_max INTEGER,
+  target_unlock_id TEXT,
+  shop_json TEXT
+);
+
+CREATE TABLE dungeons (
+  id TEXT PRIMARY KEY,
+  parent_area_id TEXT NOT NULL REFERENCES places(id),
+  name TEXT NOT NULL,
+  description TEXT NOT NULL,
+  entry_room_id TEXT NOT NULL,
+  danger INTEGER NOT NULL DEFAULT 1
+);
+
+CREATE TABLE dungeon_rooms (
+  id TEXT PRIMARY KEY,
+  dungeon_id TEXT NOT NULL REFERENCES dungeons(id),
+  name TEXT NOT NULL,
+  row INTEGER NOT NULL,
+  col INTEGER NOT NULL,
+  room_type TEXT NOT NULL,
+  description TEXT NOT NULL,
+  enemy_ids_json TEXT,
+  loot_item_id TEXT REFERENCES items(id),
+  crowns INTEGER,
+  trap_dc INTEGER,
+  trap_damage INTEGER,
+  switch_id TEXT,
+  switch_label TEXT,
+  is_boss INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE dungeon_exits (
+  id TEXT PRIMARY KEY,
+  from_room_id TEXT NOT NULL REFERENCES dungeon_rooms(id),
+  to_room_id TEXT NOT NULL REFERENCES dungeon_rooms(id),
+  label TEXT NOT NULL,
+  locked_by_switch_id TEXT,
+  locked_by_item_id TEXT REFERENCES items(id)
+);
 `;

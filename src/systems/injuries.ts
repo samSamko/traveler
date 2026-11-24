@@ -107,7 +107,11 @@ export function resolvePlayerDefeat(
   }
 
   state.combat = null;
-  state.scene = 'location';
+  if (state.frontier) {
+    state.frontier.activeDungeonId = null;
+  }
+  state.locationId = 'camp_hub';
+  state.scene = 'camp_hub';
   state.subMenu = 'root';
   p.statuses = [];
 
@@ -204,7 +208,11 @@ function advanceAftermathQueue(state: GameState): void {
     if (state.pendingPerkIds.length > 0) {
       state.scene = 'level_up';
     } else {
-      state.scene = 'location';
+      state.scene = state.frontier?.activeDungeonId
+        ? 'dungeon'
+        : state.locationId === 'camp_hub'
+          ? 'camp_hub'
+          : 'location';
       state.subMenu = 'root';
     }
   }
@@ -216,7 +224,14 @@ export function executeAftermathAction(state: GameState, actionId: string): stri
   const current = after.downedEnemies[after.activeIndex];
   if (!current || actionId === 'after:done') {
     state.aftermath = null;
-    state.scene = state.pendingPerkIds.length > 0 ? 'level_up' : 'location';
+    state.scene =
+      state.pendingPerkIds.length > 0
+        ? 'level_up'
+        : state.frontier?.activeDungeonId
+          ? 'dungeon'
+          : state.locationId === 'camp_hub'
+            ? 'camp_hub'
+            : 'location';
     return [];
   }
 

@@ -7,9 +7,13 @@ import type {
   BackgroundDef,
   BackgroundId,
   BodyModDef,
+  DungeonDef,
+  DungeonExitDef,
+  DungeonRoomDef,
   EnemyTemplate,
   EntityLink,
   EventCard,
+  ExploreEncounterDef,
   HeirloomDef,
   HeirloomId,
   InjuryDef,
@@ -20,6 +24,7 @@ import type {
   RaceDef,
   RaceId,
   RecipeDef,
+  SecretSubAreaDef,
   ShopListing,
 } from '../types.ts';
 import { WORLD_DB_SCHEMA } from './schema.ts';
@@ -54,6 +59,9 @@ export interface WorldRepository {
   events: EventCard[];
   entityLinks: EntityLink[];
   npcReactions: Array<{ npcId: string; cond: ConditionSpec; text: string }>;
+  subAreas: Record<string, SecretSubAreaDef>;
+  encounters: ExploreEncounterDef[];
+  dungeons: Record<string, DungeonDef>;
 }
 
 let cachedWorld: WorldRepository | null = null;
@@ -90,7 +98,7 @@ export function loadWorldDatabase(): WorldRepository {
     places: Array<{
       id: string;
       name: string;
-      regionType: 'settlement' | 'road' | 'ruin' | 'sanctuary' | 'belfry';
+      regionType: 'town' | 'special' | 'area';
       danger: number;
       dark: boolean;
       neighbors: string[];
@@ -166,6 +174,27 @@ export function loadWorldDatabase(): WorldRepository {
       text: string;
     }>;
   }>('links.json');
+
+  const encountersJson = readDataJson<{
+    subAreas: SecretSubAreaDef[];
+    encounters: ExploreEncounterDef[];
+  }>('encounters.json');
+
+  const dungeonsJson = readDataJson<{
+    dungeons: Array<{
+      id: string;
+      parentAreaId: string;
+      name: string;
+      description: string;
+      entryRoomId: string;
+      danger: number;
+      rooms: Array<
+        Omit<DungeonRoomDef, 'dungeonId' | 'exits'> & {
+          exits: Array<Omit<DungeonExitDef, 'fromRoomId'>>;
+        }
+      >;
+    }>;
+  }>('dungeons.json');
 
   db.exec('BEGIN');
   try {
@@ -595,6 +624,87 @@ export function loadWorldDatabase(): WorldRepository {
       insReact.run(rx.npcId, rx.sortOrder, JSON.stringify(rx.cond), rx.text);
     }
 
+    // 10. Sub-Areas & Explore Encounters
+    const insSubArea = db.prepare(
+      `INSERT INTO sub_areas (id, parent_area_id, name, description, danger_bonus) VALUES (?, ?, ?, ?, ?)`,
+    );
+    for (const sa of encountersJson.subAreas) {
+      insSubArea.run(sa.id, sa.parentAreaId, sa.name, sa.description, sa.dangerBonus);
+    }
+
+    const insEnc = db.prepare(
+      `INSERT INTO explore_encounters (
+        id, scope_type, scope_id, kind, weight, label, prose,
+        enemy_ids_json, item_id, crowns_min, crowns_max, target_unlock_id, shop_json
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    );
+    for (const enc of encountersJson.encounters) {
+      insEnc.run(
+        enc.id,
+        enc.scopeType,
+        enc.scopeId,
+        enc.kind,
+        enc.weight,
+        enc.label,
+        enc.prose,
+        enc.enemyIds ? JSON.stringify(enc.enemyIds) : null,
+        enc.itemId ?? null,
+        enc.crownsMin ?? null,
+        enc.crownsMax ?? null,
+        enc.targetUnlockId ?? null,
+        enc.shop ? JSON.stringify(enc.shop) : null,
+      );
+    }
+
+    // 11. Dungeons, Rooms & Exits
+    const insDung = db.prepare(
+      `INSERT INTO dungeons (id, parent_area_id, name, description, entry_room_id, danger) VALUES (?, ?, ?, ?, ?, ?)`,
+    );
+    const insRoom = db.prepare(
+      `INSERT INTO dungeon_rooms (
+        id, dungeon_id, name, row, col, room_type, description, enemy_ids_json,
+        loot_item_id, crowns, trap_dc, trap_damage, switch_id, switch_label, is_boss
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    );
+    const insExit = db.prepare(
+      `INSERT INTO dungeon_exits (id, from_room_id, to_room_id, label, locked_by_switch_id, locked_by_item_id)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    );
+    for (const d of dungeonsJson.dungeons) {
+      insDung.run(d.id, d.parentAreaId, d.name, d.description, d.entryRoomId, d.danger);
+      for (const r of d.rooms) {
+        insRoom.run(
+          r.id,
+          d.id,
+          r.name,
+          r.row,
+          r.col,
+          r.roomType,
+          r.description,
+          r.enemyIds ? JSON.stringify(r.enemyIds) : null,
+          r.lootItemId ?? null,
+          r.crowns ?? null,
+          r.trapDc ?? null,
+          r.trapDamage ?? null,
+          r.switchId ?? null,
+          r.switchLabel ?? null,
+          r.isBoss ? 1 : 0,
+        );
+      }
+      for (const r of d.rooms) {
+        for (const ex of r.exits) {
+          insExit.run(
+            ex.id,
+            r.id,
+            ex.toRoomId,
+            ex.label,
+            ex.lockedBySwitchId ?? null,
+            ex.lockedByItemId ?? null,
+          );
+        }
+      }
+    }
+
     db.exec('COMMIT');
   } catch (err) {
     db.exec('ROLLBACK');
@@ -761,6 +871,32 @@ export function loadWorldDatabase(): WorldRepository {
     });
   }
 
+  const subAreas: Record<string, SecretSubAreaDef> = {};
+  for (const sa of encountersJson.subAreas) {
+    subAreas[sa.id] = sa;
+  }
+
+  const dungeons: Record<string, DungeonDef> = {};
+  for (const d of dungeonsJson.dungeons) {
+    const rooms: Record<string, DungeonRoomDef> = {};
+    for (const r of d.rooms) {
+      rooms[r.id] = {
+        ...r,
+        dungeonId: d.id,
+        exits: r.exits.map((ex) => ({ ...ex, fromRoomId: r.id })),
+      };
+    }
+    dungeons[d.id] = {
+      id: d.id,
+      parentAreaId: d.parentAreaId,
+      name: d.name,
+      description: d.description,
+      entryRoomId: d.entryRoomId,
+      danger: d.danger,
+      rooms,
+    };
+  }
+
   cachedWorld = {
     db,
     races: charJson.races,
@@ -777,6 +913,9 @@ export function loadWorldDatabase(): WorldRepository {
     events,
     entityLinks: linksJson.entityLinks,
     npcReactions,
+    subAreas,
+    encounters: encountersJson.encounters,
+    dungeons,
   };
 
   return cachedWorld;

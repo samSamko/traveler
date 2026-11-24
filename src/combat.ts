@@ -685,7 +685,13 @@ function resolveVictory(state: GameState): string[] {
     return msgs;
   }
 
-  state.scene = leveled ? 'level_up' : 'location';
+  state.scene = leveled
+    ? 'level_up'
+    : state.frontier?.activeDungeonId
+      ? 'dungeon'
+      : state.locationId === 'camp_hub'
+        ? 'camp_hub'
+        : 'location';
   return msgs;
 }
 
@@ -1106,7 +1112,11 @@ export function executeCombatAction(
     const roll = rollDice(1, 20, state);
     if (roll + agi >= 12) {
       state.combat = null;
-      state.scene = 'location';
+      state.scene = state.frontier?.activeDungeonId
+        ? 'dungeon'
+        : state.locationId === 'camp_hub'
+          ? 'camp_hub'
+          : 'location';
       p.statuses = [];
       return {
         messages: ['You slip clear into the mist before the circle closes.'],

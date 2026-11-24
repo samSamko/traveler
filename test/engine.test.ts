@@ -90,8 +90,8 @@ describe('Writing Framework: Customizer, Prose Interpolator & Compositional Intr
     assert.match(beat1.body, /cheek slash/i);
 
     const skipRes = processInput(state, 'Skip');
-    assert.equal(state.scene, 'location');
-    assert.match(skipRes.messages.join(' '), /Blackened timber palisades/);
+    assert.equal(state.scene, 'camp_hub');
+    assert.match(skipRes.messages.join(' '), /lone camp/);
 
     const vaneReaction = getNpcAppearanceReaction(state, 'captain_vane');
     assert.ok(vaneReaction);
@@ -110,13 +110,13 @@ describe('Writing Framework: Customizer, Prose Interpolator & Compositional Intr
     });
 
     const rootScreen = renderCurrentScreen(state, state.lastMessages);
-    assertNoParensOrBrackets(rootScreen, 'root location screen');
-    assert.match(rootScreen, /1\. Explore\s+2\. Talk/);
+    assertNoParensOrBrackets(rootScreen, 'root camp_hub screen');
+    assert.match(rootScreen, /1\. Explore\s+2\. Travel/);
 
     const rootChoices = getSceneChoices(state);
     assert.deepEqual(
       rootChoices.map((c) => c.label),
-      ['Explore', 'Talk', 'Trade', 'Rest', 'Pack', 'Journal', 'Travel'],
+      ['Explore', 'Travel', 'Rest', 'Stash', 'Pack', 'Journal'],
     );
   });
 });
@@ -142,13 +142,15 @@ describe('24-Hour Clock, Dynamic Weather & Mobile Solo Camp', () => {
     state.player.rations = 30;
     advanceHours(state, 24 * 16);
     assert.ok(state.day >= 17);
-    assert.equal(state.scene, 'location');
+    assert.equal(state.scene, 'camp_hub');
 
-    // Cannot wild camp inside settlement
+    // Cannot wild camp inside town
+    state.locationId = 'cinderford';
+    state.scene = 'location';
     const failCamp = processInput(state, 'camp');
-    assert.match(failCamp.messages.join(' '), /settlement walls/);
+    assert.match(failCamp.messages.join(' '), /town walls/);
 
-    // Move to wild road -> Camp state opens cleanly
+    // Move to wild area -> Camp state opens cleanly
     state.locationId = 'kings_causeway';
     assert.ok(getSceneChoices(state).some((c) => c.label === 'Camp'));
     processInput(state, 'Camp');
@@ -252,13 +254,13 @@ describe('10 Damage Types, Subdue Aftermath & Scarred Survival Defeat', () => {
     assert.ok(qRes.messages.length > 0);
     const spareRes = processInput(state, 'Spare');
     assert.match(spareRes.messages.join(' '), /breathing in the ash/);
-    assert.equal(state.scene, 'location');
+    assert.equal(state.scene, 'camp_hub');
 
     // Scarred Survival player defeat inflicts injury & scar instead of game over
     startCombatEncounter(state, { enemyId: 'iron_deserter', canFlee: true });
     state.player.crowns = 40;
     const defMsgs = resolvePlayerDefeat(state, 'hp');
-    assert.equal(state.scene, 'location');
+    assert.equal(state.scene, 'camp_hub');
     assert.ok(state.player.injuries.length >= 1);
     assert.ok(state.player.crowns < 40);
     assert.match(defMsgs.join(' '), /Fractured Ribs/);
@@ -358,7 +360,7 @@ describe('Combat Qualitative UI, Appraisal, Mid-Combat Journal & Persistence', (
 
     const placeCount = db.prepare('SELECT COUNT(*) AS cnt FROM places').get() as { cnt: number };
     const eventCount = db.prepare('SELECT COUNT(*) AS cnt FROM events').get() as { cnt: number };
-    assert.equal(placeCount.cnt, 9);
+    assert.equal(placeCount.cnt, 13);
     assert.equal(eventCount.cnt, 18);
 
     const state = createNewGame({
@@ -531,5 +533,101 @@ describe('5-Slot Equipment, Action Economy, Draughts & Tabletop Mechanics', () =
         assert.equal(state.combat.swiftLeft, 2);
       }
     }
+  });
+});
+
+describe('Core Frontier Loop: Hub, 10 Areas, Sub-Areas, Dungeons & Towns', () => {
+  it('runs Camp Hub Explore -> Travel -> Town (no Explore) -> Area Sub-Area -> Dungeon Map', () => {
+    const state = createNewGame({
+      name: 'Rowan',
+      sex: 'male',
+      race: 'vaelorian',
+      background: 'ashen_blade',
+      heirloom: 'kiln_lantern',
+      skipIntro: true,
+      stealthMode: true,
+      rngState: 5,
+    });
+
+    assert.equal(state.scene, 'camp_hub');
+    // Stash put/take
+    addItemToInventory(state, 'poultice', 1);
+    processInput(state, 'Stash');
+    processInput(state, 'Store');
+    processInput(state, 'Herb Poultice');
+    assert.ok(state.frontier.stash.some((s) => s.id === 'poultice'));
+    processInput(state, 'Take');
+    processInput(state, 'Herb Poultice');
+    assert.equal(state.frontier.stash.length, 0);
+    processInput(state, 'Back');
+
+    // Camp Explore unlocks areas/towns or triggers encounter
+    processInput(state, 'Explore');
+    if (state.scene === 'combat') {
+      state.combat = null;
+      state.scene = 'camp_hub';
+    } else if (state.scene === 'shop') {
+      processInput(state, 'Leave');
+    }
+    assert.equal(state.scene, 'camp_hub');
+
+    // Unlock Cinderford Town -> verify NO Explore action inside town
+    state.frontier.unlockedTowns.push('cinderford');
+    processInput(state, 'Travel');
+    processInput(state, 'Cinderford Keep');
+    assert.equal(state.scene, 'location');
+    assert.equal(state.locationId, 'cinderford');
+    const townLabels = getSceneChoices(state).map((c) => c.label);
+    assert.equal(townLabels.includes('Explore'), false);
+    assert.ok(townLabels.includes('Talk'));
+    assert.ok(townLabels.includes('Return'));
+
+    // Return to Camp, Travel to Weeping Barrow (Area), toggle Sub-Area, Enter Dungeon
+    processInput(state, 'Return');
+    assert.equal(state.scene, 'camp_hub');
+    state.frontier.unlockedAreas.push('weeping_barrow');
+    state.frontier.unlockedSubAreas.push('barrow_crypt_ledge');
+    state.frontier.unlockedDungeons.push('barrow_undercroft');
+
+    processInput(state, 'Travel');
+    processInput(state, 'Weeping Barrow');
+    if (state.scene === 'combat') {
+      state.combat = null;
+      state.scene = 'location';
+    }
+    assert.equal(state.scene, 'location');
+    const areaLabels = getSceneChoices(state).map((c) => c.label);
+    assert.ok(areaLabels.includes('Explore'));
+    assert.ok(areaLabels.includes('Sub-Area'));
+    assert.ok(areaLabels.includes('Dungeon'));
+
+    // Toggle Sub-Area
+    processInput(state, 'Sub-Area');
+    assert.equal(state.frontier.activeSubArea.weeping_barrow, 'barrow_crypt_ledge');
+
+    // Enter Dungeon -> Room-by-Room navigation + ASCII fog-of-war + Switch + Exit
+    processInput(state, 'Dungeon');
+    assert.equal(state.scene, 'dungeon');
+    const dungScreen = renderCurrentScreen(state, []);
+    assertNoParensOrBrackets(dungScreen, 'dungeon map screen');
+    assert.match(dungScreen, /MAP - BARROW UNDERCROFT/);
+
+    // Move East to Bone Corridor (clear enemy if combat triggers)
+    processInput(state, 'East');
+    if (state.scene === 'combat') {
+      state.combat = null;
+      state.scene = 'dungeon';
+    }
+    // Move North to Chain Alcove & pull switch
+    processInput(state, 'North');
+    processInput(state, 'Pull Chain');
+    assert.ok(state.frontier.dungeonStates.barrow_undercroft.pulledSwitches.includes('bu_gate_switch'));
+
+    // Backtrack South -> West -> Leave back to Weeping Barrow
+    processInput(state, 'South');
+    processInput(state, 'West');
+    processInput(state, 'Leave');
+    assert.equal(state.scene, 'location');
+    assert.equal(state.locationId, 'weeping_barrow');
   });
 });

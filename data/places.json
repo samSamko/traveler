@@ -3,19 +3,31 @@
     {
       "id": "cinderford",
       "name": "Cinderford Keep",
-      "regionType": "settlement",
+      "regionType": "town",
       "danger": 0,
       "dark": false,
-      "neighbors": ["weeping_barrow", "kings_causeway", "ash_fen"],
-      "asciiPos": { "row": 2, "col": 0, "code": "CF" },
+      "neighbors": [
+        "weeping_barrow",
+        "kings_causeway",
+        "ash_fen"
+      ],
+      "asciiPos": {
+        "row": 2,
+        "col": 0,
+        "code": "CF"
+      },
       "sensorySummary": "Blackened timber palisades ring a squat border keep above the marsh. Pitch-lanterns hiss in the rain over the muddy garrison yard, peat smoke drifts from the Ashen Flagon inn, and nervous townsfolk eye the barred oak granary near the well.",
       "firstSightVariants": [
         {
-          "when": { "race": "grixi" },
+          "when": {
+            "race": "grixi"
+          },
           "text": "Blackened timber palisades ring a squat border keep above the marsh. Pitch-lanterns hiss in the rain over the muddy garrison yard, peat smoke drifts from the Ashen Flagon inn, and nervous townsfolk eye the barred oak granary near the well. Guards in soot-stained mail watch your tinker's satchel warily from the catwalk."
         },
         {
-          "when": { "race": "vaelorian" },
+          "when": {
+            "race": "vaelorian"
+          },
           "text": "Blackened timber palisades ring a squat border keep above the marsh. Pitch-lanterns hiss in the rain over the muddy garrison yard, peat smoke drifts from the Ashen Flagon inn, and nervous townsfolk eye the barred oak granary near the well. Weathered imperial eagles cling to the gate lintel above you."
         },
         {
@@ -24,15 +36,21 @@
       ],
       "descriptionVariants": [
         {
-          "when": { "hasFlag": "cinderford_fallen" },
+          "when": {
+            "hasFlag": "cinderford_fallen"
+          },
           "text": "Cinderford's timber gate hangs crooked on rusted hinges. Pale tendrils curl out of the granary roof, and the watch-bell lies cracked in gray slush."
         },
         {
-          "when": { "race": "grixi" },
+          "when": {
+            "race": "grixi"
+          },
           "text": "Timber palisades ring the blackened stone keep above the mire. Lanterns swing over the Iron-Vow muster yard while townsfolk watch the granary near the well. The quartermaster keeps a discreet under-ledger beneath the counter for Grixi coin."
         },
         {
-          "when": { "race": "vaelorian" },
+          "when": {
+            "race": "vaelorian"
+          },
           "text": "Timber palisades ring the blackened stone keep above the mire. Lanterns swing over the Iron-Vow muster yard while townsfolk watch the granary near the well. Old Imperial eagles still cling to the gate lintel."
         },
         {
@@ -44,11 +62,15 @@
         "keeper": "Quartermaster Harken",
         "greetingVariants": [
           {
-            "when": { "hasFlag": "cinderford_fallen" },
+            "when": {
+              "hasFlag": "cinderford_fallen"
+            },
             "text": "Harken is gone; only empty crates remain."
           },
           {
-            "when": { "hasFlag": "granary_burned" },
+            "when": {
+              "hasFlag": "granary_burned"
+            },
             "text": "Harken taps a notched tally-stick. Grain prices remain steep since the fire."
           },
           {
@@ -56,20 +78,66 @@
           }
         ],
         "items": [
-          { "itemId": "poultice", "price": 11 },
-          { "itemId": "stamina_draught", "price": 13 },
-          { "itemId": "fire_pot", "price": 15 },
-          { "itemId": "antitoxin", "price": 11 },
-          { "itemId": "iron_buckler", "price": 24 },
-          { "itemId": "tallow_lantern", "price": 16 },
-          { "itemId": "ash_mantle", "price": 26 },
-          { "itemId": "kiln_pitch", "price": 15 },
-          { "itemId": "amber_tonic", "price": 20 },
-          { "itemId": "writ_star_ward", "price": 28 },
-          { "itemId": "vesper_tonic", "price": 16, "underWarrenOnly": true },
-          { "itemId": "grixi_loupe", "price": 28, "underWarrenOnly": true },
-          { "itemId": "iron_wire_kit", "price": 36, "underWarrenOnly": true },
-          { "itemId": "vesper_needle", "price": 52, "underWarrenOnly": true }
+          {
+            "itemId": "poultice",
+            "price": 11
+          },
+          {
+            "itemId": "stamina_draught",
+            "price": 13
+          },
+          {
+            "itemId": "fire_pot",
+            "price": 15
+          },
+          {
+            "itemId": "antitoxin",
+            "price": 11
+          },
+          {
+            "itemId": "iron_buckler",
+            "price": 24
+          },
+          {
+            "itemId": "tallow_lantern",
+            "price": 16
+          },
+          {
+            "itemId": "ash_mantle",
+            "price": 26
+          },
+          {
+            "itemId": "kiln_pitch",
+            "price": 15
+          },
+          {
+            "itemId": "amber_tonic",
+            "price": 20
+          },
+          {
+            "itemId": "writ_star_ward",
+            "price": 28
+          },
+          {
+            "itemId": "vesper_tonic",
+            "price": 16,
+            "underWarrenOnly": true
+          },
+          {
+            "itemId": "grixi_loupe",
+            "price": 28,
+            "underWarrenOnly": true
+          },
+          {
+            "itemId": "iron_wire_kit",
+            "price": 36,
+            "underWarrenOnly": true
+          },
+          {
+            "itemId": "vesper_needle",
+            "price": 52,
+            "underWarrenOnly": true
+          }
         ]
       },
       "actions": [
@@ -78,13 +146,21 @@
           "label": "Granary",
           "visible": {
             "allOf": [
-              { "notFlag": "cinderford_fallen" },
-              { "notFlag": "cf_granary_opened" },
-              { "notFlag": "cinderford_saved" }
+              {
+                "notFlag": "cinderford_fallen"
+              },
+              {
+                "notFlag": "cf_granary_opened"
+              },
+              {
+                "notFlag": "cinderford_saved"
+              }
             ]
           },
           "effect": {
-            "setFlags": { "cf_granary_opened": true },
+            "setFlags": {
+              "cf_granary_opened": true
+            },
             "messages": [
               "You unbar the swollen oak door. Sweet, chalky spore-mist curls up from the lower grain cellar."
             ]
@@ -95,9 +171,15 @@
           "label": "Cellar Spores",
           "visible": {
             "allOf": [
-              { "notFlag": "cinderford_fallen" },
-              { "hasFlag": "cf_granary_opened" },
-              { "notFlag": "cinderford_saved" }
+              {
+                "notFlag": "cinderford_fallen"
+              },
+              {
+                "hasFlag": "cf_granary_opened"
+              },
+              {
+                "notFlag": "cinderford_saved"
+              }
             ]
           },
           "effect": {
@@ -105,14 +187,25 @@
               {
                 "when": {
                   "anyOf": [
-                    { "race": "ael_thalor" },
-                    { "background": "root_scholar" },
-                    { "background": "shrine_penitent" }
+                    {
+                      "race": "ael_thalor"
+                    },
+                    {
+                      "background": "root_scholar"
+                    },
+                    {
+                      "background": "shrine_penitent"
+                    }
                   ]
                 },
                 "effect": {
-                  "setFlags": { "cinderford_saved": true, "granary_purified": true },
-                  "adjustFactions": { "iron_vow": 2 },
+                  "setFlags": {
+                    "cinderford_saved": true,
+                    "granary_purified": true
+                  },
+                  "adjustFactions": {
+                    "iron_vow": 2
+                  },
                   "giveCrowns": 18,
                   "giveRations": 2,
                   "recordChronicle": {
@@ -126,11 +219,23 @@
                 }
               },
               {
-                "when": { "hasItem": "vesper_tonic" },
+                "when": {
+                  "hasItem": "vesper_tonic"
+                },
                 "effect": {
-                  "consumeItems": [{ "id": "vesper_tonic", "qty": 1 }],
-                  "setFlags": { "cinderford_saved": true, "granary_purified": true },
-                  "adjustFactions": { "iron_vow": 2 },
+                  "consumeItems": [
+                    {
+                      "id": "vesper_tonic",
+                      "qty": 1
+                    }
+                  ],
+                  "setFlags": {
+                    "cinderford_saved": true,
+                    "granary_purified": true
+                  },
+                  "adjustFactions": {
+                    "iron_vow": 2
+                  },
                   "giveCrowns": 18,
                   "giveRations": 2,
                   "recordChronicle": {
@@ -151,8 +256,13 @@
                     "label": "Cellar Quarantine",
                     "isLoreOrPerception": true,
                     "onSuccess": {
-                      "setFlags": { "cinderford_saved": true, "granary_purified": true },
-                      "adjustFactions": { "iron_vow": 2 },
+                      "setFlags": {
+                        "cinderford_saved": true,
+                        "granary_purified": true
+                      },
+                      "adjustFactions": {
+                        "iron_vow": 2
+                      },
                       "giveRations": 2,
                       "giveCrowns": 15,
                       "recordChronicle": {
@@ -165,8 +275,13 @@
                       ]
                     },
                     "onFail": {
-                      "setFlags": { "cinderford_saved": true, "granary_burned": true },
-                      "adjustFactions": { "iron_vow": 1 },
+                      "setFlags": {
+                        "cinderford_saved": true,
+                        "granary_burned": true
+                      },
+                      "adjustFactions": {
+                        "iron_vow": 1
+                      },
                       "recordChronicle": {
                         "title": "Burned Cinderford Granary",
                         "summary": "Put the contaminated granary to the torch to halt the Husk-Tide.",
@@ -187,14 +302,24 @@
           "label": "Curtain Wall",
           "visible": {
             "allOf": [
-              { "race": "durnfolk" },
-              { "notFlag": "cinderford_fallen" },
-              { "notFlag": "cf_wall_repaired" }
+              {
+                "race": "durnfolk"
+              },
+              {
+                "notFlag": "cinderford_fallen"
+              },
+              {
+                "notFlag": "cf_wall_repaired"
+              }
             ]
           },
           "effect": {
-            "setFlags": { "cf_wall_repaired": true },
-            "adjustFactions": { "iron_vow": 1 },
+            "setFlags": {
+              "cf_wall_repaired": true
+            },
+            "adjustFactions": {
+              "iron_vow": 1
+            },
             "giveCrowns": 18,
             "messages": [
               "Your Durnfolk eyes spot settling mortar above the sluice-gate. You wedge basalt shims and instruct the masons in deep-forge bracing; the master builder pays your fee gratefully."
@@ -206,14 +331,25 @@
           "label": "Storehouse",
           "visible": {
             "allOf": [
-              { "hasFlag": "cinderford_fallen" },
-              { "notFlag": "cf_looted_ruin" }
+              {
+                "hasFlag": "cinderford_fallen"
+              },
+              {
+                "notFlag": "cf_looted_ruin"
+              }
             ]
           },
           "effect": {
-            "setFlags": { "cf_looted_ruin": true },
+            "setFlags": {
+              "cf_looted_ruin": true
+            },
             "giveRations": 1,
-            "giveItems": [{ "id": "poultice", "qty": 1 }],
+            "giveItems": [
+              {
+                "id": "poultice",
+                "qty": 1
+              }
+            ],
             "messages": [
               "Among spilled grain sacks you rescue a bundle of rations and a clean poultice."
             ]
@@ -226,15 +362,21 @@
           "name": "Captain Vane",
           "unidentifiedLabel": "Scarred Officer",
           "shortLabel": "Captain Vane",
-          "visible": { "notFlag": "cinderford_fallen" },
+          "visible": {
+            "notFlag": "cinderford_fallen"
+          },
           "firstSightProse": "At the far end of the rain-slicked yard stands a broad-shouldered garrison officer leaning over a scarred oak table. Iron-grey hair sits cropped beneath a leather cap, an old sabre slash splits his left eyebrow, and gauntleted fingers drum steadily beside an iron muster roll.",
           "greetingVariants": [
             {
-              "when": { "race": "vaelorian" },
+              "when": {
+                "race": "vaelorian"
+              },
               "text": "Captain Vane eyes the old Vaelorian cut of your brow across the muster table."
             },
             {
-              "when": { "sex": "female" },
+              "when": {
+                "sex": "female"
+              },
               "text": "Captain Vane glances up from his iron muster-roll, his gaze cold and skeptical."
             },
             {
@@ -259,17 +401,34 @@
             "armsHandsDetail": "Thick forearms end in scarred knuckles resting permanently near his sword pommel.",
             "legsStanceDetail": "Planted squarely behind the oak muster board as though holding a breach.",
             "distinguishingMark": "Wears a notched iron whistle chained across his breastplate.",
-            "visibleTags": ["humanoid", "muscular", "scarred_face"]
+            "visibleTags": [
+              "humanoid",
+              "muscular",
+              "scarred_face"
+            ]
           },
           "topics": [
             {
               "id": "vane_charter",
               "label": "Blood Charter",
-              "visible": { "allOf": [{ "race": "vaelorian" }, { "notFlag": "vane_visited" }] },
+              "visible": {
+                "allOf": [
+                  {
+                    "race": "vaelorian"
+                  },
+                  {
+                    "notFlag": "vane_visited"
+                  }
+                ]
+              },
               "effect": {
                 "stayInDialogue": true,
-                "setFlags": { "vane_visited": true },
-                "adjustFactions": { "iron_vow": 2 },
+                "setFlags": {
+                  "vane_visited": true
+                },
+                "adjustFactions": {
+                  "iron_vow": 2
+                },
                 "giveCrowns": 22,
                 "giveRations": 1,
                 "recordChronicle": {
@@ -287,15 +446,25 @@
               "label": "Muster",
               "visible": {
                 "allOf": [
-                  { "notRace": "vaelorian" },
-                  { "sex": "male" },
-                  { "notFlag": "vane_visited" }
+                  {
+                    "notRace": "vaelorian"
+                  },
+                  {
+                    "sex": "male"
+                  },
+                  {
+                    "notFlag": "vane_visited"
+                  }
                 ]
               },
               "effect": {
                 "stayInDialogue": true,
-                "setFlags": { "vane_visited": true },
-                "adjustFactions": { "iron_vow": 1 },
+                "setFlags": {
+                  "vane_visited": true
+                },
+                "adjustFactions": {
+                  "iron_vow": 1
+                },
                 "giveCrowns": 16,
                 "giveTorches": 1,
                 "recordChronicle": {
@@ -313,20 +482,30 @@
               "label": "Challenge",
               "visible": {
                 "allOf": [
-                  { "notRace": "vaelorian" },
-                  { "sex": "female" },
-                  { "notFlag": "vane_visited" }
+                  {
+                    "notRace": "vaelorian"
+                  },
+                  {
+                    "sex": "female"
+                  },
+                  {
+                    "notFlag": "vane_visited"
+                  }
                 ]
               },
               "effect": {
                 "stayInDialogue": true,
-                "setFlags": { "vane_visited": true },
+                "setFlags": {
+                  "vane_visited": true
+                },
                 "check": {
                   "stat": "might",
                   "dc": 12,
                   "label": "Muster Table",
                   "onSuccess": {
-                    "adjustFactions": { "iron_vow": 2 },
+                    "adjustFactions": {
+                      "iron_vow": 2
+                    },
                     "giveCrowns": 24,
                     "grantMaxHp": 2,
                     "recordChronicle": {
@@ -340,7 +519,9 @@
                     ]
                   },
                   "onFail": {
-                    "adjustFactions": { "iron_vow": -1 },
+                    "adjustFactions": {
+                      "iron_vow": -1
+                    },
                     "giveCrowns": 10,
                     "messages": [
                       "Captain Vane scoffs at your stance and tosses a thin messenger fee across the wood."
@@ -356,7 +537,9 @@
                 "stayInDialogue": true,
                 "branch": [
                   {
-                    "when": { "hasFlag": "cinderford_saved" },
+                    "when": {
+                      "hasFlag": "cinderford_saved"
+                    },
                     "effect": {
                       "messages": [
                         "Vane nods toward the well. \"With the granary settled, we might actually outlast winter.\""
@@ -390,11 +573,15 @@
           "name": "Innkeeper Martha",
           "unidentifiedLabel": "Hearth Keeper",
           "shortLabel": "Martha",
-          "visible": { "notFlag": "cinderford_fallen" },
+          "visible": {
+            "notFlag": "cinderford_fallen"
+          },
           "firstSightProse": "Beside the smoking peat hearth stands a sturdy, grey-braided woman wiping cracked stoneware with a flour-dusted apron. Soot smudges her forearms, and shrewd amber eyes take in every wet cloak that crosses her threshold.",
           "greetingVariants": [
             {
-              "when": { "hasFlag": "granary_purified" },
+              "when": {
+                "hasFlag": "granary_purified"
+              },
               "text": "Martha ladles hot barley broth with a warm smile."
             },
             {
@@ -419,7 +606,9 @@
             "armsHandsDetail": "Strong, burn-speckled forearms lift heavy iron kettles with ease.",
             "legsStanceDetail": "Unhurried, practical stride behind the timber counter.",
             "distinguishingMark": "Keeps a heavy brass key-ring looped through her apron sash.",
-            "visibleTags": ["humanoid"]
+            "visibleTags": [
+              "humanoid"
+            ]
           },
           "topics": [
             {
@@ -435,10 +624,14 @@
             {
               "id": "martha_soup",
               "label": "Broth",
-              "visible": { "notFlag": "martha_broth_today" },
+              "visible": {
+                "notFlag": "martha_broth_today"
+              },
               "effect": {
                 "stayInDialogue": true,
-                "setFlags": { "martha_broth_today": true },
+                "setFlags": {
+                  "martha_broth_today": true
+                },
                 "healHp": 4,
                 "messages": [
                   "Martha pushes a steaming wooden bowl across the counter."
@@ -452,11 +645,19 @@
     {
       "id": "kings_causeway",
       "name": "The Old King's Causeway",
-      "regionType": "road",
+      "regionType": "area",
       "danger": 1,
       "dark": false,
-      "neighbors": ["cinderford", "petrified_starwood", "silken_cistern"],
-      "asciiPos": { "row": 2, "col": 1, "code": "KC" },
+      "neighbors": [
+        "cinderford",
+        "petrified_starwood",
+        "silken_cistern"
+      ],
+      "asciiPos": {
+        "row": 2,
+        "col": 1,
+        "code": "KC"
+      },
       "sensorySummary": "Broad Imperial flagstones buckle upward where pale subterranean roots split ancient mortar. Broken obelisks lean beside rusted deserter cages while cold ash drifts over rutted carriage tracks.",
       "firstSightVariants": [
         {
@@ -472,9 +673,13 @@
         {
           "id": "kc_milestones",
           "label": "Milestones",
-          "visible": { "notFlag": "kc_milestones_checked" },
+          "visible": {
+            "notFlag": "kc_milestones_checked"
+          },
           "effect": {
-            "setFlags": { "kc_milestones_checked": true },
+            "setFlags": {
+              "kc_milestones_checked": true
+            },
             "check": {
               "stat": "wit",
               "dc": 11,
@@ -501,17 +706,31 @@
           "label": "Courier Ditch",
           "visible": {
             "allOf": [
-              { "hasFlag": "kc_milestones_checked" },
-              { "notFlag": "kc_ditch_cleared" }
+              {
+                "hasFlag": "kc_milestones_checked"
+              },
+              {
+                "notFlag": "kc_ditch_cleared"
+              }
             ]
           },
           "effect": {
-            "setFlags": { "kc_ditch_cleared": true },
-            "giveItems": [{ "id": "ash_resin", "qty": 1 }],
+            "setFlags": {
+              "kc_ditch_cleared": true
+            },
+            "giveItems": [
+              {
+                "id": "ash_resin",
+                "qty": 1
+              }
+            ],
             "messages": [
               "Half-buried in ash mud sits a scorched saddlebag holding resin, though low smoke curls out of the culvert beside it."
             ],
-            "startCombat": { "enemyId": "ash_hound", "canFlee": true }
+            "startCombat": {
+              "enemyId": "ash_hound",
+              "canFlee": true
+            }
           }
         }
       ],
@@ -520,11 +739,18 @@
     {
       "id": "weeping_barrow",
       "name": "The Weeping Barrow",
-      "regionType": "ruin",
+      "regionType": "area",
       "danger": 2,
       "dark": true,
-      "neighbors": ["cinderford", "petrified_starwood"],
-      "asciiPos": { "row": 0, "col": 0, "code": "WB" },
+      "neighbors": [
+        "cinderford",
+        "petrified_starwood"
+      ],
+      "asciiPos": {
+        "row": 0,
+        "col": 0,
+        "code": "WB"
+      },
       "sensorySummary": "A grass-bald burial mound older than the Shattering weeps rust-orange groundwater down mossy stone steps. Silver Star-Script glints across the sunken lintel.",
       "firstSightVariants": [
         {
@@ -535,8 +761,12 @@
         {
           "when": {
             "anyOf": [
-              { "heirloom": "kiln_lantern" },
-              { "minTorches": 1 }
+              {
+                "heirloom": "kiln_lantern"
+              },
+              {
+                "minTorches": 1
+              }
             ]
           },
           "text": "An ancient pre-Shattering tumulus weeping iron-stained groundwater down mossy steps. Warm light catches silver Star-Script carved across the weeping lintel."
@@ -549,9 +779,13 @@
         {
           "id": "wb_outer_steps",
           "label": "Outer Steps",
-          "visible": { "notFlag": "wb_steps_entered" },
+          "visible": {
+            "notFlag": "wb_steps_entered"
+          },
           "effect": {
-            "setFlags": { "wb_steps_entered": true },
+            "setFlags": {
+              "wb_steps_entered": true
+            },
             "consumeTorchIfNotHeirloomOrAbility": {
               "heirloomId": "kiln_lantern",
               "abilityId": "kiln_spark",
@@ -570,13 +804,25 @@
           "label": "Inner Crypt",
           "visible": {
             "allOf": [
-              { "hasFlag": "wb_steps_entered" },
-              { "notFlag": "wb_crypt_cleared" }
+              {
+                "hasFlag": "wb_steps_entered"
+              },
+              {
+                "notFlag": "wb_crypt_cleared"
+              }
             ]
           },
           "effect": {
-            "setFlags": { "wb_crypt_cleared": true, "vorne_oath_known": true },
-            "giveItems": [{ "id": "echo_shell", "qty": 1 }],
+            "setFlags": {
+              "wb_crypt_cleared": true,
+              "vorne_oath_known": true
+            },
+            "giveItems": [
+              {
+                "id": "echo_shell",
+                "qty": 1
+              }
+            ],
             "messages": [
               "Upon the central sarcophagus rests a silver-inlaid tablet naming Sir Vorne's forgotten oath: \"Hold the Crown-Gate until the First Bell answers twice — never yield to the Choir.\" Beside it lies a Resonant Echo-Shell."
             ]
@@ -587,8 +833,12 @@
           "label": "Altar Frieze",
           "visible": {
             "allOf": [
-              { "hasFlag": "wb_crypt_cleared" },
-              { "notFlag": "kiln_cipher_learned" }
+              {
+                "hasFlag": "wb_crypt_cleared"
+              },
+              {
+                "notFlag": "kiln_cipher_learned"
+              }
             ]
           },
           "effect": {
@@ -596,13 +846,21 @@
               {
                 "when": {
                   "anyOf": [
-                    { "race": "vaelorian" },
-                    { "race": "ael_thalor" },
-                    { "background": "root_scholar" }
+                    {
+                      "race": "vaelorian"
+                    },
+                    {
+                      "race": "ael_thalor"
+                    },
+                    {
+                      "background": "root_scholar"
+                    }
                   ]
                 },
                 "effect": {
-                  "setFlags": { "kiln_cipher_learned": true },
+                  "setFlags": {
+                    "kiln_cipher_learned": true
+                  },
                   "recordChronicle": {
                     "title": "Learned First Kiln Cipher",
                     "summary": "Translated the pre-Shattering ignition sigils inside the Weeping Barrow.",
@@ -621,7 +879,9 @@
                     "label": "Kiln Altar",
                     "isLoreOrPerception": true,
                     "onSuccess": {
-                      "setFlags": { "kiln_cipher_learned": true },
+                      "setFlags": {
+                        "kiln_cipher_learned": true
+                      },
                       "recordChronicle": {
                         "title": "Learned First Kiln Cipher",
                         "summary": "Pieced together the pre-Shattering Kiln sigils from the tomb lintel.",
@@ -647,14 +907,27 @@
           "label": "Basalt Vault",
           "visible": {
             "allOf": [
-              { "race": "durnfolk" },
-              { "hasFlag": "wb_steps_entered" },
-              { "notFlag": "wb_dwarf_vault" }
+              {
+                "race": "durnfolk"
+              },
+              {
+                "hasFlag": "wb_steps_entered"
+              },
+              {
+                "notFlag": "wb_dwarf_vault"
+              }
             ]
           },
           "effect": {
-            "setFlags": { "wb_dwarf_vault": true },
-            "giveItems": [{ "id": "runic_warhammer", "qty": 1 }],
+            "setFlags": {
+              "wb_dwarf_vault": true
+            },
+            "giveItems": [
+              {
+                "id": "runic_warhammer",
+                "qty": 1
+              }
+            ],
             "giveCrowns": 20,
             "recordChronicle": {
               "title": "Opened Barrow Vault",
@@ -672,11 +945,18 @@
     {
       "id": "ash_fen",
       "name": "The Ash-Fen & Spore-Mire",
-      "regionType": "road",
+      "regionType": "area",
       "danger": 2,
       "dark": false,
-      "neighbors": ["cinderford", "silken_cistern"],
-      "asciiPos": { "row": 4, "col": 0, "code": "AF" },
+      "neighbors": [
+        "cinderford",
+        "silken_cistern"
+      ],
+      "asciiPos": {
+        "row": 4,
+        "col": 0,
+        "code": "AF"
+      },
       "sensorySummary": "Knee-deep gray bog dotted with sunken stone lanterns and pale, bell-shaped fungi. Beneath the cattails, an ancient stone culvert descends toward subterranean water.",
       "firstSightVariants": [
         {
@@ -692,10 +972,19 @@
         {
           "id": "af_herbs",
           "label": "Herb Bank",
-          "visible": { "notFlag": "af_herbs_picked" },
+          "visible": {
+            "notFlag": "af_herbs_picked"
+          },
           "effect": {
-            "setFlags": { "af_herbs_picked": true },
-            "giveItems": [{ "id": "bog_herb", "qty": 2 }],
+            "setFlags": {
+              "af_herbs_picked": true
+            },
+            "giveItems": [
+              {
+                "id": "bog_herb",
+                "qty": 2
+              }
+            ],
             "messages": [
               "You cut two bundles of silver-veined bog herb from the reeds."
             ]
@@ -704,9 +993,13 @@
         {
           "id": "af_stones",
           "label": "Stepping Stones",
-          "visible": { "notFlag": "af_stones_crossed" },
+          "visible": {
+            "notFlag": "af_stones_crossed"
+          },
           "effect": {
-            "setFlags": { "af_stones_crossed": true },
+            "setFlags": {
+              "af_stones_crossed": true
+            },
             "check": {
               "stat": "agility",
               "dc": 12,
@@ -730,13 +1023,24 @@
           "label": "Sunken Shrine",
           "visible": {
             "allOf": [
-              { "hasFlag": "af_stones_crossed" },
-              { "notFlag": "af_shrine_done" }
+              {
+                "hasFlag": "af_stones_crossed"
+              },
+              {
+                "notFlag": "af_shrine_done"
+              }
             ]
           },
           "effect": {
-            "setFlags": { "af_shrine_done": true },
-            "giveItems": [{ "id": "poultice", "qty": 1 }],
+            "setFlags": {
+              "af_shrine_done": true
+            },
+            "giveItems": [
+              {
+                "id": "poultice",
+                "qty": 1
+              }
+            ],
             "restoreFocus": 3,
             "messages": [
               "Beneath the drowned altar you retrieve a dry poultice and steady your mind."
@@ -748,15 +1052,27 @@
           "label": "Mire Vents",
           "visible": {
             "allOf": [
-              { "race": "grixi" },
-              { "notFlag": "af_grixi_skimmed" }
+              {
+                "race": "grixi"
+              },
+              {
+                "notFlag": "af_grixi_skimmed"
+              }
             ]
           },
           "effect": {
-            "setFlags": { "af_grixi_skimmed": true },
+            "setFlags": {
+              "af_grixi_skimmed": true
+            },
             "giveItems": [
-              { "id": "fire_pot", "qty": 1 },
-              { "id": "antitoxin", "qty": 1 }
+              {
+                "id": "fire_pot",
+                "qty": 1
+              },
+              {
+                "id": "antitoxin",
+                "qty": 1
+              }
             ],
             "giveCrowns": 16,
             "messages": [
@@ -770,11 +1086,19 @@
     {
       "id": "silken_cistern",
       "name": "The Silken Cistern",
-      "regionType": "sanctuary",
+      "regionType": "special",
       "danger": 1,
       "dark": false,
-      "neighbors": ["ash_fen", "kings_causeway", "drowned_forge"],
-      "asciiPos": { "row": 4, "col": 1, "code": "SC" },
+      "neighbors": [
+        "ash_fen",
+        "kings_causeway",
+        "drowned_forge"
+      ],
+      "asciiPos": {
+        "row": 4,
+        "col": 1,
+        "code": "SC"
+      },
       "sensorySummary": "Cathedral-tall subterranean aqueduct arches draped in pale luminous silk above mirror-still black water. Soft shuttle-clicks echo from blind looms hidden behind the curtains.",
       "firstSightVariants": [
         {
@@ -783,11 +1107,15 @@
       ],
       "descriptionVariants": [
         {
-          "when": { "hasFlag": "stole_cistern_vesper" },
+          "when": {
+            "hasFlag": "stole_cistern_vesper"
+          },
           "text": "The vast underground aqueduct stands dead silent. White silk curtains hang slashed, and the drained Vesper-Font weeps bitter mist."
         },
         {
-          "when": { "sex": "female" },
+          "when": {
+            "sex": "female"
+          },
           "text": "Vast subterranean vaults draped in pale luminous spider-silk above mirror-still black water. The blind Matrons incline their veiled heads toward you in quiet sisterhood."
         },
         {
@@ -799,11 +1127,15 @@
         "keeper": "Sister Orla",
         "greetingVariants": [
           {
-            "when": { "hasFlag": "stole_cistern_vesper" },
+            "when": {
+              "hasFlag": "stole_cistern_vesper"
+            },
             "text": "The stalls are abandoned and cursed."
           },
           {
-            "when": { "sex": "female" },
+            "when": {
+              "sex": "female"
+            },
             "text": "\"Peace to your step, Sister. Take what helps silence the Choir.\""
           },
           {
@@ -811,22 +1143,51 @@
           }
         ],
         "items": [
-          { "itemId": "vesper_tonic", "price": 14 },
-          { "itemId": "antitoxin", "price": 10 },
-          { "itemId": "star_sap_drop", "price": 34 },
-          { "itemId": "chitin_mantle", "price": 46 },
-          { "itemId": "silken_veil", "price": 42 },
-          { "itemId": "cistern_veil", "price": 32 },
-          { "itemId": "amber_censer", "price": 30 },
-          { "itemId": "ash_purge_draught", "price": 24 },
-          { "itemId": "writ_blight_wave", "price": 34 }
+          {
+            "itemId": "vesper_tonic",
+            "price": 14
+          },
+          {
+            "itemId": "antitoxin",
+            "price": 10
+          },
+          {
+            "itemId": "star_sap_drop",
+            "price": 34
+          },
+          {
+            "itemId": "chitin_mantle",
+            "price": 46
+          },
+          {
+            "itemId": "silken_veil",
+            "price": 42
+          },
+          {
+            "itemId": "cistern_veil",
+            "price": 32
+          },
+          {
+            "itemId": "amber_censer",
+            "price": 30
+          },
+          {
+            "itemId": "ash_purge_draught",
+            "price": 24
+          },
+          {
+            "itemId": "writ_blight_wave",
+            "price": 34
+          }
         ]
       },
       "actions": [
         {
           "id": "sc_pool_rest",
           "label": "Quiet Pool",
-          "visible": { "notFlag": "stole_cistern_vesper" },
+          "visible": {
+            "notFlag": "stole_cistern_vesper"
+          },
           "effect": {
             "healFull": true,
             "advanceDay": 1,
@@ -838,10 +1199,17 @@
         {
           "id": "sc_steal_font",
           "label": "Vesper Font",
-          "visible": { "notFlag": "stole_cistern_vesper" },
+          "visible": {
+            "notFlag": "stole_cistern_vesper"
+          },
           "effect": {
-            "setFlags": { "stole_cistern_vesper": true },
-            "adjustFactions": { "silken_cistern": -5, "husk_choir": 2 },
+            "setFlags": {
+              "stole_cistern_vesper": true
+            },
+            "adjustFactions": {
+              "silken_cistern": -5,
+              "husk_choir": 2
+            },
             "grantMaxFocus": 2,
             "giveCrowns": 45,
             "recordChronicle": {
@@ -861,11 +1229,15 @@
           "name": "Matron Veyra",
           "unidentifiedLabel": "Veiled Weaver",
           "shortLabel": "Matron Veyra",
-          "visible": { "notFlag": "stole_cistern_vesper" },
+          "visible": {
+            "notFlag": "stole_cistern_vesper"
+          },
           "firstSightProse": "Beside the black water stands a tall, slender woman wrapped from crown to heel in luminous white silk. Her eyes are bound beneath silver-stitched gauze, yet her pale hands trace invisible vibrations hanging in the cavern air.",
           "greetingVariants": [
             {
-              "when": { "sex": "female" },
+              "when": {
+                "sex": "female"
+              },
               "text": "\"Step past the silk, Sister. Let our blind looms weigh your breath.\""
             },
             {
@@ -890,18 +1262,40 @@
             "armsHandsDetail": "Long, pale fingers stain faintly silver at the tips from drawing counter-harmonic thread.",
             "legsStanceDetail": "Stands motionless upon wet flagstone without shifting weight.",
             "distinguishingMark": "Fine luminous threads cling to her sleeves and stir whenever a bell rings far away.",
-            "visibleTags": ["humanoid", "pale_skin", "occult"]
+            "visibleTags": [
+              "humanoid",
+              "pale_skin",
+              "occult"
+            ]
           },
           "topics": [
             {
               "id": "veyra_shell",
               "label": "Echo Shell",
-              "visible": { "allOf": [{ "hasItem": "echo_shell" }, { "notFlag": "seal_of_silence" }] },
+              "visible": {
+                "allOf": [
+                  {
+                    "hasItem": "echo_shell"
+                  },
+                  {
+                    "notFlag": "seal_of_silence"
+                  }
+                ]
+              },
               "effect": {
                 "stayInDialogue": true,
-                "consumeItems": [{ "id": "echo_shell", "qty": 1 }],
-                "setFlags": { "seal_of_silence": true },
-                "adjustFactions": { "silken_cistern": 3 },
+                "consumeItems": [
+                  {
+                    "id": "echo_shell",
+                    "qty": 1
+                  }
+                ],
+                "setFlags": {
+                  "seal_of_silence": true
+                },
+                "adjustFactions": {
+                  "silken_cistern": 3
+                },
                 "grantMaxFocus": 1,
                 "recordChronicle": {
                   "title": "Earned Seal of Silence",
@@ -916,17 +1310,30 @@
             {
               "id": "veyra_sisterhood",
               "label": "Sisterhood",
-              "visible": { "allOf": [{ "sex": "female" }, { "notFlag": "seal_of_silence" }] },
+              "visible": {
+                "allOf": [
+                  {
+                    "sex": "female"
+                  },
+                  {
+                    "notFlag": "seal_of_silence"
+                  }
+                ]
+              },
               "effect": {
                 "stayInDialogue": true,
-                "adjustFactions": { "silken_cistern": 1 },
+                "adjustFactions": {
+                  "silken_cistern": 1
+                },
                 "check": {
                   "stat": "wit",
                   "dc": 11,
                   "label": "Sisterhood Rite",
                   "isLoreOrPerception": true,
                   "onSuccess": {
-                    "setFlags": { "seal_of_silence": true },
+                    "setFlags": {
+                      "seal_of_silence": true
+                    },
                     "recordChronicle": {
                       "title": "Earned Seal of Silence",
                       "summary": "Passed the Unveiled Sisterhood rite before the Matrons of the Silken Cistern.",
@@ -949,9 +1356,22 @@
               "label": "Liturgy",
               "visible": {
                 "allOf": [
-                  { "sex": "male" },
-                  { "anyOf": [{ "race": "ael_thalor" }, { "background": "shrine_penitent" }] },
-                  { "notFlag": "seal_of_silence" }
+                  {
+                    "sex": "male"
+                  },
+                  {
+                    "anyOf": [
+                      {
+                        "race": "ael_thalor"
+                      },
+                      {
+                        "background": "shrine_penitent"
+                      }
+                    ]
+                  },
+                  {
+                    "notFlag": "seal_of_silence"
+                  }
                 ]
               },
               "effect": {
@@ -962,8 +1382,12 @@
                   "label": "Water Liturgy",
                   "isLoreOrPerception": true,
                   "onSuccess": {
-                    "setFlags": { "seal_of_silence": true },
-                    "adjustFactions": { "silken_cistern": 2 },
+                    "setFlags": {
+                      "seal_of_silence": true
+                    },
+                    "adjustFactions": {
+                      "silken_cistern": 2
+                    },
                     "recordChronicle": {
                       "title": "Earned Seal of Silence",
                       "summary": "Won the Matrons' trust through ancient liturgy.",
@@ -986,9 +1410,15 @@
               "label": "Blood Oath",
               "visible": {
                 "allOf": [
-                  { "sex": "male" },
-                  { "notFlag": "seal_of_silence" },
-                  { "minHp": 7 }
+                  {
+                    "sex": "male"
+                  },
+                  {
+                    "notFlag": "seal_of_silence"
+                  },
+                  {
+                    "minHp": 7
+                  }
                 ]
               },
               "effect": {
@@ -999,8 +1429,12 @@
                   "dc": 14,
                   "label": "Loom Blood-Oath",
                   "onSuccess": {
-                    "setFlags": { "seal_of_silence": true },
-                    "adjustFactions": { "silken_cistern": 1 },
+                    "setFlags": {
+                      "seal_of_silence": true
+                    },
+                    "adjustFactions": {
+                      "silken_cistern": 1
+                    },
                     "recordChronicle": {
                       "title": "Blood-Oath of Cistern",
                       "summary": "Spilled your own blood upon the Loom-threshold to earn the Seal of Silence.",
@@ -1025,7 +1459,9 @@
                 "stayInDialogue": true,
                 "branch": [
                   {
-                    "when": { "hasFlag": "seal_of_silence" },
+                    "when": {
+                      "hasFlag": "seal_of_silence"
+                    },
                     "effect": {
                       "messages": [
                         "\"With our Seal around your wrist, Malakor's Drowning Toll cannot shatter your mind,\" Veyra whispers."
@@ -1049,11 +1485,19 @@
     {
       "id": "petrified_starwood",
       "name": "The Petrified Star-Wood",
-      "regionType": "ruin",
+      "regionType": "area",
       "danger": 2,
       "dark": false,
-      "neighbors": ["weeping_barrow", "kings_causeway", "crown_watchtower"],
-      "asciiPos": { "row": 0, "col": 1, "code": "SW" },
+      "neighbors": [
+        "weeping_barrow",
+        "kings_causeway",
+        "crown_watchtower"
+      ],
+      "asciiPos": {
+        "row": 0,
+        "col": 1,
+        "code": "SW"
+      },
       "sensorySummary": "Colossal ivory-stone trunks spiral like cathedral ribs into a pale cloudbank. Glassy silver needles chime in the breeze while pale root-veins crawl across the forest floor.",
       "firstSightVariants": [
         {
@@ -1062,7 +1506,9 @@
       ],
       "descriptionVariants": [
         {
-          "when": { "race": "ael_thalor" },
+          "when": {
+            "race": "ael_thalor"
+          },
           "text": "Colossal ivory-stone trunks spiral toward a pale sky — your exiled kin's ancient home, now strangled by vibrating root-veins."
         },
         {
@@ -1073,10 +1519,19 @@
         {
           "id": "sw_resin_grove",
           "label": "Resin Grove",
-          "visible": { "notFlag": "sw_grove_searched" },
+          "visible": {
+            "notFlag": "sw_grove_searched"
+          },
           "effect": {
-            "setFlags": { "sw_grove_searched": true },
-            "giveItems": [{ "id": "ash_resin", "qty": 2 }],
+            "setFlags": {
+              "sw_grove_searched": true
+            },
+            "giveItems": [
+              {
+                "id": "ash_resin",
+                "qty": 2
+              }
+            ],
             "messages": [
               "You scrape volatile amber resin from petrified boughs and clear a deer trail into the Heart-Glade."
             ]
@@ -1087,17 +1542,30 @@
           "label": "Heart Glade",
           "visible": {
             "allOf": [
-              { "hasFlag": "sw_grove_searched" },
-              { "notFlag": "star_stag_resolved" }
+              {
+                "hasFlag": "sw_grove_searched"
+              },
+              {
+                "notFlag": "star_stag_resolved"
+              }
             ]
           },
           "effect": {
             "branch": [
               {
-                "when": { "race": "ael_thalor" },
+                "when": {
+                  "race": "ael_thalor"
+                },
                 "effect": {
-                  "setFlags": { "star_stag_resolved": true },
-                  "giveItems": [{ "id": "star_glaive", "qty": 1 }],
+                  "setFlags": {
+                    "star_stag_resolved": true
+                  },
+                  "giveItems": [
+                    {
+                      "id": "star_glaive",
+                      "qty": 1
+                    }
+                  ],
                   "grantMaxFocus": 1,
                   "recordChronicle": {
                     "title": "Calmed the Star-Stag",
@@ -1134,16 +1602,27 @@
           "label": "Root Conduit",
           "visible": {
             "allOf": [
-              { "hasFlag": "star_stag_resolved" },
-              { "notFlag": "root_conduit_severed" }
+              {
+                "hasFlag": "star_stag_resolved"
+              },
+              {
+                "notFlag": "root_conduit_severed"
+              }
             ]
           },
           "effect": {
             "branch": [
               {
-                "when": { "hasAnyAbility": ["kiln_spark", "cinder_brand"] },
+                "when": {
+                  "hasAnyAbility": [
+                    "kiln_spark",
+                    "cinder_brand"
+                  ]
+                },
                 "effect": {
-                  "setFlags": { "root_conduit_severed": true },
+                  "setFlags": {
+                    "root_conduit_severed": true
+                  },
                   "recordChronicle": {
                     "title": "Severed Root Conduit",
                     "summary": "Burned out the pulsing Pale-Root taproot beneath the Petrified Star-Wood.",
@@ -1155,10 +1634,19 @@
                 }
               },
               {
-                "when": { "hasItem": "fire_pot" },
+                "when": {
+                  "hasItem": "fire_pot"
+                },
                 "effect": {
-                  "consumeItems": [{ "id": "fire_pot", "qty": 1 }],
-                  "setFlags": { "root_conduit_severed": true },
+                  "consumeItems": [
+                    {
+                      "id": "fire_pot",
+                      "qty": 1
+                    }
+                  ],
+                  "setFlags": {
+                    "root_conduit_severed": true
+                  },
                   "recordChronicle": {
                     "title": "Severed Root Conduit",
                     "summary": "Burned out the pulsing Pale-Root taproot beneath the Petrified Star-Wood.",
@@ -1176,7 +1664,9 @@
                     "dc": 14,
                     "label": "Root-Core",
                     "onSuccess": {
-                      "setFlags": { "root_conduit_severed": true },
+                      "setFlags": {
+                        "root_conduit_severed": true
+                      },
                       "recordChronicle": {
                         "title": "Severed Root Conduit",
                         "summary": "Hacked apart the Pale-Root conduit beneath the Star-Wood.",
@@ -1204,11 +1694,18 @@
     {
       "id": "drowned_forge",
       "name": "The Drowned Forge-Vault",
-      "regionType": "ruin",
+      "regionType": "special",
       "danger": 3,
       "dark": true,
-      "neighbors": ["silken_cistern", "sunken_belfry"],
-      "asciiPos": { "row": 4, "col": 2, "code": "DF" },
+      "neighbors": [
+        "silken_cistern",
+        "sunken_belfry"
+      ],
+      "asciiPos": {
+        "row": 4,
+        "col": 2,
+        "code": "DF"
+      },
       "sensorySummary": "Flooded basalt furnace halls built by the Durnfolk before the Shattering. Warm brine laps against submerged anvils while steam hisses from copper sluice-pipes.",
       "firstSightVariants": [
         {
@@ -1224,14 +1721,25 @@
         {
           "id": "df_warden",
           "label": "Sluice Hall",
-          "visible": { "notFlag": "forge_cleared" },
+          "visible": {
+            "notFlag": "forge_cleared"
+          },
           "effect": {
             "branch": [
               {
-                "when": { "race": "durnfolk" },
+                "when": {
+                  "race": "durnfolk"
+                },
                 "effect": {
-                  "setFlags": { "forge_cleared": true },
-                  "giveItems": [{ "id": "basalt_plate", "qty": 1 }],
+                  "setFlags": {
+                    "forge_cleared": true
+                  },
+                  "giveItems": [
+                    {
+                      "id": "basalt_plate",
+                      "qty": 1
+                    }
+                  ],
                   "recordChronicle": {
                     "title": "Commanded Forge-Warden",
                     "summary": "Used ancestral Durnfolk master-signs to stand down the Basalt Kiln-Warden.",
@@ -1243,7 +1751,9 @@
                 }
               },
               {
-                "when": { "race": "grixi" },
+                "when": {
+                  "race": "grixi"
+                },
                 "effect": {
                   "check": {
                     "stat": "agility",
@@ -1251,8 +1761,15 @@
                     "label": "Flue Bypass",
                     "isCraftOrStealth": true,
                     "onSuccess": {
-                      "setFlags": { "forge_cleared": true },
-                      "giveItems": [{ "id": "basalt_plate", "qty": 1 }],
+                      "setFlags": {
+                        "forge_cleared": true
+                      },
+                      "giveItems": [
+                        {
+                          "id": "basalt_plate",
+                          "qty": 1
+                        }
+                      ],
                       "messages": [
                         "You wriggle through the ash-exhaust duct behind the golem, pull its pressure pin, and claim the Basalt Cuirass."
                       ]
@@ -1298,7 +1815,9 @@
         {
           "id": "df_hone_weapon",
           "label": "Runic Brazier",
-          "visible": { "hasFlag": "forge_cleared" },
+          "visible": {
+            "hasFlag": "forge_cleared"
+          },
           "effect": {
             "honeWeapon": true,
             "messages": [
@@ -1311,12 +1830,18 @@
           "label": "Abyssal Valve",
           "visible": {
             "allOf": [
-              { "hasFlag": "forge_cleared" },
-              { "notFlag": "root_conduit_severed" }
+              {
+                "hasFlag": "forge_cleared"
+              },
+              {
+                "notFlag": "root_conduit_severed"
+              }
             ]
           },
           "effect": {
-            "setFlags": { "root_conduit_severed": true },
+            "setFlags": {
+              "root_conduit_severed": true
+            },
             "recordChronicle": {
               "title": "Choked Deep Conduit",
               "summary": "Closed the flooded Durnfolk sluice-valves, starving Malakor's root-shield.",
@@ -1333,11 +1858,18 @@
     {
       "id": "crown_watchtower",
       "name": "Crown-Gate Watchtower",
-      "regionType": "ruin",
+      "regionType": "area",
       "danger": 3,
       "dark": false,
-      "neighbors": ["petrified_starwood", "sunken_belfry"],
-      "asciiPos": { "row": 0, "col": 2, "code": "CW" },
+      "neighbors": [
+        "petrified_starwood",
+        "sunken_belfry"
+      ],
+      "asciiPos": {
+        "row": 0,
+        "col": 2,
+        "code": "CW"
+      },
       "sensorySummary": "A wind-scoured parapet jutting over the sunken amphitheater of the Belfry. Shattered arches frame the abyss below, where an old bronze plinth holds vigil.",
       "firstSightVariants": [
         {
@@ -1346,7 +1878,9 @@
       ],
       "descriptionVariants": [
         {
-          "when": { "hasFlag": "vorne_resolved" },
+          "when": {
+            "hasFlag": "vorne_resolved"
+          },
           "text": "Wind howls through the ruined gate-arch overlooking the Sunken Belfry below. An empty bronze chair faces the chasm."
         },
         {
@@ -1357,10 +1891,19 @@
         {
           "id": "cw_parapet",
           "label": "Parapet",
-          "visible": { "notFlag": "cw_parapet_checked" },
+          "visible": {
+            "notFlag": "cw_parapet_checked"
+          },
           "effect": {
-            "setFlags": { "cw_parapet_checked": true },
-            "giveItems": [{ "id": "poultice", "qty": 1 }],
+            "setFlags": {
+              "cw_parapet_checked": true
+            },
+            "giveItems": [
+              {
+                "id": "poultice",
+                "qty": 1
+              }
+            ],
             "messages": [
               "Tucked behind a fallen battlement you uncover a dry watchman satchel and a clear vantage over the Sunken Belfry below."
             ]
@@ -1373,7 +1916,9 @@
           "name": "Sir Vorne",
           "unidentifiedLabel": "Bronze Sentinel",
           "shortLabel": "Sir Vorne",
-          "visible": { "notFlag": "vorne_resolved" },
+          "visible": {
+            "notFlag": "vorne_resolved"
+          },
           "firstSightProse": "Seated upon a bronze plinth rests a towering knight whose gorget has fused seamlessly into a cast bronze bell-helm. Mountain wind draws a low, grieving ring from his visor while gauntleted fingers rest across a notched greatblade.",
           "greetingVariants": [
             {
@@ -1398,16 +1943,30 @@
             "armsHandsDetail": "Gauntleted hands rest lightly across the pommel of a bronze greatblade.",
             "legsStanceDetail": "Greaved legs sit straight and motionless upon the stone plinth.",
             "distinguishingMark": "The mountain gale rings faintly off his cast bronze helm.",
-            "visibleTags": ["humanoid", "towering", "armored"]
+            "visibleTags": [
+              "humanoid",
+              "towering",
+              "armored"
+            ]
           },
           "topics": [
             {
               "id": "vorne_oath",
               "label": "Recite Oath",
-              "visible": { "hasFlag": "vorne_oath_known" },
+              "visible": {
+                "hasFlag": "vorne_oath_known"
+              },
               "effect": {
-                "setFlags": { "vorne_resolved": true, "vorne_redeemed": true },
-                "giveItems": [{ "id": "bell_cleaver", "qty": 1 }],
+                "setFlags": {
+                  "vorne_resolved": true,
+                  "vorne_redeemed": true
+                },
+                "giveItems": [
+                  {
+                    "id": "bell_cleaver",
+                    "qty": 1
+                  }
+                ],
                 "recordChronicle": {
                   "title": "Redeemed Sir Vorne",
                   "summary": "Spoke the forgotten Weeping Barrow oath, freeing Sir Vorne to strike at the Belfry steps.",
@@ -1421,15 +1980,32 @@
             {
               "id": "vorne_challenge",
               "label": "Challenge",
-              "visible": { "anyOf": [{ "race": "vaelorian" }, { "background": "ashen_blade" }] },
+              "visible": {
+                "anyOf": [
+                  {
+                    "race": "vaelorian"
+                  },
+                  {
+                    "background": "ashen_blade"
+                  }
+                ]
+              },
               "effect": {
                 "check": {
                   "stat": "grit",
                   "dc": 14,
                   "label": "Knightly Oath",
                   "onSuccess": {
-                    "setFlags": { "vorne_resolved": true, "vorne_redeemed": true },
-                    "giveItems": [{ "id": "bell_cleaver", "qty": 1 }],
+                    "setFlags": {
+                      "vorne_resolved": true,
+                      "vorne_redeemed": true
+                    },
+                    "giveItems": [
+                      {
+                        "id": "bell_cleaver",
+                        "qty": 1
+                      }
+                    ],
                     "recordChronicle": {
                       "title": "Redeemed Sir Vorne",
                       "summary": "Recalled Sir Vorne to knightly honor at the Crown-Gate Watchtower.",
@@ -1483,11 +2059,18 @@
     {
       "id": "sunken_belfry",
       "name": "The Sunken Belfry",
-      "regionType": "belfry",
+      "regionType": "area",
       "danger": 4,
       "dark": true,
-      "neighbors": ["crown_watchtower", "drowned_forge"],
-      "asciiPos": { "row": 2, "col": 2, "code": "SB" },
+      "neighbors": [
+        "crown_watchtower",
+        "drowned_forge"
+      ],
+      "asciiPos": {
+        "row": 2,
+        "col": 2,
+        "code": "SB"
+      },
       "sensorySummary": "A drowned stone amphitheater cradling an immense upside-down bronze bell. Living white roots braid a high throne directly beneath its trembling rim.",
       "firstSightVariants": [
         {
@@ -1503,13 +2086,19 @@
         {
           "id": "sb_confront_malakor",
           "label": "Choir Pit",
-          "visible": { "notFlag": "malakor_slain" },
-          "effect": { "sunkenBelfryEncounter": true }
+          "visible": {
+            "notFlag": "malakor_slain"
+          },
+          "effect": {
+            "sunkenBelfryEncounter": true
+          }
         },
         {
           "id": "sb_ending_shatter",
           "label": "Shatter Bell",
-          "visible": { "hasFlag": "malakor_slain" },
+          "visible": {
+            "hasFlag": "malakor_slain"
+          },
           "effect": {
             "messages": [
               "You raise your weapon against the cracked heart of the great bronze bell."
@@ -1526,12 +2115,20 @@
           "label": "Rekindle Kiln",
           "visible": {
             "allOf": [
-              { "hasFlag": "malakor_slain" },
+              {
+                "hasFlag": "malakor_slain"
+              },
               {
                 "anyOf": [
-                  { "hasFlag": "kiln_cipher_learned" },
-                  { "race": "vaelorian" },
-                  { "race": "durnfolk" }
+                  {
+                    "hasFlag": "kiln_cipher_learned"
+                  },
+                  {
+                    "race": "vaelorian"
+                  },
+                  {
+                    "race": "durnfolk"
+                  }
                 ]
               }
             ]
@@ -1552,13 +2149,26 @@
           "label": "Claim Crown",
           "visible": {
             "allOf": [
-              { "hasFlag": "malakor_slain" },
+              {
+                "hasFlag": "malakor_slain"
+              },
               {
                 "anyOf": [
-                  { "minFaction": { "faction": "husk_choir", "value": 2 } },
-                  { "hasFlag": "stole_cistern_vesper" },
-                  { "race": "ael_thalor" },
-                  { "background": "root_scholar" }
+                  {
+                    "minFaction": {
+                      "faction": "husk_choir",
+                      "value": 2
+                    }
+                  },
+                  {
+                    "hasFlag": "stole_cistern_vesper"
+                  },
+                  {
+                    "race": "ael_thalor"
+                  },
+                  {
+                    "background": "root_scholar"
+                  }
                 ]
               }
             ]
@@ -1572,6 +2182,185 @@
               "title": "The Quiet Crown",
               "openingText": "The Pale Root bows in sudden, uncanny obedience."
             }
+          }
+        }
+      ],
+      "npcs": []
+    },
+    {
+      "id": "sunken_orchard",
+      "name": "Sunken Orchard",
+      "regionType": "area",
+      "danger": 2,
+      "dark": false,
+      "neighbors": [
+        "ash_fen",
+        "petrified_starwood"
+      ],
+      "asciiPos": {
+        "row": 1,
+        "col": 1,
+        "code": "SO"
+      },
+      "sensorySummary": "Blackened fruit trees stand knee-deep in stagnant ash-water, their bare branches hung with dry bone-lanterns.",
+      "firstSightVariants": [
+        {
+          "text": "Crooked, dead apple trees rise from ankle-deep grey water. Dry seed-pods rattle in the breeze like hollow teeth, and pale moss clings to the sunken orchard wall."
+        }
+      ],
+      "descriptionVariants": [
+        {
+          "text": "Flooded rows of dead orchard trees lean over dark mirror-water where pale roots coil beneath the mud."
+        }
+      ],
+      "actions": [
+        {
+          "id": "so_harvest",
+          "label": "Gather Moss",
+          "effect": {
+            "advanceHours": 1,
+            "giveItems": [
+              {
+                "id": "bog_herb",
+                "qty": 1
+              }
+            ],
+            "messages": [
+              "You peel pale medicinal moss from the drowned orchard bark."
+            ]
+          }
+        }
+      ],
+      "npcs": []
+    },
+    {
+      "id": "kiln_scars",
+      "name": "Kiln Scars",
+      "regionType": "area",
+      "danger": 3,
+      "dark": false,
+      "neighbors": [
+        "petrified_starwood",
+        "drowned_forge"
+      ],
+      "asciiPos": {
+        "row": 3,
+        "col": 2,
+        "code": "KS"
+      },
+      "sensorySummary": "Split basalt ridges vent warm, sulfur-sweet steam from cracks in the earth.",
+      "firstSightVariants": [
+        {
+          "text": "The ground here splits into jagged black glass trenches. Warm amber-scented steam hisses from deep vents where old furnace masonry still glows faintly red in the dark."
+        }
+      ],
+      "descriptionVariants": [
+        {
+          "text": "Cracked obsidian ground vents warm ash-steam above the buried furnace galleries."
+        }
+      ],
+      "actions": [
+        {
+          "id": "ks_scrape",
+          "label": "Scrape Resin",
+          "effect": {
+            "advanceHours": 1,
+            "giveItems": [
+              {
+                "id": "ash_resin",
+                "qty": 1
+              }
+            ],
+            "messages": [
+              "You pry hardened amber resin from a warm basalt fissure."
+            ]
+          }
+        }
+      ],
+      "npcs": []
+    },
+    {
+      "id": "salt_catacombs",
+      "name": "Salt Catacombs",
+      "regionType": "area",
+      "danger": 4,
+      "dark": true,
+      "neighbors": [
+        "weeping_barrow",
+        "crown_watchtower"
+      ],
+      "asciiPos": {
+        "row": 0,
+        "col": 2,
+        "code": "SC"
+      },
+      "sensorySummary": "Dry white salt-crust coats low bone-lined arches where cold drafts carry faint bronze humming.",
+      "firstSightVariants": [
+        {
+          "text": "A collapsed hillside opens into bone-white galleries crusted with dry salt. Every footstep crunches loudly, and old iron lantern-hooks sway from the low stone ceiling."
+        }
+      ],
+      "descriptionVariants": [
+        {
+          "text": "Salt-crusted burial galleries wind beneath the northern ridge, cold and dry as old bone."
+        }
+      ],
+      "actions": [
+        {
+          "id": "sc_niche",
+          "label": "Search Niches",
+          "effect": {
+            "advanceHours": 1,
+            "giveCrowns": 12,
+            "messages": [
+              "You pry a handful of tarnished silver coins from behind a salt-crusted skull."
+            ]
+          }
+        }
+      ],
+      "npcs": []
+    },
+    {
+      "id": "iron_quarry",
+      "name": "Iron Quarry",
+      "regionType": "area",
+      "danger": 4,
+      "dark": false,
+      "neighbors": [
+        "drowned_forge",
+        "crown_watchtower"
+      ],
+      "asciiPos": {
+        "row": 4,
+        "col": 2,
+        "code": "IQ"
+      },
+      "sensorySummary": "Stepped slate terraces descend into a flooded pit ringed by rusted cranes and broken ore-carts.",
+      "firstSightVariants": [
+        {
+          "text": "Giant stepped walls of wet black slate drop into a mist-filled quarry pit. Rusted winch-chains hang motionless over dark water, and heavy iron ore-carts sit derailed along the rim."
+        }
+      ],
+      "descriptionVariants": [
+        {
+          "text": "Stepped slate ledges and rusted iron winches overlook the flooded quarry floor."
+        }
+      ],
+      "actions": [
+        {
+          "id": "iq_winch",
+          "label": "Search Carts",
+          "effect": {
+            "advanceHours": 1,
+            "giveItems": [
+              {
+                "id": "kiln_pitch",
+                "qty": 1
+              }
+            ],
+            "messages": [
+              "You salvage a sealed tin of grease-pitch from a rusted ore-cart."
+            ]
           }
         }
       ],
