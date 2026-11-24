@@ -8,8 +8,9 @@ This document governs all narrative, anatomical, environmental, and relational a
 - **Concision via Links**: Keep scene prose tight and evocative; store deep history, anatomy, and cross-references inside the structured registry (`src/writing/links.ts`, `src/writing/anatomy.ts`, `docs/lore/`), surfaced on demand in the **Journal**.
 
 ## 2. Non-Negotiable Authoring Rules
-1. **Describe Before Naming**:
+1. **Describe Before Naming (Plain Sensory Grounding First)**:
    - Never print a creature's or NPC's proper name on first sight before describing surroundings and observable form.
+   - Never stack unexplained capitalized proper nouns (`First Kiln of Aethel`, `Third Drowning Toll`, `Pale Root`, `Iron-Vow`, `Vesper-Scribe`) in opening prose, scene descriptions, or event prompts. Always describe what the player **sees, hears, smells, and understands physically** in plain English first (a massive cracked underground furnace, pale spore-choked roots splitting the road, a ragged border garrison in soot-stained mail), and introduce proper names sparingly only after the thing is grounded.
    - Author an `unidentifiedName` / `unidentifiedLabel` (e.g., `Ember-Jawed Hound`, `Scarred Officer`), a full `firstSightProse` (which MUST NOT contain the proper name), and a concise `returnSightProse` for repeat encounters.
 2. **Mirrored Full-Body Anatomy**:
    - Player, NPCs, and Enemies share `AnatomyProfile` (`height`, `weight`, `skinColor`, `hairLength`, `hairStyle`, `hairColor`, `eyeShape`, `eyeColor`, `musculature`, `bodyShape`, `facialScars`, `bodyScars`, `faceDetail`, `chestTorsoDetail`, `armsHandsDetail`, `legsStanceDetail`, `distinguishingMark`, `visibleTags`).

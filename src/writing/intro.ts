@@ -19,10 +19,10 @@ export function getIntroBeat(state: GameState, beatIndex: number): IntroBeat {
 
   if (beatIndex === 0) {
     return {
-      title: 'THE BROKEN KILN',
+      title: 'THE CRACKED VALLEY',
       body: [
-        'Seven generations past, the Crown-Wrought cracked the First Kiln of Aethel to burn soul-amber from the deep roots of the world. Their fire bought an empire, and their arrogance left an open wound beneath the valley.',
-        'Now the Gloaming Reach rots from below. Pale roots split old Imperial flagstones, bronze bells ring without wind, and a slow calcifying blight creeps outward from the Sunken Belfry where Malakor gathers breath for the Third Drowning Toll.',
+        'Seven generations ago, the rulers of this valley dug too deep and cracked open a vast underground furnace to burn glowing amber sap from the roots beneath the earth. Their fire built an empire, and their greed left a poisoned wound under the hills.',
+        'Now the frontier is rotting from below. Pale, chalky roots split the old stone roads, sunken bronze bells ring on their own in the fog, and a spreading fungal blight creeps outward from a flooded bell-tower in the lowlands.',
       ].join('\n\n'),
     };
   }
@@ -30,12 +30,12 @@ export function getIntroBeat(state: GameState, beatIndex: number): IntroBeat {
   if (beatIndex === 1) {
     const raceOpening =
       p.race === 'vaelorian'
-        ? `You walk these drowned roads as a ${p.sex === 'female' ? 'daughter' : 'son'} of the Vaelorians — short-lived inheritors of the broken throne. Garrisons still answer your blood-charter, while older folk whisper that your kin lit the fire that ruined the Reach.`
+        ? `You walk these drowned roads as a ${p.sex === 'female' ? 'daughter' : 'son'} of the Vaelorians, the mortal human heirs of the fallen empire. Border garrisons still respect your old family seals, while older villagers whisper that your bloodline lit the fire that ruined the valley.`
         : p.race === 'ael_thalor'
-          ? `You are Ael-Thalor, an ageless exile from the Petrified Star-Wood. Through stone and mire your silver ears still catch the slow, grieving hum of the Pale Root, inspiring uneasy awe wherever mortal folk gather.`
+          ? `You are Ael-Thalor, a long-lived, silver-skinned exile from a forest whose ancient trees turned to stone. Even through damp earth and rain, your sharp ears catch the slow, wet hum of the spreading rot underground.`
           : p.race === 'durnfolk'
-            ? `You are Durnfolk, basalt-kin of the sealed deep forges. Slate and iron patience live in your ribs, forged from the bitter years your clans spent barring the lower kiln-gates against the rising abyss.`
-            : `You are Grixi, citizen of the subterranean Brass-Warrens. Surface folk mistake your sharp-eared, lantern-eyed kind for feral scavengers until your guild seals audit their grain ledgers or your alchemy melts their iron locks.`;
+            ? `You are Durnfolk, stout, stone-ribbed smiths and tunnel-wardens from the deep mountain forges. Slate-hard patience lives in your bones from the bitter years your clans spent barring the lower iron gates against whatever crawls up from below.`
+            : `You are Grixi, a sharp-eared, nocturnal tinker from the underground tunnel-guilds. Surface guards often mistake your kind for feral scavengers until your guild papers audit their grain ledgers or your alchemy melts their iron locks.`;
 
     const scarClause =
       a.facialScars === 'Unmarked'
@@ -50,8 +50,8 @@ export function getIntroBeat(state: GameState, beatIndex: number): IntroBeat {
 
     const socialNote =
       p.sex === 'female'
-        ? 'On this harsh border, old customs divide iron from silk: garrisons test a woman twice before trusting her blade, while the blind Matrons beneath the mire welcome sisters behind their veil.'
-        : 'On this harsh border, old customs divide iron from silk: Iron-Vow officers muster a man swiftly onto the wall, while the blind Matrons beneath the mire guard their veil against male footsteps.';
+        ? 'On this harsh border, custom divides the watch from the cloister: soldiers on the wall test a woman twice before trusting her blade, while the blind weavers sheltering beneath the marsh welcome sisters behind their silk curtains.'
+        : 'On this harsh border, custom divides the watch from the cloister: garrison officers muster a man swiftly onto the wall, while the blind weavers sheltering beneath the marsh bar male footsteps from their inner halls.';
 
     return {
       title: `BLOOD AND FORM - ${p.name.toUpperCase()}`,
@@ -62,12 +62,12 @@ export function getIntroBeat(state: GameState, beatIndex: number): IntroBeat {
   if (beatIndex === 2) {
     const bgBeat =
       p.background === 'ashen_blade'
-        ? `Once sworn to an oath-banner, you broke command to spare a burning hamlet. Disgraced yet unbroken, you wear scarred mail and answer only to the weight of steel in ${pr.poss} hand.`
+        ? `Once sworn to a noble banner, you broke orders to spare a burning village. Stripped of rank yet unbroken, you wear scarred mail and answer only to the weight of steel in ${pr.poss} hand.`
         : p.background === 'root_scholar'
-          ? `Cast out of the High Archives for transcribing forbidden kiln-liturgies, you came north to read the Pale Root at its source before the valley turns silent.`
+          ? `Expelled from the city archives for copying forbidden notes on the underground blight, you came north to study the spreading roots at their source before the valley falls silent.`
           : p.background === 'barrow_stalker'
-            ? `Years guiding desperate packs through mire and crypt taught you where dead kings hide their silver — and how to step lightly where pale fungi listen.`
-            : `Bound in penitent iron to answer an ancestral curse, you carry the old counter-chimes down into the fog, trading blood and breath against the Choir.`;
+            ? `Years guiding desperate caravans through fog-choked marshes and old burial mounds taught you where dead kings hide their silver, and how to step lightly where pale fungi listen.`
+            : `Bound in iron chains to quiet a family curse, you carry heavy counter-chimes down into the fog, trading your own blood and breath to hold back the sickness.`;
 
     const heirloomBeat = `Secured at your belt rests the ${heirloom.name}: ${heirloom.description}`;
 
@@ -80,8 +80,8 @@ export function getIntroBeat(state: GameState, beatIndex: number): IntroBeat {
   return {
     title: 'THE GATE OF CINDERFORD',
     body: [
-      `Cold rain hisses across wet ash as the timber palisades of Cinderford Keep rise through the fog ahead. Pitch-lanterns sway over the Iron-Vow muster yard, and a low, wet hum drifts upward from the valley floor.`,
-      `The whole frontier lies open before you, ${p.name}: ruined barrows, subterranean looms, flooded forges, and the drowned amphitheater waiting in the mist. Step through the gate.`,
+      `Cold rain hisses across wet ash as the blackened timber walls of Cinderford Keep rise through the fog ahead. Pitch-lanterns sway over the muddy courtyard where iron-armored border guards change the watch, and a low, wet hum drifts up from the marsh below.`,
+      `The frontier lies open before you, ${p.name}: flooded burial mounds, hidden underground workshops, ruined forges, and a sunken bell-tower waiting in the mist. Step through the gate.`,
     ].join('\n\n'),
   };
 }

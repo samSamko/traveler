@@ -3,8 +3,8 @@
     "vaelorian": {
       "id": "vaelorian",
       "name": "Vaelorian",
-      "subtitle": "Ash-Born Inheritors",
-      "lore": "Short-lived, fierce heirs of the shattered Vaelish Empire whose ancestors cracked the First Kiln. Garrisons respect their blood-charters; elder folk remember their hubris.",
+      "subtitle": "Fallen Empire Heirs",
+      "lore": "Short-lived, fierce mortal heirs of the fallen empire whose ancestors cracked the great underground furnace. Border garrisons respect their old seals; older villagers remember their hubris.",
       "statMods": {
         "might": 1,
         "wit": 1,
@@ -24,8 +24,8 @@
     "ael_thalor": {
       "id": "ael_thalor",
       "name": "Ael-Thalor",
-      "subtitle": "Dusk-Woven Exiles",
-      "lore": "Ageless, silver-eyed exiles of the Petrified Star-Wood who hear the slow lament of the Pale Root through stone and marrow.",
+      "subtitle": "Stone-Wood Exiles",
+      "lore": "Long-lived, silver-eyed exiles from a petrified forest who hear the slow hum of the spreading underground rot through stone and bone.",
       "statMods": {
         "agility": 2,
         "wit": 2,
@@ -46,8 +46,8 @@
     "durnfolk": {
       "id": "durnfolk",
       "name": "Durnfolk",
-      "subtitle": "Basalt-Kin",
-      "lore": "Slate-veined, stone-ribbed smiths and oath-keepers who sealed the lower Kiln-Gates when the abyss breached the deep halls.",
+      "subtitle": "Deep-Forge Kin",
+      "lore": "Stout, stone-ribbed smiths and tunnel-wardens who barred the lower iron gates when the blight rose from the deep halls.",
       "statMods": {
         "might": 2,
         "grit": 2,
@@ -68,8 +68,8 @@
     "grixi": {
       "id": "grixi",
       "name": "Grixi",
-      "subtitle": "Brass-Warren Guild",
-      "lore": "Sharp-eared, lantern-eyed citizens of the subterranean Under-Warrens — masters of contract law, black-powder alchemy, and salvage.",
+      "subtitle": "Tunnel-Guild Tinkers",
+      "lore": "Sharp-eared, lantern-eyed citizens of the underground tunnel-guilds — masters of trade contracts, alchemy, and salvage.",
       "statMods": {
         "agility": 2,
         "wit": 2,
@@ -128,8 +128,8 @@
     "root_scholar": {
       "id": "root_scholar",
       "name": "Root-Scholar",
-      "subtitle": "Vesper-Scribe",
-      "lore": "Expelled from the High Archives for copying forbidden Kiln-liturgies, you read the Pale Root like parchment.",
+      "subtitle": "Blight Researcher",
+      "lore": "Expelled from the city archives for copying forbidden notes on the underground blight, you study the spreading roots like parchment.",
       "statMods": {
         "wit": 3
       },

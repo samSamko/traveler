@@ -8,18 +8,18 @@
       "dark": false,
       "neighbors": ["weeping_barrow", "kings_causeway", "ash_fen"],
       "asciiPos": { "row": 2, "col": 0, "code": "CF" },
-      "sensorySummary": "Blackened timber palisades ring a squat border keep above the mire. Pitch-lanterns hiss in the rain over the Iron-Vow muster yard, peat smoke drifts from the Ashen Flagon inn, and nervous townsfolk eye the barred oak granary near the well.",
+      "sensorySummary": "Blackened timber palisades ring a squat border keep above the marsh. Pitch-lanterns hiss in the rain over the muddy garrison yard, peat smoke drifts from the Ashen Flagon inn, and nervous townsfolk eye the barred oak granary near the well.",
       "firstSightVariants": [
         {
           "when": { "race": "grixi" },
-          "text": "Blackened timber palisades ring a squat border keep above the mire. Pitch-lanterns hiss in the rain over the Iron-Vow muster yard, peat smoke drifts from the Ashen Flagon inn, and nervous townsfolk eye the barred oak granary near the well. Sentries eye your brass-warren satchel warily from the catwalk."
+          "text": "Blackened timber palisades ring a squat border keep above the marsh. Pitch-lanterns hiss in the rain over the muddy garrison yard, peat smoke drifts from the Ashen Flagon inn, and nervous townsfolk eye the barred oak granary near the well. Guards in soot-stained mail watch your tinker's satchel warily from the catwalk."
         },
         {
           "when": { "race": "vaelorian" },
-          "text": "Blackened timber palisades ring a squat border keep above the mire. Pitch-lanterns hiss in the rain over the Iron-Vow muster yard, peat smoke drifts from the Ashen Flagon inn, and nervous townsfolk eye the barred oak granary near the well. Weathered Imperial eagles cling to the gate lintel above you."
+          "text": "Blackened timber palisades ring a squat border keep above the marsh. Pitch-lanterns hiss in the rain over the muddy garrison yard, peat smoke drifts from the Ashen Flagon inn, and nervous townsfolk eye the barred oak granary near the well. Weathered imperial eagles cling to the gate lintel above you."
         },
         {
-          "text": "Blackened timber palisades ring a squat border keep above the mire. Pitch-lanterns hiss in the rain over the Iron-Vow muster yard, peat smoke drifts from the Ashen Flagon inn, and nervous townsfolk eye the barred oak granary near the well. Iron boots splash across wet slate as patrols change the watch."
+          "text": "Blackened timber palisades ring a squat border keep above the marsh. Pitch-lanterns hiss in the rain over the muddy garrison yard, peat smoke drifts from the Ashen Flagon inn, and nervous townsfolk eye the barred oak granary near the well. Iron boots splash across wet slate as patrols change the watch."
         }
       ],
       "descriptionVariants": [
