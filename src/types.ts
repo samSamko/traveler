@@ -42,6 +42,43 @@ export interface StatusEffect {
   power: number;
 }
 
+export interface AnatomyProfile {
+  height: string;
+  weight: string;
+  skinColor: string;
+  hairLength: string;
+  hairStyle: string;
+  hairColor: string;
+  eyeShape: string;
+  eyeColor: string;
+  musculature: string;
+  bodyShape: string;
+  facialScars: string;
+  bodyScars: string;
+  faceDetail: string;
+  chestTorsoDetail: string;
+  armsHandsDetail: string;
+  legsStanceDetail: string;
+  distinguishingMark: string;
+  visibleTags: string[];
+}
+
+export interface AppearanceSelections {
+  height: string;
+  weight: string;
+  skinColor: string;
+  hairLength: string;
+  hairStyle: string;
+  hairColor: string;
+  eyeShape: string;
+  eyeColor: string;
+  musculature: string;
+  bodyShape: string;
+  facialScars: string;
+  bodyScars: string;
+  distinguishingMark: string;
+}
+
 export type AbilityKind = 'skill' | 'cantrip' | 'spell';
 
 export interface AbilityDef {
@@ -171,12 +208,24 @@ export interface EnemyIntent {
   description: string;
 }
 
+export interface EnemyVisibleGear {
+  weapon: string;
+  armor: string;
+  hiddenDetail: string;
+}
+
 export interface EnemyTemplate {
   id: string;
   name: string;
+  unidentifiedName: string;
   category: 'husk' | 'beast' | 'humanoid' | 'construct' | 'boss';
   maxHp: number;
   armor: number;
+  stats: Stats;
+  visibleGear: EnemyVisibleGear;
+  anatomy: AnatomyProfile;
+  firstSightProse: string;
+  returnSightProse: string;
   xpReward: number;
   crownReward: [number, number];
   lootTable: Array<{ itemId: string; chance: number }>;
@@ -189,11 +238,17 @@ export interface EnemyTemplate {
 export interface ActiveEnemy {
   templateId: string;
   name: string;
+  unidentifiedName: string;
+  suffix: string;
   category: 'husk' | 'beast' | 'humanoid' | 'construct' | 'boss';
   hp: number;
   maxHp: number;
   baseArmor: number;
   turnArmor: number;
+  stats: Stats;
+  visibleGear: EnemyVisibleGear;
+  appraisalTier: 0 | 1 | 2;
+  identified: boolean;
   statuses: StatusEffect[];
   intents: EnemyIntent[];
   nextIntentIndex: number;
@@ -210,6 +265,7 @@ export interface CombatState {
   enemies: ActiveEnemy[];
   subMenu: CombatSubMenu;
   pendingActionId: string | null;
+  observedUsedThisRound: boolean;
   round: number;
   heirloomUsedThisFight: boolean;
   guaranteedDodgeThisTurn: boolean;
@@ -235,12 +291,34 @@ export interface WorldMemory {
   chronicle: ChronicleEntry[];
 }
 
+export interface EnemyDiscoveryRecord {
+  seen: boolean;
+  identified: boolean;
+  appraisalTier: 0 | 1 | 2;
+  observedAttacks: string[];
+}
+
+export interface EntityDiscoveryState {
+  knownPlaces: string[];
+  knownNpcs: string[];
+  knownItems: string[];
+  knownEnemies: Record<string, EnemyDiscoveryRecord>;
+}
+
+export interface EntityLink {
+  from: string;
+  relation: string;
+  to: string;
+  note: string;
+}
+
 export interface PlayerCharacter {
   name: string;
   sex: SexId;
   race: RaceId;
   background: BackgroundId;
   heirloom: HeirloomId;
+  anatomy: AnatomyProfile;
   level: number;
   xp: number;
   xpToNext: number;
@@ -302,9 +380,12 @@ export interface DialogueTopic {
 export interface NpcNode {
   id: string;
   name: string;
+  unidentifiedLabel: string;
   shortLabel: string;
   visible?: (state: GameState) => boolean;
+  firstSightProse: (state: GameState) => string;
   greeting: (state: GameState) => string;
+  anatomy: AnatomyProfile;
   topics: DialogueTopic[];
 }
 
@@ -323,7 +404,9 @@ export interface LocationNode {
   dark?: boolean;
   neighbors: string[];
   asciiPos: { row: number; col: number; code: string };
+  firstSightProse: (state: GameState) => string;
   description: (state: GameState) => string;
+  sensorySummary: string;
   actions: LocationAction[];
   npcs?: NpcNode[];
   shop?: {
@@ -335,10 +418,12 @@ export interface LocationNode {
 }
 
 export type SceneMode =
+  | 'intro'
   | 'location'
   | 'event'
   | 'combat'
   | 'shop'
+  | 'journal'
   | 'level_up'
   | 'ending'
   | 'dead';
@@ -353,6 +438,16 @@ export type LocationSubMenu =
   | 'pack_use'
   | 'pack_equip'
   | 'pack_craft';
+
+export type JournalTab =
+  | 'root'
+  | 'self'
+  | 'arts'
+  | 'bestiary'
+  | 'people'
+  | 'places'
+  | 'items'
+  | 'chronicle';
 
 export interface ActiveEventState {
   eventId: string;
@@ -407,8 +502,13 @@ export interface GameState {
   visitedLocations: string[];
   seenEvents: string[];
   memory: WorldMemory;
+  discovery: EntityDiscoveryState;
   scene: SceneMode;
   subMenu: LocationSubMenu;
+  introBeat: number;
+  journalTab: JournalTab;
+  journalDetailId: string | null;
+  journalReturn: { scene: SceneMode; subMenu: LocationSubMenu } | null;
   activeNpcId: string | null;
   activeEvent: ActiveEventState | null;
   combat: CombatState | null;

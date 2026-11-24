@@ -1,10 +1,23 @@
 import { stdin, stdout } from 'node:process';
 import { createInterface } from 'node:readline';
-import type { BackgroundId, GameState, HeirloomId, RaceId, SexId } from './types.ts';
+import type {
+  AnatomyProfile,
+  AppearanceSelections,
+  BackgroundId,
+  GameState,
+  HeirloomId,
+  RaceId,
+  SexId,
+} from './types.ts';
 import { BACKGROUNDS, HEIRLOOMS, RACES } from './content/characters.ts';
 import { createNewGame, processInput, renderCurrentScreen } from './engine.ts';
 import { loadGame, loadMetaProfile, recordRunCompletion, saveGame } from './save.ts';
 import { paint } from './ui.ts';
+import {
+  buildPlayerAnatomy,
+  getAppearanceOptionsFor,
+  rollDefaultAnatomy,
+} from './writing/anatomy.ts';
 
 class LineReader {
   private lines: string[] = [];
@@ -59,6 +72,77 @@ function pickFromList<T extends string>(raw: string | null, ids: T[], defaultIdx
   return ids[defaultIdx];
 }
 
+async function askOption(
+  reader: LineReader,
+  heading: string,
+  options: string[],
+): Promise<string> {
+  console.log(`\n${heading}:`);
+  options.forEach((opt, idx) => {
+    console.log(`  ${idx + 1}. ${opt}`);
+  });
+  const raw = await reader.ask('> ');
+  return pickFromList(raw, options, 0);
+}
+
+async function runAppearanceCustomizer(
+  reader: LineReader,
+  sex: SexId,
+  race: RaceId,
+  background: BackgroundId,
+): Promise<AnatomyProfile> {
+  console.log('\nAppearance:');
+  console.log('  1. Quick Roll');
+  console.log('  2. Customize');
+  const modeRaw = await reader.ask('> ');
+  if ((modeRaw ?? '').trim() !== '2') {
+    return rollDefaultAnatomy(sex, race, background);
+  }
+
+  const opts = getAppearanceOptionsFor(sex, race);
+  const height = await askOption(reader, 'Height', opts.height);
+  const weight = await askOption(reader, 'Weight', opts.weight);
+  const skinColor = await askOption(reader, 'Skin Color', opts.skinColor);
+  const hairLength = await askOption(reader, 'Hair Length', opts.hairLength);
+  const hairStyle =
+    hairLength === 'Shaved'
+      ? 'None'
+      : await askOption(reader, 'Hair Style', opts.hairStyle);
+  const hairColor =
+    hairLength === 'Shaved'
+      ? 'None'
+      : await askOption(reader, 'Hair Color', opts.hairColor);
+  const eyeShape = await askOption(reader, 'Eye Shape', opts.eyeShape);
+  const eyeColor = await askOption(reader, 'Eye Color', opts.eyeColor);
+  const musculature = await askOption(reader, 'Musculature', opts.musculature);
+  const bodyShape = await askOption(reader, 'Build and Curves', opts.bodyShape);
+  const facialScars = await askOption(reader, 'Facial Scars', opts.facialScars);
+  const bodyScars = await askOption(reader, 'Body Scars', opts.bodyScars);
+  const distinguishingMark = await askOption(
+    reader,
+    'Distinguishing Detail',
+    opts.distinguishingMark,
+  );
+
+  const selections: AppearanceSelections = {
+    height,
+    weight,
+    skinColor,
+    hairLength,
+    hairStyle,
+    hairColor,
+    eyeShape,
+    eyeColor,
+    musculature,
+    bodyShape,
+    facialScars,
+    bodyScars,
+    distinguishingMark,
+  };
+
+  return buildPlayerAnatomy(sex, race, background, selections);
+}
+
 async function runCharacterCreation(
   reader: LineReader,
   stealth: boolean,
@@ -110,6 +194,8 @@ async function runCharacterCreation(
   const heirloomRaw = await reader.ask('> ');
   const heirloom = pickFromList(heirloomRaw, unlocked, 0);
 
+  const anatomy = await runAppearanceCustomizer(reader, sex, race, background);
+
   console.log('\nName:');
   const nameRaw = await reader.ask('> ');
   const name = (nameRaw ?? '').trim() || 'Vesper';
@@ -120,6 +206,7 @@ async function runCharacterCreation(
     race,
     background,
     heirloom,
+    anatomy,
     stealthMode: stealth,
   });
 }

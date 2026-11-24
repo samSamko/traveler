@@ -8,14 +8,18 @@
   3. Do NOT use TypeScript `enum`, `namespace`, or constructor parameter properties (`constructor(public x: number)`). Use string literal union types and `as const` objects instead.
 
 ## Verification Gate
-Run the automated test suite after every change:
+Run the lore validator and automated test suite after every change:
 ```powershell
+node scripts/validate-lore.ts
 node --test test/engine.test.ts
 ```
 And verify CLI startup in stealth mode:
 ```powershell
-"1`n2`n2`n1`nAelindra`n1`n0`n2`n1`nLeave`nmap`nstats`nquit`n" | node src/index.ts --stealth
+"1`n2`n2`n1`n1`nAelindra`n1`n2`nJournal`nSelf`nBack`nArts`nBack`nBack`nquit`n" | node src/index.ts --stealth
 ```
+
+## Writing Framework & Writer Agent
+Read `docs/WRITER_AGENT.md` and `docs/lore/` before authoring new prose, creatures, NPCs, or locations. Every entity must supply `firstSightProse`, `unidentifiedName` / `unidentifiedLabel`, mirrored `AnatomyProfile`, and `ENTITY_LINKS` entries in `src/writing/links.ts`.
 
 ## Architecture Overview
 - `src/types.ts`: Domain contracts for characters, combat, memory flags, factions, locations, events, and saves.

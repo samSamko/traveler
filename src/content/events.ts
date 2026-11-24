@@ -10,12 +10,12 @@ function hasItem(state: GameState, itemId: string): boolean {
 export const EVENTS: EventCard[] = [
   {
     id: 'kale_deserter',
-    title: 'Kale the Oath-Breaker',
+    title: 'The Deserter by the Milestone',
     locations: ['kings_causeway'],
     weight: 3,
     condition: (state) => !hasFlag(state, 'kale_fate'),
     prompt: (state) =>
-      `Half-hidden under a broken mile-stone kneels Kale, an Iron-Vow deserter clutching a chalky white rash creeping up his wrist. "Wait, ${pronouns(state.player.sex).formal.toLowerCase()}, don't call the dogs. I fled when the Watchtower sang, not from cowardice."`,
+      `Half-hidden under a broken mile-stone kneels a gaunt young soldier in mud-soaked Iron-Vow wool, clutching a chalky white rash creeping up his wrist. "Wait, ${pronouns(state.player.sex).formal.toLowerCase()}, don't call the dogs. I'm Kale — I fled when the Watchtower sang, not from cowardice."`,
     choices: [
       {
         id: 'kale_cure',
@@ -91,18 +91,18 @@ export const EVENTS: EventCard[] = [
 
   {
     id: 'husk_kale_ambush',
-    title: 'The Hollowed Betrayer',
+    title: 'Movement in the Ditch',
     locations: ['kings_causeway', 'ash_fen', 'petrified_starwood'],
     weight: 4,
     condition: (state) => hasFlag(state, 'kale_fate', 'abandoned') && !hasFlag(state, 'kale_husk_slain'),
     prompt: () =>
-      'Pale roots drag a broken mail-shirt out of the ditch. Kale\'s jaw hangs unhinged, rattling a bronze echo from his chest.',
+      'Pale roots drag a familiar torn mail-shirt out of the muddy ditch. A chalky jaw hangs unhinged, rattling a bronze echo from an open throat while a broken broadsword gleams fused into its right forearm.',
     choices: [
       {
         id: 'fight_husk_kale',
         label: 'Draw Steel',
         resolve: () => ({
-          messages: ['Husk-Stalker Kale lunges from the ditch.'],
+          messages: ['The root-bound figure surges up the bank toward you.'],
           startCombat: {
             enemyId: 'husk_kale',
             canFlee: true,
@@ -125,13 +125,13 @@ export const EVENTS: EventCard[] = [
     weight: 4,
     condition: (state) => hasFlag(state, 'stole_cistern_vesper') && !hasFlag(state, 'silk_assassin_slain'),
     prompt: () =>
-      'A silver wire sings past your ear and snaps into a milestone. From the mist steps a veiled Cistern hunter bearing twin Vesper-glass stilettos.',
+      'A silver wire sings past your ear and snaps into a roadside milestone. Out of the mist glides a lithe, blindfolded woman wrapped in pale luminous silk, spinning twin amber-glass stilettos without a sound.',
     choices: [
       {
         id: 'fight_silk_assassin',
         label: 'Draw Steel',
         resolve: () => ({
-          messages: ['The Cistern Vengeance darts out of the fog.'],
+          messages: ['The veiled hunter darts across the fog toward you.'],
           startCombat: {
             enemyId: 'silk_assassin',
             canFlee: true,
@@ -149,14 +149,14 @@ export const EVENTS: EventCard[] = [
 
   {
     id: 'press_gang',
-    title: 'The Iron-Vow Press-Gang',
+    title: 'Pike-Line at the Culvert',
     locations: ['kings_causeway', 'ash_fen'],
     weight: 2,
     prompt: (state) => {
       if (state.player.sex === 'female') {
-        return 'Grim pike-levies block the culvert. Their sergeant spits into the ash: "No lone woman wanders past Cinderford without a pass or a toll."';
+        return 'Grim, mud-caked soldiers in dented kettle helms block the stone culvert beside a growling, smoke-mouthed hound. Their sergeant spits into the ash: "No lone woman wanders past Cinderford without a pass or a toll."';
       }
-      return 'Grim pike-levies block the culvert. Their sergeant taps an Iron-Vow roll: "Every able man owes silver or wall-service, traveler."';
+      return 'Grim, mud-caked soldiers in dented kettle helms block the stone culvert beside a growling, smoke-mouthed hound. Their sergeant taps an Iron-Vow roll: "Every able man owes silver or wall-service, traveler."';
     },
     choices: [
       {
@@ -208,7 +208,7 @@ export const EVENTS: EventCard[] = [
             };
           }
           return {
-            messages: [check.logLine, 'Two hollowed brigands break ranks and charge with halberds.'],
+            messages: [check.logLine, 'A rusted halberd levels forward as the smoke-jawed hound slips its leash.'],
             startCombat: { enemyIds: ['iron_deserter', 'ash_hound'], canFlee: true },
           };
         },
@@ -218,7 +218,7 @@ export const EVENTS: EventCard[] = [
 
   {
     id: 'mourning_widow',
-    title: 'The Widow of Barrow-Downs',
+    title: 'The Cairn in the Mist',
     locations: ['weeping_barrow', 'cinderford', 'kings_causeway'],
     weight: 2,
     prompt: (state) =>
@@ -279,11 +279,11 @@ export const EVENTS: EventCard[] = [
 
   {
     id: 'chitin_vent_cache',
-    title: 'Collapsed Chitin-Vent',
+    title: 'The Webbed Drainage Flue',
     locations: ['ash_fen', 'drowned_forge', 'weeping_barrow'],
     weight: 2,
     prompt: () =>
-      'Beneath an uprooted birch yawns a tight brass-lined ventilation flue smelling of lamp-oil and ozone. Something glints three arm-lengths down through pale webbing.',
+      'Beneath an uprooted birch yawns a tight brass-lined ventilation flue smelling of lamp-oil and ozone. Something glints three arm-lengths down through sticky pale webbing.',
     choices: [
       {
         id: 'cv_grixi',
@@ -323,7 +323,7 @@ export const EVENTS: EventCard[] = [
             return { messages: [check.logLine, 'You hook a leather coin purse clear of the webbing.'] };
           }
           return {
-            messages: [check.logLine, 'Your sleeve tears open a web-sac and wakes a nest of weavers.'],
+            messages: [check.logLine, 'Your sleeve tears open a web-sac and wakes pale, clicking carapaces inside.'],
             startCombat: { enemyIds: ['chitin_weaver', 'chitin_weaver'], canFlee: true },
           };
         },
@@ -433,7 +433,7 @@ export const EVENTS: EventCard[] = [
             return { messages: [check.logLine, 'You clear the glade before the resonance bites.'] };
           }
           return {
-            messages: [check.logLine, 'The humming draws two Root-Husks out of the brush.'],
+            messages: [check.logLine, 'The humming draws two chalk-ribbed figures shambling out of the brush.'],
             startCombat: { enemyIds: ['root_husk', 'root_husk'], canFlee: true },
           };
         },
@@ -593,11 +593,11 @@ export const EVENTS: EventCard[] = [
 
   {
     id: 'ash_hound_pack',
-    title: 'Cinder-Maw Pack',
+    title: 'Smoke Beneath the Cart',
     locations: ['kings_causeway', 'weeping_barrow', 'petrified_starwood'],
     weight: 2,
     prompt: () =>
-      'Grey embers drift from behind an overturned cart as two gaunt, ember-breathed hounds pad into the trail, ears flattened.',
+      'Thin ribbons of grey smoke drift from beneath an overturned wain. Out of the haze step two starved, charcoal-furred beasts with sunken ribs; bright orange embers glimmer inside their blackened jaws as they crouch low to the flagstones.',
     choices: [
       {
         id: 'ah_ration',
@@ -612,7 +612,7 @@ export const EVENTS: EventCard[] = [
         id: 'ah_fight',
         label: 'Draw Steel',
         resolve: () => ({
-          messages: ['Two Cinder-Maw Hounds lunge through the smoke.'],
+          messages: ['The ember-jawed predators spring straight through the smoke.'],
           startCombat: { enemyIds: ['ash_hound', 'ash_hound'], canFlee: true },
         }),
       },
@@ -621,11 +621,11 @@ export const EVENTS: EventCard[] = [
 
   {
     id: 'choir_procession',
-    title: 'Lanternless Choir',
+    title: 'Chanting on the Ridge',
     locations: ['petrified_starwood', 'crown_watchtower', 'drowned_forge'],
     weight: 2,
     prompt: () =>
-      'A Choir Acolyte swings a smoking censer along the ridge road while a shambling Root-Husk trails behind, muttering the Third Toll countdown.',
+      'A tall, blindfolded figure in damp ash-robes glides along the ridge swinging a smoking bronze censer, trailed closely by a stooped chalk-ribbed walker whose throat rattles with pale tendrils.',
     choices: [
       {
         id: 'cp_ambush',
@@ -748,7 +748,7 @@ export const EVENTS: EventCard[] = [
             return { messages: [check.logLine, 'You free the iron-root draught and tucked silver.'] };
           }
           return {
-            messages: [check.logLine, 'The limestone shatters and wakes two lurking Root-Husks.'],
+            messages: [check.logLine, 'The limestone shatters and wakes two chalk-ribbed walkers from the scree.'],
             startCombat: { enemyIds: ['root_husk', 'root_husk'], canFlee: true },
           };
         },

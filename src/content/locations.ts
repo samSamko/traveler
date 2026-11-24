@@ -2,9 +2,15 @@ import type { GameState, LocationNode } from '../types.ts';
 import { resolveCheck } from '../dice.ts';
 import { adjustFaction, hasFlag, pronouns, recordChronicle, setFlag } from '../memory.ts';
 import { addItemToInventory, consumeInventoryItem } from '../combat.ts';
+import { getNpcAppearanceReaction } from '../writing/anatomy.ts';
 
 function hasItem(state: GameState, itemId: string): boolean {
   return state.player.inventory.some((e) => e.id === itemId && e.qty > 0);
+}
+
+function appendReaction(base: string, state: GameState, npcId: string): string {
+  const react = getNpcAppearanceReaction(state, npcId);
+  return react ? `${base} ${react}` : base;
 }
 
 export const LOCATIONS: Record<string, LocationNode> = {
@@ -15,18 +21,22 @@ export const LOCATIONS: Record<string, LocationNode> = {
     danger: 0,
     neighbors: ['weeping_barrow', 'kings_causeway', 'ash_fen'],
     asciiPos: { row: 2, col: 0, code: 'CF' },
+    sensorySummary:
+      'Blackened timber palisades ring a squat border keep above the mire. Pitch-lanterns hiss in the rain over the Iron-Vow muster yard, peat smoke drifts from the Ashen Flagon inn, and nervous townsfolk eye the barred oak granary near the well.',
+    firstSightProse: (state) =>
+      `${LOCATIONS.cinderford.sensorySummary} ${state.player.race === 'grixi' ? 'Sentries eye your brass-warren satchel warily from the catwalk.' : state.player.race === 'vaelorian' ? 'Weathered Imperial eagles cling to the gate lintel above you.' : 'Iron boots splash across wet slate as patrols change the watch.'}`,
     description: (state) => {
       if (hasFlag(state, 'cinderford_fallen')) {
         return "Cinderford's timber gate hangs crooked on rusted hinges. Pale tendrils curl out of the granary roof, and the watch-bell lies cracked in gray slush.";
       }
       const p = state.player;
       const base =
-        'Timber palisades ring a blackened stone keep above the mire. Lanterns swing over the Iron-Vow muster yard, while nervous townsfolk watch the sealed granary near the well.';
+        'Timber palisades ring the blackened stone keep above the mire. Lanterns swing over the Iron-Vow muster yard while townsfolk watch the granary near the well.';
       if (p.race === 'grixi') {
-        return `${base} Sentries eye your brass-warren satchel warily, though the quartermaster keeps a discreet ledger beneath the counter for Grixi coin.`;
+        return `${base} The quartermaster keeps a discreet under-ledger beneath the counter for Grixi coin.`;
       }
       if (p.race === 'vaelorian') {
-        return `${base} Old Imperial eagles cling to the gate lintel, and the garrison greets Vaelorian blood like distant kin.`;
+        return `${base} Old Imperial eagles still cling to the gate lintel.`;
       }
       return base;
     },
@@ -55,16 +65,39 @@ export const LOCATIONS: Record<string, LocationNode> = {
       {
         id: 'captain_vane',
         name: 'Captain Vane',
+        unidentifiedLabel: 'Scarred Officer',
         shortLabel: 'Captain Vane',
         visible: (state) => !hasFlag(state, 'cinderford_fallen'),
+        firstSightProse: () =>
+          'At the far end of the rain-slicked yard stands a broad-shouldered garrison officer leaning over a scarred oak table. Iron-grey hair sits cropped beneath a leather cap, an old sabre slash splits his left eyebrow, and gauntleted fingers drum steadily beside an iron muster roll.',
         greeting: (state) => {
-          if (state.player.race === 'vaelorian') {
-            return 'Captain Vane eyes the old Vaelorian cut of your brow across the muster table.';
-          }
-          if (state.player.sex === 'female') {
-            return 'Captain Vane glances up from his iron muster-roll, his gaze cold and skeptical.';
-          }
-          return 'Captain Vane beckons you toward the scarred oak muster table.';
+          const base =
+            state.player.race === 'vaelorian'
+              ? 'Captain Vane eyes the old Vaelorian cut of your brow across the muster table.'
+              : state.player.sex === 'female'
+                ? 'Captain Vane glances up from his iron muster-roll, his gaze cold and skeptical.'
+                : 'Captain Vane beckons you toward the scarred oak muster table.';
+          return appendReaction(base, state, 'captain_vane');
+        },
+        anatomy: {
+          height: 'Tall',
+          weight: 'Solid',
+          skinColor: 'Weathered Tan',
+          hairLength: 'Cropped',
+          hairStyle: 'Unkempt',
+          hairColor: 'Iron-Grey',
+          eyeShape: 'Deep-Set',
+          eyeColor: 'Storm-Grey',
+          musculature: 'Broad',
+          bodyShape: 'Broad-Chested',
+          facialScars: 'Brow Split',
+          bodyScars: 'Old Spear-Mark',
+          faceDetail: 'Deep-set storm-grey eyes sit beneath a jagged scar splitting his left eyebrow and a hard, stubbled jaw.',
+          chestTorsoDetail: 'A heavy barrel chest fills out oiled Iron-Vow plate worn dull by frontier winters.',
+          armsHandsDetail: 'Thick forearms end in scarred knuckles resting permanently near his sword pommel.',
+          legsStanceDetail: 'Planted squarely behind the oak muster board as though holding a breach.',
+          distinguishingMark: 'Wears a notched iron whistle chained across his breastplate.',
+          visibleTags: ['humanoid', 'muscular', 'scarred_face'],
         },
         topics: [
           {
@@ -183,12 +216,37 @@ export const LOCATIONS: Record<string, LocationNode> = {
       {
         id: 'innkeeper_martha',
         name: 'Innkeeper Martha',
+        unidentifiedLabel: 'Hearth Keeper',
         shortLabel: 'Martha',
         visible: (state) => !hasFlag(state, 'cinderford_fallen'),
-        greeting: (state) =>
-          hasFlag(state, 'granary_purified')
+        firstSightProse: () =>
+          'Beside the smoking peat hearth stands a sturdy, grey-braided woman wiping cracked stoneware with a flour-dusted apron. Soot smudges her forearms, and shrewd amber eyes take in every wet cloak that crosses her threshold.',
+        greeting: (state) => {
+          const base = hasFlag(state, 'granary_purified')
             ? 'Martha ladles hot barley broth with a warm smile.'
-            : 'Martha wipes cracked stoneware beside the peat hearth.',
+            : 'Martha wipes cracked stoneware beside the peat hearth.';
+          return appendReaction(base, state, 'innkeeper_martha');
+        },
+        anatomy: {
+          height: 'Average',
+          weight: 'Solid',
+          skinColor: 'Warm Olive',
+          hairLength: 'Long',
+          hairStyle: 'Braided',
+          hairColor: 'Iron-Grey',
+          eyeShape: 'Almond',
+          eyeColor: 'Amber',
+          musculature: 'Toned',
+          bodyShape: 'Full-Figured',
+          facialScars: 'Unmarked',
+          bodyScars: 'Unmarked',
+          faceDetail: 'Laugh-creased amber eyes watch sharply above rosy, hearth-warmed cheeks.',
+          chestTorsoDetail: 'Sturdy shoulders and a full apron bear flour dust and dried rosemary.',
+          armsHandsDetail: 'Strong, burn-speckled forearms lift heavy iron kettles with ease.',
+          legsStanceDetail: 'Unhurried, practical stride behind the timber counter.',
+          distinguishingMark: 'Keeps a heavy brass key-ring looped through her apron sash.',
+          visibleTags: ['humanoid'],
+        },
         topics: [
           {
             id: 'martha_rumors',
@@ -353,6 +411,10 @@ export const LOCATIONS: Record<string, LocationNode> = {
     danger: 1,
     neighbors: ['cinderford', 'petrified_starwood', 'silken_cistern'],
     asciiPos: { row: 2, col: 1, code: 'KC' },
+    sensorySummary:
+      'Broad Imperial flagstones buckle upward where pale subterranean roots split ancient mortar. Broken obelisks lean beside rusted deserter cages while cold ash drifts over rutted carriage tracks.',
+    firstSightProse: () =>
+      'The muddy lane widens abruptly onto immense gray flagstones laid for long-dead Imperial legions. Pale roots heave the stone blocks crooked, rusted gibbet cages creak above the ditches, and distant smoke hangs low over the road.',
     description: () =>
       'Flagstones wide enough for Imperial war-wagons heave upward where white roots split the mortar. Toppled milestone obelisks bear faded Vaelish edicts beside hanged deserter cages.',
     actions: [
@@ -391,7 +453,7 @@ export const LOCATIONS: Record<string, LocationNode> = {
           addItemToInventory(state, 'ash_resin', 1);
           return {
             messages: [
-              'Half-buried in ash mud sits a scorched saddlebag holding resin, though a gaunt hound snarls from the culvert.',
+              'Half-buried in ash mud sits a scorched saddlebag holding resin, though low smoke curls out of the culvert beside it.',
             ],
             startCombat: { enemyId: 'ash_hound', canFlee: true },
           };
@@ -408,6 +470,10 @@ export const LOCATIONS: Record<string, LocationNode> = {
     dark: true,
     neighbors: ['cinderford', 'petrified_starwood'],
     asciiPos: { row: 0, col: 0, code: 'WB' },
+    sensorySummary:
+      'A grass-bald burial mound older than the Shattering weeps rust-orange groundwater down mossy stone steps. Silver Star-Script glints across the sunken lintel.',
+    firstSightProse: () =>
+      'A swollen hill of wet slate rises out of the bracken, split by a narrow mouth of dressed granite. Iron-orange water trickles steadily down mossy steps into pitch blackness that smells of wet bronze and cold limestone.',
     description: (state) => {
       const darkNote =
         state.player.heirloom === 'kiln_lantern' || state.player.torches > 0
@@ -527,6 +593,10 @@ export const LOCATIONS: Record<string, LocationNode> = {
     danger: 2,
     neighbors: ['cinderford', 'silken_cistern'],
     asciiPos: { row: 4, col: 0, code: 'AF' },
+    sensorySummary:
+      'Knee-deep gray bog dotted with sunken stone lanterns and pale, bell-shaped fungi. Beneath the cattails, an ancient stone culvert descends toward subterranean water.',
+    firstSightProse: () =>
+      'Solid earth gives way to cold, ash-gray mire smelling of wet peat and sweet mold. Half-drowned stone lanterns mark a crooked causeway of stepping stones, while clusters of pale bell-fungi tremble along the reeds.',
     description: () =>
       'Knee-deep gray bog dotted with sunken stone lanterns and pale, bell-shaped fungi. Beneath the cattails, an ancient stone culvert descends toward the Silken Cistern.',
     actions: [
@@ -604,6 +674,10 @@ export const LOCATIONS: Record<string, LocationNode> = {
     danger: 1,
     neighbors: ['ash_fen', 'kings_causeway', 'drowned_forge'],
     asciiPos: { row: 4, col: 1, code: 'SC' },
+    sensorySummary:
+      'Cathedral-tall subterranean aqueduct arches draped in pale luminous silk above mirror-still black water. Soft shuttle-clicks echo from blind looms hidden behind the curtains.',
+    firstSightProse: () =>
+      'Descending through the mire culvert opens into an immense vaulted cistern lit by pale, softly glowing curtains of spider-silk hanging from flooded arches. Mirror-still black water carries the rhythmic clack of unseen looms and the hushed whisper of veiled watchers.',
     description: (state) => {
       const p = state.player;
       if (hasFlag(state, 'stole_cistern_vesper')) {
@@ -634,12 +708,38 @@ export const LOCATIONS: Record<string, LocationNode> = {
       {
         id: 'matron_veyra',
         name: 'Matron Veyra',
+        unidentifiedLabel: 'Veiled Weaver',
         shortLabel: 'Matron Veyra',
         visible: (state) => !hasFlag(state, 'stole_cistern_vesper'),
-        greeting: (state) =>
-          state.player.sex === 'female'
-            ? '"Step past the silk, Sister. Let our blind looms weigh your breath."'
-            : '"Halt at the black water, man. Speak why the loom should spare your weight."',
+        firstSightProse: () =>
+          'Beside the black water stands a tall, slender woman wrapped from crown to heel in luminous white silk. Her eyes are bound beneath silver-stitched gauze, yet her pale hands trace invisible vibrations hanging in the cavern air.',
+        greeting: (state) => {
+          const base =
+            state.player.sex === 'female'
+              ? '"Step past the silk, Sister. Let our blind looms weigh your breath."'
+              : '"Halt at the black water, man. Speak why the loom should spare your weight."';
+          return appendReaction(base, state, 'matron_veyra');
+        },
+        anatomy: {
+          height: 'Tall',
+          weight: 'Lean',
+          skinColor: 'Moon-Pale',
+          hairLength: 'Waist-Length',
+          hairStyle: 'Braided',
+          hairColor: 'Ash-White',
+          eyeShape: 'Almond',
+          eyeColor: 'Blindfolded',
+          musculature: 'Wiry',
+          bodyShape: 'Slender',
+          facialScars: 'Ritual Brand',
+          bodyScars: 'Unmarked',
+          faceDetail: 'Silver-stitched gauze wraps the upper face above pale, serene cheekbones and an unmoving mouth.',
+          chestTorsoDetail: 'Layered luminous silk hangs straight across narrow shoulders and a spare, upright torso.',
+          armsHandsDetail: 'Long, pale fingers stain faintly silver at the tips from drawing counter-harmonic thread.',
+          legsStanceDetail: 'Stands motionless upon wet flagstone without shifting weight.',
+          distinguishingMark: 'Fine luminous threads cling to her sleeves and stir whenever a bell rings far away.',
+          visibleTags: ['humanoid', 'pale_skin', 'occult'],
+        },
         topics: [
           {
             id: 'veyra_shell',
@@ -831,6 +931,10 @@ export const LOCATIONS: Record<string, LocationNode> = {
     danger: 2,
     neighbors: ['weeping_barrow', 'kings_causeway', 'crown_watchtower'],
     asciiPos: { row: 0, col: 1, code: 'SW' },
+    sensorySummary:
+      'Colossal ivory-stone trunks spiral like cathedral ribs into a pale cloudbank. Glassy silver needles chime in the breeze while pale root-veins crawl across the forest floor.',
+    firstSightProse: () =>
+      'The mud turns to crunchy silver dust beneath colossal white trunks turned wholly to stone. Frozen boughs lock high overhead like cathedral ribs, chiming faintly in the cold draft while something heavy scrapes its antlers deeper in the grove.',
     description: (state) => {
       if (state.player.race === 'ael_thalor') {
         return "Colossal ivory-stone trunks spiral toward a pale sky — your exiled kin's ancient home, now strangled by vibrating root-veins.";
@@ -869,15 +973,13 @@ export const LOCATIONS: Record<string, LocationNode> = {
             );
             return {
               messages: [
-                'You kneel and sing the elder Memory-Canticle. The great Star-Stag halts, shakes pale vines from its silver antlers, and leaves a Star-Glaive gleaming in the mossy plinth.',
+                'You kneel and sing the elder Memory-Canticle. The immense silver stag halts, shakes pale vines from its chiming rack, and leaves a Star-Glaive gleaming in the mossy plinth.',
               ],
             };
           }
 
           return {
-            messages: [
-              'A towering stag plated in chalky bark bursts from the petrified ferns, pale chimes rattling from its antlers.',
-            ],
+            messages: ['Silver ferns split apart as heavy hooves thunder into the glade.'],
             startCombat: {
               enemyId: 'star_stag',
               canFlee: true,
@@ -950,6 +1052,10 @@ export const LOCATIONS: Record<string, LocationNode> = {
     dark: true,
     neighbors: ['silken_cistern', 'sunken_belfry'],
     asciiPos: { row: 4, col: 2, code: 'DF' },
+    sensorySummary:
+      'Flooded basalt furnace halls built by the Durnfolk before the Shattering. Warm brine laps against submerged anvils while steam hisses from copper sluice-pipes.',
+    firstSightProse: () =>
+      'Warm, sulfur-thick steam rolls out of a low square gate cut into black basalt. Knee-deep brine floods vast recessed forge floors where old anvils glow dull ember beneath the water and a massive sluice-wheel hums beyond the mist.',
     description: () =>
       'Flooded basalt halls built by the Durnfolk before the Kiln shattered. Half-submerged anvils glow faintly under sluggish steam while an iron sluice-wheel hums behind a watchful bronze sentinel.',
     actions: [
@@ -992,7 +1098,7 @@ export const LOCATIONS: Record<string, LocationNode> = {
           }
 
           return {
-            messages: ['Steam hisses from copper joints as the Basalt Kiln-Warden lurches forward with a furnace hammer.'],
+            messages: ['Boiling water surges sideways as heavy basalt joints grind awake in the steam.'],
             startCombat: {
               enemyId: 'forge_automaton',
               canFlee: true,
@@ -1048,20 +1154,50 @@ export const LOCATIONS: Record<string, LocationNode> = {
     danger: 3,
     neighbors: ['petrified_starwood', 'sunken_belfry'],
     asciiPos: { row: 0, col: 2, code: 'CW' },
+    sensorySummary:
+      'A wind-scoured parapet jutting over the sunken amphitheater of the Belfry. Shattered arches frame the abyss below, where an old bronze plinth holds vigil.',
+    firstSightProse: () =>
+      'Steep stone stairs break out onto a wind-scoured cliff parapet hanging above a vast drowned crater. Below lies a sunken amphitheater crowned by a colossal inverted bell; on the broken flagstones before you sits a motionless, towering figure in green-tarnished bronze.',
     description: (state) => {
       if (hasFlag(state, 'vorne_resolved')) {
         return 'Wind howls through the ruined gate-arch overlooking the Sunken Belfry below. An empty bronze chair faces the chasm.';
       }
-      return 'A shattered parapet overlooking the abyssal crater of the Sunken Belfry. On a bronze plinth sits Sir Vorne, motionless save for the slow ring of his bell-helm in the wind.';
+      return 'A shattered parapet overlooking the abyssal crater of the Sunken Belfry. On a bronze plinth sits a motionless bell-helmed sentinel whose visor hums in the wind.';
     },
     npcs: [
       {
         id: 'sir_vorne_npc',
         name: 'Sir Vorne',
+        unidentifiedLabel: 'Bronze Sentinel',
         shortLabel: 'Sir Vorne',
         visible: (state) => !hasFlag(state, 'vorne_resolved'),
-        greeting: () =>
-          'Beneath a great bronze bell-helm, Sir Vorne grips his massive cleaver without rising.',
+        firstSightProse: () =>
+          'Seated upon a bronze plinth rests a towering knight whose gorget has fused seamlessly into a cast bronze bell-helm. Mountain wind draws a low, grieving ring from his visor while gauntleted fingers rest across a notched greatblade.',
+        greeting: (state) => {
+          const base =
+            'Beneath a great bronze bell-helm, Sir Vorne grips his massive cleaver without rising.';
+          return appendReaction(base, state, 'sir_vorne_npc');
+        },
+        anatomy: {
+          height: 'Towering',
+          weight: 'Heavy',
+          skinColor: 'Hidden Under Plate',
+          hairLength: 'None',
+          hairStyle: 'None',
+          hairColor: 'None',
+          eyeShape: 'Narrow',
+          eyeColor: 'Shadowed',
+          musculature: 'Hulking',
+          bodyShape: 'Broad-Chested',
+          facialScars: 'Unmarked',
+          bodyScars: 'Old Spear-Mark',
+          faceDetail: 'Only cold shadow answers behind the slit of his fused bronze bell-helm.',
+          chestTorsoDetail: 'Massive green-tarnished pauldrons and breastplate stand weathered by mountain wind.',
+          armsHandsDetail: 'Gauntleted hands rest lightly across the pommel of a bronze greatblade.',
+          legsStanceDetail: 'Greaved legs sit straight and motionless upon the stone plinth.',
+          distinguishingMark: 'The mountain gale rings faintly off his cast bronze helm.',
+          visibleTags: ['humanoid', 'towering', 'armored'],
+        },
         topics: [
           {
             id: 'vorne_oath',
@@ -1169,6 +1305,10 @@ export const LOCATIONS: Record<string, LocationNode> = {
     dark: true,
     neighbors: ['crown_watchtower', 'drowned_forge'],
     asciiPos: { row: 2, col: 2, code: 'SB' },
+    sensorySummary:
+      'A drowned stone amphitheater cradling an immense upside-down bronze bell. Living white roots braid a high throne directly beneath its trembling rim.',
+    firstSightProse: () =>
+      'The tunnel opens onto the rim of a colossal sunken amphitheater flooded with shallow, mirror-black ash-water. Suspended upside-down across the pit hangs a bronze bell vast as a keep, humming softly over a living throne of braided white roots.',
     description: () =>
       'At the bottom of a drowned stone amphitheater hangs an upside-down bronze bell as large as a keep. Pale roots weave a living throne beneath it where Malakor awaits the Third Drowning Toll.',
     actions: [

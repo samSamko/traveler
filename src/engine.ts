@@ -1,9 +1,11 @@
 import { randomUUID } from 'node:crypto';
 import type {
   ActionOutcome,
+  AnatomyProfile,
   BackgroundId,
   GameState,
   HeirloomId,
+  JournalTab,
   RaceId,
   RecipeDef,
   SexId,
@@ -22,13 +24,27 @@ import {
   startCombatEncounter,
 } from './combat.ts';
 import {
+  divider,
+  formatActionGrid,
   formatStatusHeader,
+  paint,
   renderAsciiMap,
   renderCharacterSheet,
   renderHelpText,
   renderInventory,
   renderMemoryChronicle,
+  wrapText,
 } from './ui.ts';
+import { rollDefaultAnatomy } from './writing/anatomy.ts';
+import {
+  createInitialDiscovery,
+  getNpcDisplayName,
+  markNpcMet,
+  markPlaceSeen,
+} from './writing/discovery.ts';
+import { INTRO_BEAT_COUNT, getIntroBeat } from './writing/intro.ts';
+import { formatCombatEnemyCard } from './writing/appraisal.ts';
+import { getJournalChoices, renderJournalBody } from './writing/journal.ts';
 
 const SHORT_LOCATION_NAMES: Record<string, string> = {
   cinderford: 'Cinderford Keep',
@@ -48,6 +64,8 @@ export interface CreateCharacterInput {
   race: RaceId;
   background: BackgroundId;
   heirloom: HeirloomId;
+  anatomy?: AnatomyProfile;
+  skipIntro?: boolean;
   stealthMode?: boolean;
   rngState?: number;
 }
@@ -83,6 +101,17 @@ export function createNewGame(input: CreateCharacterInput): GameState {
     (trinket?.maxFocusBonus ?? 0);
 
   const abilities = [raceDef.racialAbilityId, ...bgDef.abilityIds];
+  const anatomy =
+    input.anatomy ?? rollDefaultAnatomy(input.sex, input.race, input.background);
+
+  const startingKnownItems = [
+    bgDef.startingWeaponId,
+    bgDef.startingArmorId,
+    ...(bgDef.startingTrinketId ? [bgDef.startingTrinketId] : []),
+    ...bgDef.startingItems.map((i) => i.id),
+  ];
+
+  const skipIntro = Boolean(input.skipIntro);
 
   return {
     runId: randomUUID(),
@@ -95,6 +124,7 @@ export function createNewGame(input: CreateCharacterInput): GameState {
       race: input.race,
       background: input.background,
       heirloom: input.heirloom,
+      anatomy,
       level: 1,
       xp: 0,
       xpToNext: 35,
@@ -131,16 +161,23 @@ export function createNewGame(input: CreateCharacterInput): GameState {
       },
       chronicle: [],
     },
-    scene: 'location',
+    discovery: createInitialDiscovery(startingKnownItems),
+    scene: skipIntro ? 'location' : 'intro',
     subMenu: 'root',
+    introBeat: 0,
+    journalTab: 'root',
+    journalDetailId: null,
+    journalReturn: null,
     activeNpcId: null,
     activeEvent: null,
     combat: null,
     pendingPerkIds: [],
     endingSummary: null,
-    lastMessages: [
-      'You arrive at Cinderford Keep with fourteen days before Malakor sounds the Third Drowning Toll in the Sunken Belfry.',
-    ],
+    lastMessages: skipIntro
+      ? [
+          'You step through the rain-slicked timber gate with fourteen days before the Third Drowning Toll.',
+        ]
+      : [],
     rngState: input.rngState,
   };
 }
@@ -163,6 +200,16 @@ function canCraftRecipe(state: GameState, recipe: RecipeDef): boolean {
 export function getSceneChoices(state: GameState): MenuEntry[] {
   const entries: MenuEntry[] = [];
 
+  if (state.scene === 'intro') {
+    entries.push({ index: 1, id: 'intro:next', label: 'Continue', enabled: true });
+    entries.push({ index: 2, id: 'intro:skip', label: 'Skip', enabled: true });
+    return entries;
+  }
+
+  if (state.scene === 'journal') {
+    return getJournalChoices(state);
+  }
+
   if (state.scene === 'location') {
     const loc = LOCATIONS[state.locationId];
 
@@ -180,6 +227,7 @@ export function getSceneChoices(state: GameState): MenuEntry[] {
       }
       entries.push({ index: entries.length + 1, id: 'rest_action', label: 'Rest', enabled: true });
       entries.push({ index: entries.length + 1, id: 'sub:pack', label: 'Pack', enabled: true });
+      entries.push({ index: entries.length + 1, id: 'open_journal', label: 'Journal', enabled: true });
       entries.push({ index: entries.length + 1, id: 'sub:travel', label: 'Travel', enabled: true });
       return entries;
     }
@@ -205,7 +253,7 @@ export function getSceneChoices(state: GameState): MenuEntry[] {
           entries.push({
             index: entries.length + 1,
             id: `npc:${npc.id}`,
-            label: npc.shortLabel,
+            label: getNpcDisplayName(state, npc),
             enabled: true,
           });
         }
@@ -250,9 +298,8 @@ export function getSceneChoices(state: GameState): MenuEntry[] {
       entries.push({ index: 1, id: 'sub:pack_use', label: 'Use', enabled: true });
       entries.push({ index: 2, id: 'sub:pack_equip', label: 'Equip', enabled: true });
       entries.push({ index: 3, id: 'sub:pack_craft', label: 'Craft', enabled: true });
-      entries.push({ index: 4, id: 'pack:sheet', label: 'Sheet', enabled: true });
-      entries.push({ index: 5, id: 'pack:chronicle', label: 'Chronicle', enabled: true });
-      entries.push({ index: 6, id: 'sub:root', label: 'Back', enabled: true });
+      entries.push({ index: 4, id: 'open_journal', label: 'Journal', enabled: true });
+      entries.push({ index: 5, id: 'sub:root', label: 'Back', enabled: true });
       return entries;
     }
 
@@ -383,6 +430,28 @@ export function getSceneChoices(state: GameState): MenuEntry[] {
   return entries;
 }
 
+function openJournal(state: GameState, initialTab: JournalTab = 'root'): void {
+  if (state.scene !== 'journal') {
+    state.journalReturn = { scene: state.scene, subMenu: state.subMenu };
+  }
+  state.scene = 'journal';
+  state.journalTab = initialTab;
+  state.journalDetailId = null;
+}
+
+function closeJournal(state: GameState): void {
+  if (state.journalReturn) {
+    state.scene = state.journalReturn.scene;
+    state.subMenu = state.journalReturn.subMenu;
+    state.journalReturn = null;
+  } else {
+    state.scene = 'location';
+    state.subMenu = 'root';
+  }
+  state.journalTab = 'root';
+  state.journalDetailId = null;
+}
+
 function advanceFrontierDays(state: GameState, days: number): string[] {
   const msgs: string[] = [];
   for (let i = 0; i < days; i += 1) {
@@ -435,7 +504,8 @@ function applyActionOutcome(state: GameState, outcome: ActionOutcome): string[] 
   if (outcome.startCombat) {
     state.subMenu = 'root';
     state.activeNpcId = null;
-    startCombatEncounter(state, outcome.startCombat);
+    const { introMessages } = startCombatEncounter(state, outcome.startCombat);
+    msgs.push(...introMessages);
     return msgs;
   }
   if (!outcome.stayInDialogue && state.subMenu === 'dialogue') {
@@ -489,8 +559,12 @@ function travelTo(state: GameState, destId: string): string[] {
   state.locationId = destId;
   state.subMenu = 'root';
   state.activeNpcId = null;
+  const firstVisit = markPlaceSeen(state, destId);
   if (!state.visitedLocations.includes(destId)) {
     state.visitedLocations.push(destId);
+  }
+  if (firstVisit) {
+    msgs.push(dest.firstSightProse(state));
   }
 
   if (
@@ -507,9 +581,13 @@ function travelTo(state: GameState, destId: string): string[] {
       'cinderford',
     );
     msgs.push(
-      'Cinderford Keep has succumbed to the granary spores. Two Root-Husks burst from the gatehouse.',
+      'Cinderford Keep has succumbed to the granary spores. Two stooped figures burst from the gatehouse.',
     );
-    startCombatEncounter(state, { enemyIds: ['root_husk', 'root_husk'], canFlee: true });
+    const { introMessages } = startCombatEncounter(state, {
+      enemyIds: ['root_husk', 'root_husk'],
+      canFlee: true,
+    });
+    msgs.push(...introMessages);
     return msgs;
   }
 
@@ -656,6 +734,16 @@ function handleUseCommand(state: GameState, query: string): string[] {
 }
 
 function handleBackShortcut(state: GameState): boolean {
+  if (state.scene === 'journal') {
+    if (state.journalDetailId) {
+      state.journalDetailId = null;
+    } else if (state.journalTab !== 'root') {
+      state.journalTab = 'root';
+    } else {
+      closeJournal(state);
+    }
+    return true;
+  }
   if (state.scene === 'combat' && state.combat && state.combat.subMenu !== 'root') {
     executeCombatAction(state, 'menu:back');
     return true;
@@ -704,7 +792,22 @@ export function processInput(
     return { messages: [renderHelpText()], shouldQuit: false };
   }
 
+  if (lower === 'journal' || lower === 'j') {
+    if (state.scene !== 'intro' && state.scene !== 'dead' && state.scene !== 'ending') {
+      openJournal(state, 'root');
+      return { messages: [], shouldQuit: false };
+    }
+  }
+
+  if (lower === 'memory') {
+    return { messages: [renderMemoryChronicle(state)], shouldQuit: false };
+  }
+
   if (lower === 'look' || lower === 'l') {
+    if (state.scene === 'location') {
+      const loc = LOCATIONS[state.locationId];
+      return { messages: [loc.firstSightProse(state)], shouldQuit: false };
+    }
     return { messages: [], shouldQuit: false };
   }
 
@@ -724,10 +827,6 @@ export function processInput(
 
   if (lower === 'inv' || lower === 'i' || lower === 'inventory') {
     return { messages: [renderInventory(state)], shouldQuit: false };
-  }
-
-  if (lower === 'memory' || lower === 'journal' || lower === 'j') {
-    return { messages: [renderMemoryChronicle(state)], shouldQuit: false };
   }
 
   if (lower.startsWith('equip ')) {
@@ -779,7 +878,46 @@ export function processInput(
     };
   }
 
-  // Sub-menu navigation
+  // Intro progression
+  if (chosen.id === 'intro:next') {
+    if (state.introBeat + 1 < INTRO_BEAT_COUNT) {
+      state.introBeat += 1;
+      return { messages: [], shouldQuit: false };
+    }
+    state.scene = 'location';
+    state.subMenu = 'root';
+    return { messages: [LOCATIONS.cinderford.firstSightProse(state)], shouldQuit: false };
+  }
+  if (chosen.id === 'intro:skip') {
+    state.scene = 'location';
+    state.subMenu = 'root';
+    return { messages: [LOCATIONS.cinderford.firstSightProse(state)], shouldQuit: false };
+  }
+
+  // Journal navigation
+  if (chosen.id === 'open_journal') {
+    openJournal(state, 'root');
+    return { messages: [], shouldQuit: false };
+  }
+  if (chosen.id === 'jclose') {
+    closeJournal(state);
+    return { messages: [], shouldQuit: false };
+  }
+  if (chosen.id === 'jdetail:back') {
+    state.journalDetailId = null;
+    return { messages: [], shouldQuit: false };
+  }
+  if (chosen.id.startsWith('jtab:')) {
+    state.journalTab = chosen.id.slice(5) as JournalTab;
+    state.journalDetailId = null;
+    return { messages: [], shouldQuit: false };
+  }
+  if (chosen.id.startsWith('jdetail:')) {
+    state.journalDetailId = chosen.id.slice(8);
+    return { messages: [], shouldQuit: false };
+  }
+
+  // Location sub-menu navigation
   if (chosen.id === 'sub:root') {
     state.subMenu = 'root';
     state.activeNpcId = null;
@@ -818,12 +956,6 @@ export function processInput(
   if (chosen.id === 'rest_action') {
     return { messages: performRest(state), shouldQuit: false };
   }
-  if (chosen.id === 'pack:sheet') {
-    return { messages: [renderCharacterSheet(state)], shouldQuit: false };
-  }
-  if (chosen.id === 'pack:chronicle') {
-    return { messages: [renderMemoryChronicle(state)], shouldQuit: false };
-  }
   if (chosen.id.startsWith('use_item:')) {
     const itemId = chosen.id.slice(9);
     const msgs = handleUseCommand(state, itemId);
@@ -853,9 +985,15 @@ export function processInput(
   }
 
   if (chosen.id.startsWith('npc:')) {
-    state.activeNpcId = chosen.id.slice(4);
+    const npcId = chosen.id.slice(4);
+    const npc = LOCATIONS[state.locationId].npcs?.find((n) => n.id === npcId);
+    const firstMeet = markNpcMet(state, npcId);
+    state.activeNpcId = npcId;
     state.subMenu = 'dialogue';
-    return { messages: [], shouldQuit: false };
+    return {
+      messages: firstMeet && npc ? [npc.firstSightProse(state)] : [],
+      shouldQuit: false,
+    };
   }
 
   if (chosen.id.startsWith('topic:')) {
@@ -975,13 +1113,28 @@ export function processInput(
 }
 
 export function renderCurrentScreen(state: GameState, messages: string[]): string {
+  const s = state.stealthMode;
   const out: string[] = [];
+
+  if (state.scene === 'intro') {
+    const beat = getIntroBeat(state, state.introBeat);
+    out.push(divider(s, '='));
+    out.push(paint(`${beat.title} - ${state.introBeat + 1}/${INTRO_BEAT_COUNT}`, 'cyan', s));
+    out.push(divider(s, '='));
+    out.push('');
+    out.push(wrapText(beat.body));
+    out.push('');
+    out.push(divider(s, '-'));
+    out.push(...formatActionGrid(getSceneChoices(state)));
+    return out.join('\n');
+  }
+
   out.push(formatStatusHeader(state));
 
   if (messages.length > 0) {
     out.push('');
     for (const m of messages) {
-      out.push(m);
+      out.push(wrapText(m));
     }
   }
 
@@ -991,74 +1144,68 @@ export function renderCurrentScreen(state: GameState, messages: string[]): strin
 
   out.push('');
 
-  if (state.scene === 'location') {
+  if (state.scene === 'journal') {
+    const lines = renderJournalBody(state);
+    for (const line of lines) {
+      out.push(wrapText(line));
+    }
+  } else if (state.scene === 'location') {
     const loc = LOCATIONS[state.locationId];
     if (state.subMenu === 'root') {
-      out.push(loc.name.toUpperCase());
-      out.push(loc.description(state));
+      out.push(paint(loc.name.toUpperCase(), 'cyan', s));
+      out.push(wrapText(loc.description(state)));
     } else if (state.subMenu === 'explore') {
-      out.push(`${loc.name.toUpperCase()} - EXPLORE`);
+      out.push(paint(`${loc.name.toUpperCase()} - EXPLORE`, 'cyan', s));
     } else if (state.subMenu === 'talk') {
-      out.push(`${loc.name.toUpperCase()} - TALK`);
+      out.push(paint(`${loc.name.toUpperCase()} - TALK`, 'cyan', s));
     } else if (state.subMenu === 'dialogue' && state.activeNpcId) {
       const npc = loc.npcs?.find((n) => n.id === state.activeNpcId);
       if (npc) {
-        out.push(npc.name.toUpperCase());
-        out.push(npc.greeting(state));
+        out.push(paint(npc.name.toUpperCase(), 'cyan', s));
+        out.push(wrapText(npc.greeting(state)));
       }
     } else if (state.subMenu === 'travel') {
-      out.push('TRAVEL');
+      out.push(paint('TRAVEL', 'cyan', s));
     } else if (state.subMenu === 'pack') {
-      out.push('PACK');
+      out.push(paint('PACK', 'cyan', s));
     } else if (state.subMenu === 'pack_use') {
-      out.push('USE ITEM');
+      out.push(paint('USE ITEM', 'cyan', s));
     } else if (state.subMenu === 'pack_equip') {
-      out.push('EQUIP GEAR');
+      out.push(paint('EQUIP GEAR', 'cyan', s));
     } else if (state.subMenu === 'pack_craft') {
-      out.push('CRAFT');
+      out.push(paint('CRAFT', 'cyan', s));
     }
   } else if (state.scene === 'event' && state.activeEvent) {
     const ev = EVENTS.find((e) => e.id === state.activeEvent!.eventId);
     if (ev) {
-      out.push(ev.title.toUpperCase());
+      out.push(paint(ev.title.toUpperCase(), 'yellow', s));
       if (!state.activeEvent.resolved) {
-        out.push(ev.prompt(state));
+        out.push(wrapText(ev.prompt(state)));
       }
     }
   } else if (state.scene === 'combat' && state.combat) {
-    out.push(`COMBAT - Round ${state.combat.round}`);
+    out.push(paint(`COMBAT - Round ${state.combat.round}`, 'red', s));
     for (const enemy of state.combat.enemies) {
       if (enemy.hp <= 0) continue;
-      const statuses =
-        enemy.statuses.length > 0
-          ? ` | ${enemy.statuses.map((s) => `${s.type} ${s.turns}t`).join(', ')}`
-          : '';
-      out.push(`${enemy.name}: HP ${enemy.hp}/${enemy.maxHp} | Armor ${enemy.baseArmor + enemy.turnArmor}${statuses}`);
-    }
-    for (const enemy of state.combat.enemies) {
-      if (enemy.hp <= 0) continue;
-      const intent = enemy.intents[enemy.nextIntentIndex];
-      if (intent) {
-        out.push(`${enemy.name} ${intent.description}`);
+      for (const line of formatCombatEnemyCard(state, enemy)) {
+        out.push(wrapText(line));
       }
     }
   } else if (state.scene === 'shop') {
     const shop = LOCATIONS[state.locationId].shop;
     if (shop) {
-      out.push(shop.name.toUpperCase());
-      out.push(shop.greeting(state));
+      out.push(paint(shop.name.toUpperCase(), 'cyan', s));
+      out.push(wrapText(shop.greeting(state)));
     }
   } else if (state.scene === 'level_up') {
-    out.push(`LEVEL ${state.player.level} - CHOOSE A PERK`);
+    out.push(paint(`LEVEL ${state.player.level} - CHOOSE A PERK`, 'green', s));
   }
 
   const choices = getSceneChoices(state);
   if (choices.length > 0) {
     out.push('');
-    for (const c of choices) {
-      const lockSuffix = c.enabled ? '' : ' - Unavailable';
-      out.push(`  ${c.index}. ${c.label}${lockSuffix}`);
-    }
+    out.push(divider(s, '-'));
+    out.push(...formatActionGrid(choices));
   }
 
   return out.join('\n');

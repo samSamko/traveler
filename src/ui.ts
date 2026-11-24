@@ -27,8 +27,64 @@ export function paint(
 }
 
 export function divider(stealth: boolean, char = '-'): string {
-  const line = char.repeat(68);
+  const line = char.repeat(74);
   return stealth ? line : paint(line, 'gray', false);
+}
+
+export function wrapText(text: string, width = 74): string {
+  const rawLines = text.split('\n');
+  const wrapped: string[] = [];
+
+  for (const raw of rawLines) {
+    if (raw.trim().length === 0) {
+      wrapped.push('');
+      continue;
+    }
+    const leadMatch = raw.match(/^(\s*)/);
+    const indent = leadMatch ? leadMatch[1] : '';
+    const words = raw.trim().split(/\s+/);
+    let current = indent;
+
+    for (const word of words) {
+      if (current.trim().length === 0) {
+        current += word;
+      } else if (current.length + 1 + word.length <= width) {
+        current += ` ${word}`;
+      } else {
+        wrapped.push(current);
+        current = `${indent}${word}`;
+      }
+    }
+    if (current.trim().length > 0) {
+      wrapped.push(current);
+    }
+  }
+
+  return wrapped.join('\n');
+}
+
+export function formatActionGrid(
+  choices: Array<{ index: number; label: string; enabled: boolean }>,
+): string[] {
+  const formatted = choices.map((c) => {
+    const suffix = c.enabled ? '' : ' - Unavailable';
+    return `${c.index}. ${c.label}${suffix}`;
+  });
+
+  const canTwoColumn =
+    formatted.length >= 4 && formatted.every((entry) => entry.length <= 28);
+
+  if (!canTwoColumn) {
+    return formatted.map((entry) => `  ${entry}`);
+  }
+
+  const lines: string[] = [];
+  for (let i = 0; i < formatted.length; i += 2) {
+    const left = formatted[i].padEnd(32, ' ');
+    const right = formatted[i + 1] ?? '';
+    lines.push(right ? `  ${left}${right}` : `  ${formatted[i]}`);
+  }
+  return lines;
 }
 
 export function formatStatusHeader(state: GameState): string {
@@ -194,7 +250,8 @@ export function renderHelpText(): string {
     'COMMANDS',
     '  1, 2, 3...    Choose a numbered option',
     '  0 or back     Return to the previous menu',
-    '  look          Re-read the current scene',
+    '  look          Inspect full surroundings in detail',
+    '  journal or j  Open the Traveler Journal anytime, even in combat',
     '  go <place>    Travel directly to a neighboring site',
     '  map           Display the frontier map',
     '  stats         View character sheet',
@@ -202,7 +259,6 @@ export function renderHelpText(): string {
     '  equip <item>  Equip gear from pack',
     '  use <item>    Use a consumable outside combat',
     '  camp          Make camp',
-    '  memory        Inspect factions and chronicle',
     '  stealth       Toggle monochrome plain-text mode',
     '  quit          Save and exit',
   ].join('\n');

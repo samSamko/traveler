@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node src/index.ts",
     "stealth": "node src/index.ts --stealth",
+    "validate": "node scripts/validate-lore.ts",
     "test": "node --test test/engine.test.ts"
   },
   "engines": {

@@ -6,10 +6,17 @@ import type {
   StatusType,
 } from './types.ts';
 import { getEffectiveStat, nextRandom, rollDice } from './dice.ts';
-import { ABILITIES, HEIRLOOMS, PERKS } from './content/characters.ts';
+import { ABILITIES, PERKS } from './content/characters.ts';
 import { ITEMS } from './content/items.ts';
 import { ENEMIES } from './content/enemies.ts';
 import { recordChronicle, setFlag } from './memory.ts';
+import {
+  getEnemyDisplayName,
+  identifyEnemy,
+  markItemSeen,
+  recordEnemyAttackObserved,
+} from './writing/discovery.ts';
+import { runActiveObserveCheck, runPassiveCombatGlance } from './writing/appraisal.ts';
 
 const ROMAN = ['I', 'II', 'III', 'IV'] as const;
 
@@ -18,6 +25,7 @@ export function addItemToInventory(
   itemId: string,
   qty = 1,
 ): void {
+  markItemSeen(state, itemId);
   const existing = state.player.inventory.find((entry) => entry.id === itemId);
   if (existing) {
     existing.qty += qty;
@@ -110,7 +118,7 @@ export function startCombatEncounter(
     preDamageRatio?: number;
     brokenSeals?: string[];
   },
-): CombatState {
+): { combat: CombatState; introMessages: string[] } {
   const ids = opts.enemyIds && opts.enemyIds.length > 0
     ? opts.enemyIds
     : opts.enemyId
@@ -157,16 +165,22 @@ export function startCombatEncounter(
     const startHp = Math.max(10, template.maxHp - hpLoss);
 
     seen[id] = (seen[id] ?? 0) + 1;
-    const suffix = counts[id] > 1 ? ` ${ROMAN[seen[id] - 1] ?? seen[id]}` : '';
+    const suffix = counts[id] > 1 ? String(ROMAN[seen[id] - 1] ?? seen[id]) : '';
 
     return {
       templateId: template.id,
-      name: `${template.name}${suffix}`,
+      name: template.name,
+      unidentifiedName: template.unidentifiedName,
+      suffix,
       category: template.category,
       hp: startHp,
       maxHp: template.maxHp,
       baseArmor,
       turnArmor: 0,
+      stats: { ...template.stats },
+      visibleGear: { ...template.visibleGear },
+      appraisalTier: 0,
+      identified: false,
       statuses: [],
       intents,
       nextIntentIndex: idx % intents.length,
@@ -182,6 +196,7 @@ export function startCombatEncounter(
     enemies,
     subMenu: 'root',
     pendingActionId: null,
+    observedUsedThisRound: false,
     round: 1,
     heirloomUsedThisFight: false,
     guaranteedDodgeThisTurn: false,
@@ -190,14 +205,15 @@ export function startCombatEncounter(
     onVictoryFlag: opts.onVictoryFlag,
     onVictoryChronicle: opts.onVictoryChronicle,
     canFlee: opts.canFlee ?? true,
-    log: enemies.length === 1
-      ? [ENEMIES[enemies[0].templateId].description]
-      : [`${enemies.length} foes bar the way.`],
+    log: [],
   };
 
   state.combat = combat;
   state.scene = 'combat';
-  return combat;
+
+  const introMessages = runPassiveCombatGlance(state);
+  combat.log = introMessages.slice(-4);
+  return { combat, introMessages };
 }
 
 export interface CombatMenuOption {
@@ -239,6 +255,10 @@ export function getCombatMenuOptions(state: GameState): CombatMenuOption[] {
       opts.push({ index: opts.length + 1, id: 'menu:spells', label: 'Spells', enabled: true });
     }
 
+    if (!combat.observedUsedThisRound) {
+      opts.push({ index: opts.length + 1, id: 'observe', label: 'Observe', enabled: true });
+    }
+
     if (!combat.heirloomUsedThisFight) {
       opts.push({ index: opts.length + 1, id: 'heirloom', label: 'Heirloom', enabled: true });
     }
@@ -250,6 +270,8 @@ export function getCombatMenuOptions(state: GameState): CombatMenuOption[] {
     if (hasCombatItems) {
       opts.push({ index: opts.length + 1, id: 'menu:items', label: 'Item', enabled: true });
     }
+
+    opts.push({ index: opts.length + 1, id: 'open_journal', label: 'Journal', enabled: true });
 
     if (combat.canFlee) {
       opts.push({ index: opts.length + 1, id: 'flee', label: 'Flee', enabled: true });
@@ -315,7 +337,7 @@ export function getCombatMenuOptions(state: GameState): CombatMenuOption[] {
       opts.push({
         index: opts.length + 1,
         id: `target:${idx}`,
-        label: combat.enemies[idx].name,
+        label: getEnemyDisplayName(state, combat.enemies[idx]),
         enabled: true,
       });
     }
@@ -349,13 +371,17 @@ function resolveVictory(state: GameState): string[] {
   const p = state.player;
   const msgs: string[] = [
     combat.enemies.length === 1
-      ? `Victory. ${combat.enemies[0].name} falls.`
+      ? `Victory. ${getEnemyDisplayName(state, combat.enemies[0])} falls.`
       : 'Victory. Every foe lies still.',
   ];
 
   let totalCrowns = 0;
   let totalXp = 0;
   for (const enemy of combat.enemies) {
+    if (enemy.isBoss || enemy.isElite) {
+      identifyEnemy(state, enemy.templateId);
+    }
+
     let crowns =
       enemy.crownReward[0] +
       Math.floor(nextRandom(state) * (enemy.crownReward[1] - enemy.crownReward[0] + 1));
@@ -443,7 +469,7 @@ function tickStatusList(statuses: StatusEffect[]): { dmg: number; logs: string[]
 }
 
 function needsSingleTarget(actionId: string): boolean {
-  if (actionId === 'strike') return true;
+  if (actionId === 'strike' || actionId === 'observe') return true;
   if (actionId.startsWith('ability:')) {
     const ab = ABILITIES[actionId.slice(8)];
     return Boolean(ab?.damageDice && !ab.isAoE);
@@ -490,7 +516,6 @@ export function executeCombatAction(
     combat.pendingActionId = null;
     combat.subMenu = 'root';
   } else if (needsSingleTarget(actionId) && getLivingEnemyIndices(combat).length > 1) {
-    // Check affordability before opening target sub-menu
     if (actionId.startsWith('ability:')) {
       const ab = ABILITIES[actionId.slice(8)];
       if (ab && (p.stamina < ab.staminaCost || p.focus < ab.focusCost || (ab.hpCost && p.hp <= ab.hpCost))) {
@@ -502,6 +527,13 @@ export function executeCombatAction(
     return { messages: [] };
   } else {
     combat.subMenu = 'root';
+  }
+
+  // Free tactical action: Observe does NOT end the player's turn
+  if (actionId === 'observe') {
+    const msgs = runActiveObserveCheck(state, targetIdx);
+    combat.log = msgs.slice(-5);
+    return { messages: msgs };
   }
 
   const logs: string[] = [];
@@ -526,7 +558,7 @@ export function executeCombatAction(
       roundOneBonus +
       perkDmg;
     const dealt = dealDamageToEnemy(primaryEnemy, raw, false);
-    logs.push(`You strike ${primaryEnemy.name} for ${dealt} damage.`);
+    logs.push(`You strike ${getEnemyDisplayName(state, primaryEnemy)} for ${dealt} damage.`);
   } else if (actionId === 'guard') {
     pushStatus(p.statuses, { type: 'guarded', turns: 1, power: 4 });
     p.stamina = Math.min(p.maxStamina, p.stamina + 1);
@@ -550,6 +582,7 @@ export function executeCombatAction(
 
     for (const target of affected) {
       if (ab.shatterGuard) target.turnArmor = 0;
+      const tName = getEnemyDisplayName(state, target);
       if (ab.damageDice) {
         const [cnt, sides] = ab.damageDice;
         const statBonus = getEffectiveStat(state, ab.stat);
@@ -563,11 +596,11 @@ export function executeCombatAction(
           roundOneBonus +
           perkDmg;
         const dealt = dealDamageToEnemy(target, raw, Boolean(ab.pierceArmor));
-        logs.push(`${ab.name} hits ${target.name} for ${dealt} damage.`);
+        logs.push(`${ab.name} hits ${tName} for ${dealt} damage.`);
       }
       if (ab.applyEnemyStatus && target.hp > 0) {
         pushStatus(target.statuses, ab.applyEnemyStatus);
-        logs.push(`${target.name} becomes ${ab.applyEnemyStatus.type}.`);
+        logs.push(`${tName} becomes ${ab.applyEnemyStatus.type}.`);
       }
     }
 
@@ -602,7 +635,7 @@ export function executeCombatAction(
       primaryEnemy.turnArmor = 0;
       const dealt = dealDamageToEnemy(primaryEnemy, 8, true);
       p.focus = Math.min(p.maxFocus, p.focus + 3);
-      logs.push(`Kiln Lantern sears ${primaryEnemy.name} for ${dealt} damage.`);
+      logs.push(`Kiln Lantern sears ${getEnemyDisplayName(state, primaryEnemy)} for ${dealt} damage.`);
     } else if (p.heirloom === 'orin_bell_shard') {
       for (const idx of getLivingEnemyIndices(combat)) {
         pushStatus(combat.enemies[idx].statuses, { type: 'staggered', turns: 1, power: 1 });
@@ -628,10 +661,11 @@ export function executeCombatAction(
     }
     if (item.throwDamage) {
       const dealt = dealDamageToEnemy(primaryEnemy, item.throwDamage, true);
-      logs.push(`You hurl ${item.name} at ${primaryEnemy.name} for ${dealt} damage.`);
+      const tName = getEnemyDisplayName(state, primaryEnemy);
+      logs.push(`You hurl ${item.name} at ${tName} for ${dealt} damage.`);
       if (item.throwStatus && primaryEnemy.hp > 0) {
         pushStatus(primaryEnemy.statuses, item.throwStatus);
-        logs.push(`${primaryEnemy.name} catches fire.`);
+        logs.push(`${tName} catches fire.`);
       }
     }
     if (item.healHp) {
@@ -673,17 +707,17 @@ export function executeCombatAction(
     return { messages: [...logs, ...resolveVictory(state)] };
   }
 
-  // Tick statuses on all living enemies
   for (const idx of getLivingEnemyIndices(combat)) {
     const enemy = combat.enemies[idx];
+    const eName = getEnemyDisplayName(state, enemy);
     const tick = tickStatusList(enemy.statuses);
     enemy.statuses = tick.next;
     if (tick.dmg > 0) {
       enemy.hp = Math.max(0, enemy.hp - tick.dmg);
-      logs.push(...tick.logs.map((l) => `${enemy.name}: ${l}`));
+      logs.push(...tick.logs.map((l) => `${eName}: ${l}`));
     }
     if (enemy.hp <= 0) {
-      logs.push(`${enemy.name} collapses.`);
+      logs.push(`${eName} collapses.`);
     }
   }
 
@@ -691,32 +725,33 @@ export function executeCombatAction(
     return { messages: [...logs, ...resolveVictory(state)] };
   }
 
-  // Enemy turns
   for (const idx of getLivingEnemyIndices(combat)) {
     const enemy = combat.enemies[idx];
+    const eName = getEnemyDisplayName(state, enemy);
     enemy.turnArmor = 0;
     const intent = enemy.intents[enemy.nextIntentIndex];
     const staggeredIdx = enemy.statuses.findIndex((s) => s.type === 'staggered');
 
     if (staggeredIdx >= 0) {
       enemy.statuses.splice(staggeredIdx, 1);
-      logs.push(`${enemy.name} reels staggered and loses its action.`);
+      logs.push(`${eName} reels staggered and loses its action.`);
     } else if (intent) {
+      recordEnemyAttackObserved(state, enemy.templateId, intent.label);
       if (intent.kind === 'guard') {
         enemy.turnArmor += intent.armorGain ?? 4;
-        logs.push(`${enemy.name} uses ${intent.label} and raises its guard.`);
+        logs.push(`${eName} uses ${intent.label} and raises its guard.`);
       } else if (combat.guaranteedDodgeThisTurn) {
         combat.guaranteedDodgeThisTurn = false;
         const cDmg = dealDamageToEnemy(enemy, combat.counterDamagePending, false);
         combat.counterDamagePending = 0;
-        logs.push(`You slip past ${enemy.name}'s ${intent.label} and counter for ${cDmg} damage.`);
+        logs.push(`You slip past ${eName}'s ${intent.label} and counter for ${cDmg} damage.`);
       } else {
         const dazed = enemy.statuses.find((s) => s.type === 'dazed');
         const dmgReduction = dazed ? dazed.power : 0;
         const playerArmor = getPlayerArmor(state, Boolean(enemy.isBoss));
         const incoming = Math.max(0, intent.damage - dmgReduction - playerArmor);
         p.hp = Math.max(0, p.hp - incoming);
-        logs.push(`${enemy.name} strikes with ${intent.label} for ${incoming} damage.`);
+        logs.push(`${eName} strikes with ${intent.label} for ${incoming} damage.`);
         if (intent.status) {
           const half = p.race === 'durnfolk' && (intent.status.type === 'bleeding' || intent.status.type === 'blighted');
           pushStatus(p.statuses, intent.status, half);
@@ -733,7 +768,6 @@ export function executeCombatAction(
     return { messages: [...logs, ...resolveVictory(state)] };
   }
 
-  // Tick player statuses & recovery
   const playerTick = tickStatusList(p.statuses);
   p.statuses = playerTick.next;
   if (playerTick.dmg > 0) {
@@ -749,6 +783,7 @@ export function executeCombatAction(
   }
 
   combat.round += 1;
+  combat.observedUsedThisRound = false;
   p.stamina = Math.min(p.maxStamina, p.stamina + 1);
   if (p.background === 'root_scholar') {
     p.focus = Math.min(p.maxFocus, p.focus + 1);
