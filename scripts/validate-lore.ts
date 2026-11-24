@@ -2,7 +2,11 @@ import { ENEMIES } from '../src/content/enemies.ts';
 import { LOCATIONS } from '../src/content/locations.ts';
 import { ITEMS } from '../src/content/items.ts';
 import { EVENTS } from '../src/content/events.ts';
+import { ABILITIES } from '../src/content/characters.ts';
 import { ENTITY_LINKS } from '../src/writing/links.ts';
+import { BODY_MODS } from '../src/systems/bodymods.ts';
+import { INJURIES } from '../src/systems/injuries.ts';
+import { DAMAGE_TYPE_META } from '../src/systems/damage.ts';
 import { createNewGame } from '../src/engine.ts';
 import type { AnatomyProfile } from '../src/types.ts';
 
@@ -74,7 +78,26 @@ for (const [id, enemy] of Object.entries(ENEMIES)) {
   checkAnatomy(enemy.anatomy, `enemy:${id}`);
   for (const intent of enemy.intents) {
     checkNoBracketsOrParens(intent.description, `enemy:${id}.intent.${intent.label}`);
+    if (!DAMAGE_TYPE_META[intent.damageType]) {
+      errors.push(`Enemy ${id} intent ${intent.label} has invalid damageType "${intent.damageType}"`);
+    }
   }
+}
+
+// 1b. Validate Body Mods & Injuries
+for (const [id, mod] of Object.entries(BODY_MODS)) {
+  checkNoBracketsOrParens(mod.name, `bodymod:${id}.name`);
+  checkNoBracketsOrParens(mod.description, `bodymod:${id}.description`);
+  checkNoBracketsOrParens(mod.bonusSummary, `bodymod:${id}.bonusSummary`);
+  checkNoBracketsOrParens(mod.drawbackSummary, `bodymod:${id}.drawbackSummary`);
+  if (mod.grantedAbilityId && !ABILITIES[mod.grantedAbilityId]) {
+    errors.push(`BodyMod ${id} grants unknown ability "${mod.grantedAbilityId}"`);
+  }
+}
+
+for (const [id, inj] of Object.entries(INJURIES)) {
+  checkNoBracketsOrParens(inj.name, `injury:${id}.name`);
+  checkNoBracketsOrParens(inj.description, `injury:${id}.description`);
 }
 
 // 2. Validate all locations & NPCs
@@ -151,5 +174,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `LORE VALIDATION PASSED: ${Object.keys(ENEMIES).length} enemies, ${Object.keys(LOCATIONS).length} places, ${allNpcIds.size} NPCs, ${EVENTS.length} events, ${ENTITY_LINKS.length} verified entity links.`,
+  `LORE VALIDATION PASSED: ${Object.keys(ENEMIES).length} enemies, ${Object.keys(LOCATIONS).length} places, ${allNpcIds.size} NPCs, ${EVENTS.length} events, ${Object.keys(BODY_MODS).length} body mods, ${Object.keys(INJURIES).length} injuries, ${ENTITY_LINKS.length} verified entity links.`,
 );

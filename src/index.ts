@@ -8,6 +8,7 @@ import type {
   HeirloomId,
   RaceId,
   SexId,
+  SurvivalMode,
 } from './types.ts';
 import { BACKGROUNDS, HEIRLOOMS, RACES } from './content/characters.ts';
 import { createNewGame, processInput, renderCurrentScreen } from './engine.ts';
@@ -152,9 +153,15 @@ async function runCharacterCreation(
   console.log(paint('TRAVELER - THE GLOAMING REACH', 'cyan', stealth));
   if (meta.runsPlayed > 0) {
     console.log(
-      `Runs ${meta.runsPlayed} | Victories ${meta.victories} | Best Day ${meta.bestDayReached}/14`,
+      `Runs ${meta.runsPlayed} | Victories ${meta.victories} | Best Day ${meta.bestDayReached}`,
     );
   }
+
+  console.log('\nSurvival Mode:');
+  console.log('  1. Scarred Survival');
+  console.log('  2. Ironman');
+  const modeRaw = await reader.ask('> ');
+  const survivalMode: SurvivalMode = (modeRaw ?? '').trim() === '2' ? 'ironman' : 'scarred';
 
   console.log('\nSex:');
   console.log('  1. Male');
@@ -206,6 +213,7 @@ async function runCharacterCreation(
     race,
     background,
     heirloom,
+    survivalMode,
     anatomy,
     stealthMode: stealth,
   });
@@ -219,7 +227,7 @@ async function main(): Promise<void> {
     let state = loadGame();
     if (state) {
       if (stealthArg) state.stealthMode = true;
-      console.log(`Resuming ${state.player.name} on Day ${state.day}/${state.maxDays}.`);
+      console.log(`Resuming ${state.player.name} on Day ${state.day}.`);
     } else {
       state = await runCharacterCreation(reader, stealthArg);
       saveGame(state);

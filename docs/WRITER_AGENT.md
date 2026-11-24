@@ -23,6 +23,12 @@ This document governs all narrative, anatomical, environmental, and relational a
    - Whenever multiple actions, skills, spells, items, or enemies exist, branch into a clean sub-menu with `Back`.
 5. **Cross-Link Everything**:
    - Register every relational tie (`commands`, `guards`, `prowls`, `holds`, `seeks`, `wields`, `yields`, `serves`, `based_at`) in `src/writing/links.ts` (`ENTITY_LINKS`).
+6. **Variable Prose & QBN Storylets**:
+   - Use `renderProse(template, state)` from `src/writing/prose.ts` (`{name}`, `{skin}`, `{hair}`, `{eyes}`, `{height}`, `{weapon}`, `{weather}`, `{period}`, `{if:tag}...{/if}`, `{if:defilement>=N}...{/if}`) so scenes stay concise yet reflect customized anatomy, scars, body mods, weather, and Defilement.
+   - Gate new `EventCard`s cleanly with `periods`, `weathers`, `minDefilement`, `maxDefilement`, `requiredTags`, `repeatable`, and `cooldownHours`.
+7. **Damage Types, Resolve, Defilement & Body Mods**:
+   - Assign one of the 10 damage types (`slashing`, `piercing`, `bludgeoning`, `fire`, `cold`, `lightning`, `acid`, `poison`, `blight`, `resonant`) to every weapon, offensive ability, and enemy intent.
+   - Every `BodyModDef` in `src/systems/bodymods.ts` MUST declare its `kind` (`mutation` | `surgery` | `implant`), anatomical `slot`, explicit `bonusSummary` AND `drawbackSummary`, `defilementLoad`, `anatomyOverlay`, and `excisionScar`.
    - Update the matching internal canon dossier under `docs/lore/`:
      - [WORLD.md](file:///c:/Users/samael.samoilenko/Desktop/Projs/traveler/docs/lore/WORLD.md)
      - [RACES_AND_ANATOMY.md](file:///c:/Users/samael.samoilenko/Desktop/Projs/traveler/docs/lore/RACES_AND_ANATOMY.md)

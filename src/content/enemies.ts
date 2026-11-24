@@ -9,6 +9,8 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     maxHp: 20,
     armor: 1,
     stats: { might: 2, agility: 1, wit: 1, grit: 2 },
+    resistances: { blight: 'resistant', poison: 'immune', fire: 'vulnerable' },
+    harvestItemId: 'husk_gland',
     visibleGear: {
       weapon: 'Calcified splinter claws fused to finger bones',
       armor: 'Rotted wool tunic plated with pale bark over the chest',
@@ -47,9 +49,9 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     ],
     description: 'A hollow villager whose ribs burst with pale, bell-like tendrils.',
     intents: [
-      { kind: 'attack', label: 'Splinter Claw', damage: 6, description: 'draws back a calcified claw.' },
-      { kind: 'blight', label: 'Spore Cough', damage: 4, status: { type: 'blighted', turns: 2, power: 2 }, description: 'inhales rattling root-spores.' },
-      { kind: 'guard', label: 'Bark-Harden', damage: 0, armorGain: 3, description: 'plates its ribs in pale bark.' },
+      { kind: 'attack', label: 'Splinter Claw', damage: 6, damageType: 'slashing', description: 'draws back a calcified claw.' },
+      { kind: 'blight', label: 'Spore Cough', damage: 4, damageType: 'blight', resolveDamage: 2, defilementGain: 2, status: { type: 'blighted', turns: 2, power: 2 }, description: 'inhales rattling root-spores.' },
+      { kind: 'guard', label: 'Bark-Harden', damage: 0, damageType: 'bludgeoning', armorGain: 3, description: 'plates its ribs in pale bark.' },
     ],
   },
 
@@ -61,6 +63,8 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     maxHp: 17,
     armor: 0,
     stats: { might: 2, agility: 4, wit: 1, grit: 1 },
+    resistances: { fire: 'resistant', cold: 'vulnerable' },
+    harvestItemId: 'ash_resin',
     visibleGear: {
       weapon: 'Soot-blackened fangs dripping orange sparks',
       armor: 'Singed, scarred mastiff hide with no barding',
@@ -98,8 +102,8 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     ],
     description: 'Gaunt frontier mastiff whose breath trails grey embers.',
     intents: [
-      { kind: 'attack', label: 'Throat Lunge', damage: 7, status: { type: 'bleeding', turns: 2, power: 2 }, description: 'crouches low for the throat.' },
-      { kind: 'heavy', label: 'Ash-Pounce', damage: 9, description: 'bares ember-lit fangs for a leap.' },
+      { kind: 'attack', label: 'Throat Lunge', damage: 7, damageType: 'piercing', status: { type: 'bleeding', turns: 2, power: 2 }, description: 'crouches low for the throat.' },
+      { kind: 'heavy', label: 'Ash-Pounce', damage: 9, damageType: 'fire', description: 'bares ember-lit fangs for a leap.' },
     ],
   },
 
@@ -111,6 +115,8 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     maxHp: 24,
     armor: 2,
     stats: { might: 2, agility: 3, wit: 2, grit: 3 },
+    resistances: { acid: 'resistant', poison: 'resistant', bludgeoning: 'vulnerable', fire: 'vulnerable' },
+    harvestItemId: 'husk_gland',
     visibleGear: {
       weapon: 'Serrated ivory mandibles dripping green acid',
       armor: 'Layered subterranean chitin plates',
@@ -148,9 +154,9 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     ],
     description: 'Subterranean pale beetle-stalker nesting beneath the Cistern aqueducts.',
     intents: [
-      { kind: 'attack', label: 'Mandible Shear', damage: 7, description: 'clacks jagged mandibles wide.' },
-      { kind: 'blight', label: 'Corrosive Silk', damage: 5, status: { type: 'corroded', turns: 3, power: 2 }, description: 'gathers hissing acid silk.' },
-      { kind: 'guard', label: 'Carapace Lock', damage: 0, armorGain: 4, description: 'tucks beneath armored plates.' },
+      { kind: 'attack', label: 'Mandible Shear', damage: 7, damageType: 'slashing', description: 'clacks jagged mandibles wide.' },
+      { kind: 'blight', label: 'Corrosive Silk', damage: 5, damageType: 'acid', status: { type: 'corroded', turns: 3, power: 2 }, description: 'gathers hissing acid silk.' },
+      { kind: 'guard', label: 'Carapace Lock', damage: 0, damageType: 'bludgeoning', armorGain: 4, description: 'tucks beneath armored plates.' },
     ],
   },
 
@@ -162,6 +168,9 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     maxHp: 23,
     armor: 2,
     stats: { might: 3, agility: 2, wit: 2, grit: 2 },
+    resistances: { slashing: 'resistant', lightning: 'vulnerable' },
+    interrogateHint:
+      'He coughs out that smugglers trade Under-Warren grafts behind Harken at Cinderford, and the Weeping Barrow hides a silver Echo-Shell.',
     visibleGear: {
       weapon: 'Notched iron halberd with stained haft',
       armor: 'Dented Iron-Vow brigandine and cracked pavise shield',
@@ -199,9 +208,9 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     ],
     description: 'A deserter from the frontier pike-line, eyes clouded by Vesper-withdrawal.',
     intents: [
-      { kind: 'attack', label: 'Halberd Slash', damage: 8, description: 'sweeps a rusted halberd wide.' },
-      { kind: 'guard', label: 'Shield Wall', damage: 0, armorGain: 4, description: 'braces behind a dented pavise.' },
-      { kind: 'heavy', label: 'Pommel Smash', damage: 10, description: 'hefts steel for an overhead blow.' },
+      { kind: 'attack', label: 'Halberd Slash', damage: 8, damageType: 'slashing', description: 'sweeps a rusted halberd wide.' },
+      { kind: 'guard', label: 'Shield Wall', damage: 0, damageType: 'bludgeoning', armorGain: 4, description: 'braces behind a dented pavise.' },
+      { kind: 'heavy', label: 'Pommel Smash', damage: 10, damageType: 'bludgeoning', description: 'hefts steel for an overhead blow.' },
     ],
   },
 
@@ -213,6 +222,8 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     maxHp: 26,
     armor: 1,
     stats: { might: 1, agility: 2, wit: 4, grit: 2 },
+    resistances: { blight: 'resistant', resonant: 'resistant', fire: 'vulnerable', slashing: 'vulnerable' },
+    harvestItemId: 'husk_gland',
     visibleGear: {
       weapon: 'Tarnished bronze chain-censer smoking with pale spores',
       armor: 'Soot-stiffened penitent robes over chalky ribs',
@@ -251,8 +262,8 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     ],
     description: 'Blind zealot swinging a tarnished censer of pale-root incense.',
     intents: [
-      { kind: 'toll', label: 'Censer Toll', damage: 8, status: { type: 'dazed', turns: 2, power: 2 }, description: 'swings a resonant bronze censer.' },
-      { kind: 'blight', label: 'Mire Incense', damage: 6, status: { type: 'blighted', turns: 3, power: 3 }, description: 'fans choking grey smoke outward.' },
+      { kind: 'toll', label: 'Censer Toll', damage: 8, damageType: 'resonant', resolveDamage: 4, defilementGain: 2, status: { type: 'dazed', turns: 2, power: 2 }, description: 'swings a resonant bronze censer.' },
+      { kind: 'blight', label: 'Mire Incense', damage: 6, damageType: 'blight', resolveDamage: 2, defilementGain: 3, status: { type: 'blighted', turns: 3, power: 3 }, description: 'fans choking grey smoke outward.' },
     ],
   },
 
@@ -264,6 +275,8 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     maxHp: 38,
     armor: 2,
     stats: { might: 3, agility: 3, wit: 2, grit: 3 },
+    resistances: { blight: 'resistant', poison: 'immune', fire: 'vulnerable' },
+    harvestItemId: 'husk_gland',
     visibleGear: {
       weapon: 'Broken broadsword fused to forearm bone by white roots',
       armor: 'Torn Iron-Vow chainmail knit together with pale tendons',
@@ -299,9 +312,9 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     lootTable: [{ itemId: 'vesper_tonic', chance: 0.8 }],
     description: 'The deserter you left to turn, his broken sword fused to his bone by pale roots.',
     intents: [
-      { kind: 'attack', label: "Betrayer's Thrust", damage: 10, status: { type: 'bleeding', turns: 2, power: 3 }, description: 'draws back a root-bound blade.' },
-      { kind: 'blight', label: 'Root-Snare', damage: 7, status: { type: 'blighted', turns: 2, power: 3 }, description: 'drives gnarled knuckles into the mud.' },
-      { kind: 'heavy', label: 'Hollow Lunge', damage: 13, description: 'poises for a desperate lunge.' },
+      { kind: 'attack', label: "Betrayer's Thrust", damage: 10, damageType: 'piercing', status: { type: 'bleeding', turns: 2, power: 3 }, description: 'draws back a root-bound blade.' },
+      { kind: 'blight', label: 'Root-Snare', damage: 7, damageType: 'blight', resolveDamage: 3, defilementGain: 3, status: { type: 'blighted', turns: 2, power: 3 }, description: 'drives gnarled knuckles into the mud.' },
+      { kind: 'heavy', label: 'Hollow Lunge', damage: 13, damageType: 'slashing', description: 'poises for a desperate lunge.' },
     ],
   },
 
@@ -313,6 +326,8 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     maxHp: 44,
     armor: 2,
     stats: { might: 4, agility: 4, wit: 3, grit: 3 },
+    resistances: { cold: 'resistant', resonant: 'resistant', fire: 'vulnerable' },
+    harvestItemId: 'star_sap_drop',
     visibleGear: {
       weapon: 'Towering silver antlers choked in bronze root-chimes',
       armor: 'Fossilized white bark plates grown across chest and flanks',
@@ -351,9 +366,9 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     ],
     description: 'An ancient spirit of the Ael-Thalor woods, antlers choked in pale spore-chimes.',
     intents: [
-      { kind: 'heavy', label: 'Antler Charge', damage: 13, description: 'lowers its chiming rack to charge.' },
-      { kind: 'blight', label: 'Star-Wither Gale', damage: 8, status: { type: 'blighted', turns: 3, power: 3 }, description: 'gathers freezing spore-frost.' },
-      { kind: 'guard', label: 'Silver Bark', damage: 0, armorGain: 5, description: 'hardens its hide into petrified bark.' },
+      { kind: 'heavy', label: 'Antler Charge', damage: 13, damageType: 'piercing', description: 'lowers its chiming rack to charge.' },
+      { kind: 'blight', label: 'Star-Wither Gale', damage: 8, damageType: 'cold', resolveDamage: 3, status: { type: 'blighted', turns: 3, power: 3 }, description: 'gathers freezing spore-frost.' },
+      { kind: 'guard', label: 'Silver Bark', damage: 0, damageType: 'bludgeoning', armorGain: 5, description: 'hardens its hide into petrified bark.' },
     ],
   },
 
@@ -365,6 +380,15 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     maxHp: 48,
     armor: 4,
     stats: { might: 5, agility: 1, wit: 2, grit: 5 },
+    resistances: {
+      poison: 'immune',
+      blight: 'immune',
+      slashing: 'resistant',
+      piercing: 'resistant',
+      lightning: 'vulnerable',
+      acid: 'vulnerable',
+    },
+    harvestItemId: 'iron_wire_kit',
     visibleGear: {
       weapon: 'Piston-driven basalt furnace hammer',
       armor: 'Interlocking Durnfolk slate plates and copper steam-shutters',
@@ -400,9 +424,9 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     lootTable: [{ itemId: 'basalt_plate', chance: 1.0 }],
     description: 'A Durnfolk brass-and-slate golem guarding the flooded furnace valve.',
     intents: [
-      { kind: 'heavy', label: 'Piston Hammer', damage: 14, description: 'raises a massive furnace hammer.' },
-      { kind: 'blight', label: 'Cinder Vent', damage: 9, status: { type: 'burned', turns: 2, power: 3 }, description: 'opens scalding copper steam-vents.' },
-      { kind: 'guard', label: 'Kiln Shutter', damage: 0, armorGain: 6, description: 'locks slate chest shutters tight.' },
+      { kind: 'heavy', label: 'Piston Hammer', damage: 14, damageType: 'bludgeoning', description: 'raises a massive furnace hammer.' },
+      { kind: 'blight', label: 'Cinder Vent', damage: 9, damageType: 'fire', status: { type: 'burned', turns: 2, power: 3 }, description: 'opens scalding copper steam-vents.' },
+      { kind: 'guard', label: 'Kiln Shutter', damage: 0, damageType: 'bludgeoning', armorGain: 6, description: 'locks slate chest shutters tight.' },
     ],
   },
 
@@ -414,6 +438,9 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     maxHp: 52,
     armor: 3,
     stats: { might: 4, agility: 2, wit: 3, grit: 4 },
+    resistances: { slashing: 'resistant', piercing: 'resistant', lightning: 'vulnerable', bludgeoning: 'vulnerable' },
+    interrogateHint:
+      'Through his cracked bronze visor he whispers that the Weeping Barrow holds his original oath and the First Kiln ignition cipher.',
     visibleGear: {
       weapon: 'Enormous bronze Bell-Cleaver notched from centuries of vigil',
       armor: 'Tarnished bronze plate fused at the gorget into a bell-shaped greathelm',
@@ -449,9 +476,9 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     lootTable: [{ itemId: 'bell_cleaver', chance: 1.0 }],
     description: 'A towering knight fused into his bronze-bell helm, keeping hollow watch above the Belfry.',
     intents: [
-      { kind: 'attack', label: 'Bell-Cleaver Arc', damage: 12, status: { type: 'bleeding', turns: 2, power: 2 }, description: 'swings his bronze greatblade wide.' },
-      { kind: 'guard', label: 'Oath-Vigil', damage: 0, armorGain: 5, description: 'plants his steel guard firmly.' },
-      { kind: 'toll', label: 'Helm Resonance', damage: 11, status: { type: 'dazed', turns: 2, power: 3 }, description: 'rings his great helm with a gauntlet.' },
+      { kind: 'attack', label: 'Bell-Cleaver Arc', damage: 12, damageType: 'slashing', status: { type: 'bleeding', turns: 2, power: 2 }, description: 'swings his bronze greatblade wide.' },
+      { kind: 'guard', label: 'Oath-Vigil', damage: 0, damageType: 'bludgeoning', armorGain: 5, description: 'plants his steel guard firmly.' },
+      { kind: 'toll', label: 'Helm Resonance', damage: 11, damageType: 'resonant', resolveDamage: 4, status: { type: 'dazed', turns: 2, power: 3 }, description: 'rings his great helm with a gauntlet.' },
     ],
   },
 
@@ -463,6 +490,9 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     maxHp: 40,
     armor: 1,
     stats: { might: 2, agility: 5, wit: 4, grit: 2 },
+    resistances: { poison: 'resistant', acid: 'resistant', fire: 'vulnerable' },
+    interrogateHint:
+      'She hisses that the Seal of Silence breaks Malakor\'s Drowning Toll, though the Matrons will never forgive the drained Font.',
     visibleGear: {
       weapon: 'Twin Vesper-glass stilettos and coiled acid wire',
       armor: 'Pale luminous spider-silk mantle that blurs outlines in mist',
@@ -498,8 +528,8 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     lootTable: [{ itemId: 'vesper_needle', chance: 1.0 }],
     description: 'A veiled sister of the Silken Cistern dispatched to reclaim stolen Vesper blood.',
     intents: [
-      { kind: 'attack', label: 'Needle Flurry', damage: 11, status: { type: 'bleeding', turns: 3, power: 3 }, description: 'spins twin Vesper-glass stilettos.' },
-      { kind: 'blight', label: 'Venom Thread', damage: 8, status: { type: 'corroded', turns: 2, power: 2 }, description: 'coils a glistening acid wire.' },
+      { kind: 'attack', label: 'Needle Flurry', damage: 11, damageType: 'piercing', status: { type: 'bleeding', turns: 3, power: 3 }, description: 'spins twin Vesper-glass stilettos.' },
+      { kind: 'blight', label: 'Venom Thread', damage: 8, damageType: 'poison', status: { type: 'poisoned', turns: 2, power: 3 }, description: 'coils a glistening venom wire.' },
     ],
   },
 
@@ -511,6 +541,7 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     maxHp: 88,
     armor: 3,
     stats: { might: 4, agility: 2, wit: 5, grit: 5 },
+    resistances: { blight: 'resistant', poison: 'immune', resonant: 'resistant', fire: 'vulnerable', lightning: 'vulnerable' },
     visibleGear: {
       weapon: 'Root-twisted bronze bell-scepter',
       armor: 'Living pale-root vestments and fractured High Warden bell-crown',
@@ -546,10 +577,10 @@ export const ENEMIES: Record<string, EnemyTemplate> = {
     lootTable: [],
     description: 'The fallen High Bell-Warden, throne-bound to the Pale Root beneath a cracked bronze spire.',
     intents: [
-      { kind: 'attack', label: 'Root-Scepter Smash', damage: 13, status: { type: 'bleeding', turns: 2, power: 2 }, description: 'lifts a root-twisted bronze scepter.' },
-      { kind: 'blight', label: 'Calcifying Choir', damage: 10, status: { type: 'blighted', turns: 3, power: 3 }, description: 'chants a pale-root chorus.' },
-      { kind: 'toll', label: 'Drowning Toll', damage: 18, status: { type: 'dazed', turns: 2, power: 3 }, description: 'draws breath beneath the great drowned bell.' },
-      { kind: 'guard', label: 'Belfry Aegis', damage: 0, armorGain: 6, description: 'summons living bark around his throne.' },
+      { kind: 'attack', label: 'Root-Scepter Smash', damage: 13, damageType: 'bludgeoning', status: { type: 'bleeding', turns: 2, power: 2 }, description: 'lifts a root-twisted bronze scepter.' },
+      { kind: 'blight', label: 'Calcifying Choir', damage: 10, damageType: 'blight', resolveDamage: 4, defilementGain: 4, status: { type: 'blighted', turns: 3, power: 3 }, description: 'chants a pale-root chorus.' },
+      { kind: 'toll', label: 'Drowning Toll', damage: 18, damageType: 'resonant', resolveDamage: 7, defilementGain: 5, status: { type: 'dazed', turns: 2, power: 3 }, description: 'draws breath beneath the great drowned bell.' },
+      { kind: 'guard', label: 'Belfry Aegis', damage: 0, damageType: 'bludgeoning', armorGain: 6, description: 'summons living bark around his throne.' },
     ],
   },
 };

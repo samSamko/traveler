@@ -5,8 +5,15 @@ import { ENEMIES } from '../content/enemies.ts';
 import { LOCATIONS } from '../content/locations.ts';
 import { getEffectiveStat } from '../dice.ts';
 import { FACTION_NAMES, countBrokenSeals, getFactionStance } from '../memory.ts';
+import { BODY_MODS } from '../systems/bodymods.ts';
+import { INJURIES } from '../systems/injuries.ts';
+import { DAMAGE_TYPE_META, getEffectivePlayerResistances } from '../systems/damage.ts';
 import { renderAnatomyProse } from './anatomy.ts';
-import { describeStatImpressions, getHealthConditionLabel } from './appraisal.ts';
+import {
+  describeStatImpressions,
+  formatResistanceProfile,
+  getHealthConditionLabel,
+} from './appraisal.ts';
 import { getRelatedLinks } from './links.ts';
 
 export interface JournalChoice {
@@ -124,7 +131,7 @@ export function renderJournalBody(state: GameState): string[] {
   if (state.journalTab === 'root') {
     return [
       'TRAVELER JOURNAL',
-      'Inspect your own body and bearing, exact attack mechanics, observed beasts, people met, known places, items, and recorded deeds.',
+      'Inspect your own body, alterations, exact attack mechanics, observed beasts, people met, known places, items, and recorded deeds.',
     ];
   }
 
@@ -144,12 +151,15 @@ export function renderJournalBody(state: GameState): string[] {
         ? p.statuses.map((s) => `${s.type} for ${s.turns} turns`).join(', ')
         : 'Clear of afflictions';
 
+    const resLine = formatResistanceProfile(getEffectivePlayerResistances(state));
+
     const lines = [
       'JOURNAL - SELF',
       `Identity: ${p.name} - ${p.sex === 'female' ? 'Female' : 'Male'} ${race.name} ${bg.name}, Level ${p.level}`,
-      `Vitality: HP ${p.hp}/${p.maxHp} | Stamina ${p.stamina}/${p.maxStamina} | Focus ${p.focus}/${p.maxFocus} | XP ${p.xp}/${p.xpToNext}`,
+      `Vitality: HP ${p.hp}/${p.maxHp} | Resolve ${p.resolve}/${p.maxResolve} | Stamina ${p.stamina}/${p.maxStamina} | Focus ${p.focus}/${p.maxFocus} | Defilement ${p.defilement}/100`,
       `Attributes: Might ${getEffectiveStat(state, 'might')} | Agility ${getEffectiveStat(state, 'agility')} | Wit ${getEffectiveStat(state, 'wit')} | Grit ${getEffectiveStat(state, 'grit')}`,
       `Passives: ${race.passive.name} - ${race.passive.description} | ${bg.passive.name} - ${bg.passive.description}`,
+      ...(resLine ? [`Damage Affinities: ${resLine}`] : []),
       '',
       ...renderAnatomyProse('Physical Description', p.anatomy, {
         gearLine: gearParts.join(', '),
@@ -157,6 +167,28 @@ export function renderJournalBody(state: GameState): string[] {
         statusLine,
       }),
     ];
+
+    const mods = Object.entries(p.bodyMods);
+    if (mods.length > 0) {
+      lines.push('');
+      lines.push('Body Modifications:');
+      for (const [slot, modId] of mods) {
+        const mod = modId ? BODY_MODS[modId] : undefined;
+        if (!mod) continue;
+        lines.push(`  - ${mod.name} | ${mod.kind} in ${slot}`);
+        lines.push(`    Bonus: ${mod.bonusSummary}`);
+        lines.push(`    Drawback: ${mod.drawbackSummary}`);
+      }
+    }
+
+    if (p.injuries.length > 0) {
+      lines.push('');
+      lines.push('Lasting Injuries:');
+      for (const injId of p.injuries) {
+        const inj = INJURIES[injId];
+        if (inj) lines.push(`  - ${inj.name}: ${inj.description}`);
+      }
+    }
 
     if (p.perks.length > 0) {
       lines.push('');
@@ -175,13 +207,15 @@ export function renderJournalBody(state: GameState): string[] {
     const [wdCount, wdSides] = weapon?.damageDice ?? [1, 6];
     const wBonus = (weapon?.bonusDamage ?? 0) + (p.weaponHoned ? 1 : 0);
     const wStat = weapon?.statScaling ?? 'might';
+    const wType = DAMAGE_TYPE_META[weapon?.damageType ?? 'slashing'].label;
 
     const lines: string[] = [
       'JOURNAL - ATTACKS AND ARTS',
       '',
-      `Strike: Uses ${weapon?.name ?? 'Weapon'} | Damage ${wdCount}d${wdSides}+${wBonus} plus ${wStat} | Cost Free`,
-      'Guard: Raises armor by 4 for 1 turn, restores 1 Stamina and 2 Focus | Cost Free',
-      'Observe: Free Wit check once per combat round to read enemy anatomy, stats, and gear without spending your turn.',
+      `Strike: Uses ${weapon?.name ?? 'Weapon'} | ${wType} ${wdCount}d${wdSides}+${wBonus} plus ${wStat} | Cost Free`,
+      'Subdue: Bludgeoning flat-of-weapon blow | High chance to leave foe downed alive | Cost 1 Stamina',
+      'Guard: Raises armor by 4 for 1 turn, restores 1 Stamina, 2 Focus, and 2 Resolve | Cost Free',
+      'Observe: Free Wit check once per combat round to read enemy anatomy, stats, gear, and affinities.',
       '',
       'Known Skills, Cantrips, and Spells:',
     ];
@@ -195,9 +229,11 @@ export function renderJournalBody(state: GameState): string[] {
       if (ab.hpCost) costParts.push(`HP ${ab.hpCost}`);
       const effectParts: string[] = [];
       if (ab.damageDice) {
-        effectParts.push(`Damage ${ab.damageDice[0]}d${ab.damageDice[1]}+${ab.baseDamage ?? 0} plus ${ab.stat}`);
+        const dType = DAMAGE_TYPE_META[ab.damageType ?? 'bludgeoning'].label;
+        effectParts.push(`${dType} ${ab.damageDice[0]}d${ab.damageDice[1]}+${ab.baseDamage ?? 0} plus ${ab.stat}`);
       }
       if (ab.healAmount) effectParts.push(`Heals ${ab.healAmount} plus ${ab.stat}`);
+      if (ab.restoreResolve) effectParts.push(`Restores ${ab.restoreResolve} Resolve`);
       if (ab.isAoE) effectParts.push('Hits all enemies');
       if (ab.pierceArmor) effectParts.push('Pierces armor');
       if (ab.shatterGuard) effectParts.push('Shatters guard');
@@ -247,13 +283,15 @@ export function renderJournalBody(state: GameState): string[] {
         for (const r of describeStatImpressions(tpl.stats, 2)) {
           lines.push(`  - ${r}`);
         }
+        const resLine = formatResistanceProfile(tpl.resistances);
+        if (resLine) lines.push(`  - Affinities: ${resLine}`);
       } else if (rec.appraisalTier === 1) {
         lines.push('');
         lines.push(`Surface Impression: ${tpl.visibleGear.weapon}; ${tpl.visibleGear.armor}.`);
         for (const r of describeStatImpressions(tpl.stats, 1)) {
           lines.push(`  - ${r}`);
         }
-        lines.push('Use Observe in combat to uncover full anatomy and true identity.');
+        lines.push('Use Observe in combat to uncover full anatomy, affinities, and true identity.');
       } else {
         lines.push('');
         lines.push('Not yet studied closely. Use Observe in combat to learn its anatomy, build, and gear.');
@@ -280,7 +318,7 @@ export function renderJournalBody(state: GameState): string[] {
       'JOURNAL - BESTIARY',
       count === 0
         ? 'No creatures encountered yet.'
-        : 'Select a creature to review its silhouette, anatomy, observed gear, and attacks.',
+        : 'Select a creature to review its silhouette, anatomy, observed gear, affinities, and attacks.',
     ];
   }
 
@@ -347,16 +385,29 @@ export function renderJournalBody(state: GameState): string[] {
       if (!item) return ['Item not found.'];
       const stats: string[] = [`Category: ${item.slot}`, `Value: ${item.value} Crowns`];
       if (item.damageDice) {
-        stats.push(`Damage: ${item.damageDice[0]}d${item.damageDice[1]}+${item.bonusDamage ?? 0} plus ${item.statScaling ?? 'might'}`);
+        const dt = DAMAGE_TYPE_META[item.damageType ?? 'slashing'].label;
+        stats.push(`Damage: ${dt} ${item.damageDice[0]}d${item.damageDice[1]}+${item.bonusDamage ?? 0} plus ${item.statScaling ?? 'might'}`);
       }
       if (item.armorBonus) stats.push(`Armor: +${item.armorBonus}`);
+      const res = formatResistanceProfile(item.resistances);
+      if (res) stats.push(`Affinities: ${res}`);
       if (item.maxHpBonus) stats.push(`Max HP: +${item.maxHpBonus}`);
       if (item.maxFocusBonus) stats.push(`Max Focus: +${item.maxFocusBonus}`);
       if (item.healHp) stats.push(`Restores HP: ${item.healHp}`);
       if (item.restoreStamina) stats.push(`Restores Stamina: ${item.restoreStamina}`);
       if (item.restoreFocus) stats.push(`Restores Focus: ${item.restoreFocus}`);
-      if (item.throwDamage) stats.push(`Thrown Damage: ${item.throwDamage}`);
-      if (item.cureNegative) stats.push('Purges bleeding, blight, and corrosion');
+      if (item.restoreResolve) stats.push(`Restores Resolve: ${item.restoreResolve}`);
+      if (item.throwDamage) {
+        const tt = DAMAGE_TYPE_META[item.throwDamageType ?? 'fire'].label;
+        stats.push(`Thrown Damage: ${tt} ${item.throwDamage}`);
+      }
+      if (item.grantsBodyModId && BODY_MODS[item.grantsBodyModId]) {
+        const mod = BODY_MODS[item.grantsBodyModId];
+        stats.push(`Grants Modification: ${mod.name} in ${mod.slot}`);
+        stats.push(`Bonus: ${mod.bonusSummary}`);
+        stats.push(`Drawback: ${mod.drawbackSummary}`);
+      }
+      if (item.cureNegative) stats.push('Purges negative afflictions');
 
       const lines = [
         `ITEMS - ${item.name.toUpperCase()}`,
@@ -387,7 +438,6 @@ export function renderJournalBody(state: GameState): string[] {
     ];
   }
 
-  // Chronicle tab
   const lines = ['JOURNAL - CHRONICLE', '', 'Faction Standing:'];
   (Object.keys(FACTION_NAMES) as Array<keyof typeof FACTION_NAMES>).forEach((fid) => {
     const val = state.memory.factions[fid] ?? 0;

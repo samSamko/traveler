@@ -1,6 +1,8 @@
-import type { ActiveEnemy, GameState, Stats } from '../types.ts';
+import type { ActiveEnemy, DamageProfile, DamageType, GameState, Stats } from '../types.ts';
 import { resolveCheck } from '../dice.ts';
 import { ENEMIES } from '../content/enemies.ts';
+import { WEATHER_DATA } from '../systems/clock.ts';
+import { DAMAGE_TYPE_META } from '../systems/damage.ts';
 import { renderAnatomyProse } from './anatomy.ts';
 import { getEnemyDisplayName, markEnemySeen, upgradeEnemyAppraisal } from './discovery.ts';
 
@@ -62,6 +64,26 @@ export function describeStatImpressions(stats: Stats, tier: 0 | 1 | 2): string[]
   ];
 }
 
+export function formatResistanceProfile(profile?: DamageProfile): string | null {
+  if (!profile) return null;
+  const immune: string[] = [];
+  const resistant: string[] = [];
+  const vulnerable: string[] = [];
+
+  for (const [dtype, level] of Object.entries(profile) as Array<[DamageType, string]>) {
+    const label = DAMAGE_TYPE_META[dtype]?.label ?? dtype;
+    if (level === 'immune') immune.push(label);
+    else if (level === 'resistant') resistant.push(label);
+    else if (level === 'vulnerable') vulnerable.push(label);
+  }
+
+  const parts: string[] = [];
+  if (immune.length > 0) parts.push(`Immune to ${immune.join(', ')}`);
+  if (resistant.length > 0) parts.push(`Resistant to ${resistant.join(', ')}`);
+  if (vulnerable.length > 0) parts.push(`Vulnerable to ${vulnerable.join(', ')}`);
+  return parts.length > 0 ? parts.join(' | ') : null;
+}
+
 export function formatCombatEnemyCard(state: GameState, enemy: ActiveEnemy): string[] {
   const displayName = getEnemyDisplayName(state, enemy);
   const condition = getHealthConditionLabel(enemy.hp, enemy.maxHp);
@@ -80,6 +102,8 @@ export function formatCombatEnemyCard(state: GameState, enemy: ActiveEnemy): str
     }
     if (enemy.appraisalTier >= 2) {
       lines.push(`  Detail: ${enemy.visibleGear.hiddenDetail}`);
+      const resLine = formatResistanceProfile(enemy.resistances);
+      if (resLine) lines.push(`  Affinities: ${resLine}`);
     }
   } else {
     lines.push('  Unassessed silhouette. Use Observe to gauge build, gear, and footing.');
@@ -97,6 +121,8 @@ export function runPassiveCombatGlance(state: GameState): string[] {
   const combat = state.combat;
   if (!combat) return [];
   const logs: string[] = [];
+  const autoGlance = state.player.bodyMods.eyes === 'star_sap_eyes';
+  const weatherMod = WEATHER_DATA[state.clock.weather].observeMod;
 
   for (const enemy of combat.enemies) {
     const firstSight = markEnemySeen(state, enemy.templateId);
@@ -118,9 +144,19 @@ export function runPassiveCombatGlance(state: GameState): string[] {
       continue;
     }
 
+    if (autoGlance) {
+      enemy.appraisalTier = 1;
+      upgradeEnemyAppraisal(state, enemy.templateId, 1);
+      logs.push(
+        `Your Star-Sap Lenses immediately measure ${getEnemyDisplayName(state, enemy)}: ${enemy.visibleGear.weapon}, ${enemy.visibleGear.armor}.`,
+      );
+      continue;
+    }
+
     const dc = enemy.isBoss || enemy.isElite ? 13 : 11;
     const check = resolveCheck(state, 'wit', dc, {
       label: 'First Glance',
+      extraBonus: weatherMod,
       isLoreOrPerception: true,
     });
 
@@ -148,9 +184,11 @@ export function runActiveObserveCheck(state: GameState, enemyIdx: number): strin
   combat.observedUsedThisRound = true;
 
   const tpl = ENEMIES[enemy.templateId];
+  const weatherMod = WEATHER_DATA[state.clock.weather].observeMod;
   const dc = enemy.appraisalTier >= 1 ? 10 : enemy.isBoss || enemy.isElite ? 14 : 12;
   const check = resolveCheck(state, 'wit', dc, {
     label: 'Close Study',
+    extraBonus: weatherMod,
     isLoreOrPerception: true,
   });
 
@@ -165,10 +203,12 @@ export function runActiveObserveCheck(state: GameState, enemyIdx: number): strin
       conditionLine: condition,
     });
     const statLines = describeStatImpressions(enemy.stats, 2);
+    const resLine = formatResistanceProfile(enemy.resistances);
     return [
       `You take the full measure of ${enemy.name} and record it in your Journal.`,
       ...anatomyLines,
       ...statLines,
+      ...(resLine ? [`Affinities: ${resLine}`] : []),
     ];
   }
 

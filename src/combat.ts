@@ -1,6 +1,8 @@
 import type {
   ActiveEnemy,
   CombatState,
+  DamageType,
+  DownedEnemyEntry,
   GameState,
   StatusEffect,
   StatusType,
@@ -10,6 +12,14 @@ import { ABILITIES, PERKS } from './content/characters.ts';
 import { ITEMS } from './content/items.ts';
 import { ENEMIES } from './content/enemies.ts';
 import { recordChronicle, setFlag } from './memory.ts';
+import { BODY_MODS } from './systems/bodymods.ts';
+import {
+  DAMAGE_TYPE_META,
+  computeDamageAfterResistance,
+  determineEnemyDefeatOutcome,
+  getEffectivePlayerResistances,
+} from './systems/damage.ts';
+import { resolvePlayerDefeat } from './systems/injuries.ts';
 import {
   getEnemyDisplayName,
   identifyEnemy,
@@ -66,6 +76,11 @@ export function getPlayerArmor(state: GameState, enemyIsBoss = false): number {
     if (perk?.armorBonus) armor += perk.armorBonus;
   }
 
+  for (const modId of Object.values(p.bodyMods)) {
+    const mod = modId ? BODY_MODS[modId] : undefined;
+    if (mod?.armorMod) armor += mod.armorMod;
+  }
+
   for (const st of p.statuses) {
     if (st.type === 'guarded' || st.type === 'hidden') {
       armor += st.power;
@@ -103,7 +118,17 @@ function pushStatus(
 }
 
 export function clearNegativeStatuses(list: StatusEffect[]): StatusEffect[] {
-  const negatives: StatusType[] = ['bleeding', 'burned', 'blighted', 'corroded', 'dazed', 'staggered'];
+  const negatives: StatusType[] = [
+    'bleeding',
+    'burned',
+    'blighted',
+    'poisoned',
+    'chilled',
+    'shocked',
+    'corroded',
+    'dazed',
+    'staggered',
+  ];
   return list.filter((s) => !negatives.includes(s.type));
 }
 
@@ -153,6 +178,7 @@ export function startCombatEncounter(
         for (const intent of intents) {
           if (intent.kind === 'toll') {
             intent.damage = Math.max(5, Math.floor(intent.damage / 2));
+            intent.resolveDamage = Math.max(1, Math.floor((intent.resolveDamage ?? 4) / 2));
             intent.status = undefined;
           }
         }
@@ -178,9 +204,11 @@ export function startCombatEncounter(
       baseArmor,
       turnArmor: 0,
       stats: { ...template.stats },
+      resistances: { ...(template.resistances ?? {}) },
       visibleGear: { ...template.visibleGear },
       appraisalTier: 0,
       identified: false,
+      defeatedState: 'alive',
       statuses: [],
       intents,
       nextIntentIndex: idx % intents.length,
@@ -240,7 +268,14 @@ export function getCombatMenuOptions(state: GameState): CombatMenuOption[] {
 
   if (combat.subMenu === 'root') {
     opts.push({ index: 1, id: 'strike', label: 'Strike', enabled: true });
-    opts.push({ index: 2, id: 'guard', label: 'Guard', enabled: true });
+    opts.push({
+      index: 2,
+      id: 'subdue',
+      label: 'Subdue',
+      enabled: p.stamina >= 1,
+      reason: p.stamina >= 1 ? undefined : 'Insufficient stamina',
+    });
+    opts.push({ index: 3, id: 'guard', label: 'Guard', enabled: true });
 
     const hasSkills = p.abilities.some((id) => ABILITIES[id]?.kind === 'skill');
     if (hasSkills) {
@@ -265,7 +300,7 @@ export function getCombatMenuOptions(state: GameState): CombatMenuOption[] {
 
     const hasCombatItems = p.inventory.some((entry) => {
       const item = ITEMS[entry.id];
-      return item && item.slot === 'consumable' && entry.qty > 0;
+      return item && item.slot === 'consumable' && !item.grantsBodyModId && entry.qty > 0;
     });
     if (hasCombatItems) {
       opts.push({ index: opts.length + 1, id: 'menu:items', label: 'Item', enabled: true });
@@ -319,7 +354,7 @@ export function getCombatMenuOptions(state: GameState): CombatMenuOption[] {
   if (combat.subMenu === 'items') {
     for (const entry of p.inventory) {
       const item = ITEMS[entry.id];
-      if (item && item.slot === 'consumable' && entry.qty > 0) {
+      if (item && item.slot === 'consumable' && !item.grantsBodyModId && entry.qty > 0) {
         opts.push({
           index: opts.length + 1,
           id: `item:${item.id}`,
@@ -356,23 +391,63 @@ function getEnemyArmor(enemy: ActiveEnemy): number {
 }
 
 function dealDamageToEnemy(
+  state: GameState,
   enemy: ActiveEnemy,
   raw: number,
-  pierceArmor = false,
-): number {
-  const armor = pierceArmor ? 0 : getEnemyArmor(enemy);
-  const dealt = Math.max(1, raw - armor);
-  enemy.hp = Math.max(0, enemy.hp - dealt);
-  return dealt;
+  damageType: DamageType,
+  options?: { pierceArmor?: boolean; forcedSubdue?: boolean },
+): { dealt: number; relationNote: string; weatherNote?: string; downedOrKilled?: 'downed' | 'killed' } {
+  const armor = options?.pierceArmor ? 0 : getEnemyArmor(enemy);
+  const afterArmor = Math.max(1, raw - armor);
+  const res = computeDamageAfterResistance(
+    afterArmor,
+    damageType,
+    enemy.resistances,
+    state.clock.weather,
+  );
+
+  const prevHp = enemy.hp;
+  enemy.hp = Math.max(0, enemy.hp - res.finalDamage);
+  enemy.lastHitDamageType = damageType;
+  enemy.lastHitOverkill = Math.max(0, res.finalDamage - prevHp);
+
+  const relationNote =
+    res.relation === 'immune'
+      ? ' It has no effect.'
+      : res.relation === 'resistant'
+        ? ' It resists the blow.'
+        : res.relation === 'vulnerable'
+          ? ' The blow bites deep into a weakness.'
+          : '';
+
+  let downedOrKilled: 'downed' | 'killed' | undefined;
+  if (enemy.hp <= 0 && prevHp > 0) {
+    downedOrKilled = determineEnemyDefeatOutcome(
+      enemy,
+      damageType,
+      enemy.lastHitOverkill,
+      Boolean(options?.forcedSubdue),
+      state,
+    );
+    enemy.defeatedState = downedOrKilled;
+  }
+
+  return {
+    dealt: res.finalDamage,
+    relationNote,
+    weatherNote: res.weatherNote,
+    downedOrKilled,
+  };
 }
 
 function resolveVictory(state: GameState): string[] {
   const combat = state.combat!;
   const p = state.player;
+  const downedList: DownedEnemyEntry[] = [];
   const msgs: string[] = [
     combat.enemies.length === 1
       ? `Victory. ${getEnemyDisplayName(state, combat.enemies[0])} falls.`
-      : 'Victory. Every foe lies still.',
+      : 'Victory. The clash ends.',
   ];
 
   let totalCrowns = 0;
@@ -380,6 +455,17 @@ function resolveVictory(state: GameState): string[] {
   for (const enemy of combat.enemies) {
     if (enemy.isBoss || enemy.isElite) {
       identifyEnemy(state, enemy.templateId);
+    }
+
+    if (enemy.defeatedState === 'downed') {
+      downedList.push({
+        templateId: enemy.templateId,
+        displayName: getEnemyDisplayName(state, enemy),
+        category: enemy.category,
+        questioned: false,
+        stripped: false,
+        resolved: false,
+      });
     }
 
     let crowns =
@@ -428,26 +514,44 @@ function resolveVictory(state: GameState): string[] {
   p.xp += totalXp;
   state.combat = null;
 
+  let leveled = false;
   if (p.xp >= p.xpToNext) {
     p.xp -= p.xpToNext;
     p.level += 1;
     p.xpToNext = Math.floor(p.xpToNext * 1.5);
     p.maxHp += 4;
+    p.maxResolve += 2;
     p.hp = Math.min(p.maxHp, p.hp + 6);
+    p.resolve = Math.min(p.maxResolve, p.resolve + 4);
     p.stamina = p.maxStamina;
     p.focus = p.maxFocus;
 
     const availablePerks = Object.keys(PERKS).filter((pid) => !p.perks.includes(pid));
     if (availablePerks.length > 0) {
       state.pendingPerkIds = availablePerks.slice(0, 3);
-      state.scene = 'level_up';
-      msgs.push(`Reached Level ${p.level}. Choose a perk.`);
-      return msgs;
+      leveled = true;
+      msgs.push(`Reached Level ${p.level}.`);
+    } else {
+      msgs.push(`Reached Level ${p.level}.`);
     }
-    msgs.push(`Reached Level ${p.level}.`);
   }
 
-  state.scene = 'location';
+  if (downedList.length > 0) {
+    state.aftermath = {
+      downedEnemies: downedList,
+      activeIndex: 0,
+      victorySummary: msgs,
+    };
+    state.scene = 'aftermath';
+    msgs.push(
+      downedList.length === 1
+        ? `${downedList[0].displayName} still breathes in the ash, broken and helpless.`
+        : `${downedList.length} defeated foes still breathe in the ash.`,
+    );
+    return msgs;
+  }
+
+  state.scene = leveled ? 'level_up' : 'location';
   return msgs;
 }
 
@@ -457,7 +561,13 @@ function tickStatusList(statuses: StatusEffect[]): { dmg: number; logs: string[]
   const next: StatusEffect[] = [];
 
   for (const st of statuses) {
-    if (st.type === 'bleeding' || st.type === 'burned' || st.type === 'blighted') {
+    if (
+      st.type === 'bleeding' ||
+      st.type === 'burned' ||
+      st.type === 'blighted' ||
+      st.type === 'poisoned' ||
+      st.type === 'shocked'
+    ) {
       dmg += st.power;
       logs.push(`${st.type} deals ${st.power} damage.`);
     }
@@ -469,7 +579,7 @@ function tickStatusList(statuses: StatusEffect[]): { dmg: number; logs: string[]
 }
 
 function needsSingleTarget(actionId: string): boolean {
-  if (actionId === 'strike' || actionId === 'observe') return true;
+  if (actionId === 'strike' || actionId === 'subdue' || actionId === 'observe') return true;
   if (actionId.startsWith('ability:')) {
     const ab = ABILITIES[actionId.slice(8)];
     return Boolean(ab?.damageDice && !ab.isAoE);
@@ -516,6 +626,9 @@ export function executeCombatAction(
     combat.pendingActionId = null;
     combat.subMenu = 'root';
   } else if (needsSingleTarget(actionId) && getLivingEnemyIndices(combat).length > 1) {
+    if (actionId === 'subdue' && p.stamina < 1) {
+      return { messages: ['Insufficient stamina.'] };
+    }
     if (actionId.startsWith('ability:')) {
       const ab = ABILITIES[actionId.slice(8)];
       if (ab && (p.stamina < ab.staminaCost || p.focus < ab.focusCost || (ab.hpCost && p.hp <= ab.hpCost))) {
@@ -529,7 +642,6 @@ export function executeCombatAction(
     combat.subMenu = 'root';
   }
 
-  // Free tactical action: Observe does NOT end the player's turn
   if (actionId === 'observe') {
     const msgs = runActiveObserveCheck(state, targetIdx);
     combat.log = msgs.slice(-5);
@@ -542,14 +654,20 @@ export function executeCombatAction(
   const roundOneBonus = combat.round === 1 && p.background === 'barrow_stalker' ? 3 : 0;
   const perkDmg = getPerkDamageBonus(state);
 
-  if (actionId === 'strike') {
+  if (actionId === 'strike' || actionId === 'subdue') {
+    const isSubdue = actionId === 'subdue';
+    if (isSubdue) {
+      if (p.stamina < 1) return { messages: ['Insufficient stamina.'] };
+      p.stamina -= 1;
+    }
     const weapon = ITEMS[p.weaponId];
     const [cnt, sides] = weapon?.damageDice ?? [1, 6];
     const statName = weapon?.statScaling ?? 'might';
     const statBonus = getEffectiveStat(state, statName);
     const honed = p.weaponHoned ? 1 : 0;
     const poise = p.background === 'ashen_blade' ? 1 : 0;
-    const raw =
+    const dType: DamageType = isSubdue ? 'bludgeoning' : (weapon?.damageType ?? 'slashing');
+    const rawBase =
       rollDice(cnt, sides, state) +
       (weapon?.bonusDamage ?? 0) +
       statBonus +
@@ -557,13 +675,22 @@ export function executeCombatAction(
       poise +
       roundOneBonus +
       perkDmg;
-    const dealt = dealDamageToEnemy(primaryEnemy, raw, false);
-    logs.push(`You strike ${getEnemyDisplayName(state, primaryEnemy)} for ${dealt} damage.`);
+    const raw = isSubdue ? Math.max(2, Math.floor(rawBase * 0.85)) : rawBase;
+    const hit = dealDamageToEnemy(state, primaryEnemy, raw, dType, {
+      forcedSubdue: isSubdue,
+    });
+    const tName = getEnemyDisplayName(state, primaryEnemy);
+    const verb = isSubdue ? 'strike to subdue' : 'strike';
+    logs.push(
+      `You ${verb} ${tName} with ${DAMAGE_TYPE_META[dType].label.toLowerCase()} force for ${hit.dealt} damage.${hit.relationNote}`,
+    );
+    if (hit.weatherNote) logs.push(hit.weatherNote);
   } else if (actionId === 'guard') {
     pushStatus(p.statuses, { type: 'guarded', turns: 1, power: 4 });
     p.stamina = Math.min(p.maxStamina, p.stamina + 1);
     p.focus = Math.min(p.maxFocus, p.focus + 2);
-    logs.push('You raise your guard and steady your breath.');
+    p.resolve = Math.min(p.maxResolve, p.resolve + 2);
+    logs.push('You raise your guard, steady your breath, and steel your resolve.');
   } else if (actionId.startsWith('ability:')) {
     const abId = actionId.slice(8);
     const ab = ABILITIES[abId];
@@ -595,8 +722,15 @@ export function executeCombatAction(
           debuffBonus +
           roundOneBonus +
           perkDmg;
-        const dealt = dealDamageToEnemy(target, raw, Boolean(ab.pierceArmor));
-        logs.push(`${ab.name} hits ${tName} for ${dealt} damage.`);
+        const dType: DamageType = ab.damageType ?? 'resonant';
+        const hit = dealDamageToEnemy(state, target, raw, dType, {
+          pierceArmor: Boolean(ab.pierceArmor),
+          forcedSubdue: Boolean(ab.nonLethal),
+        });
+        logs.push(
+          `${ab.name} hits ${tName} with ${DAMAGE_TYPE_META[dType].label.toLowerCase()} force for ${hit.dealt} damage.${hit.relationNote}`,
+        );
+        if (hit.weatherNote) logs.push(hit.weatherNote);
       }
       if (ab.applyEnemyStatus && target.hp > 0) {
         pushStatus(target.statuses, ab.applyEnemyStatus);
@@ -608,6 +742,10 @@ export function executeCombatAction(
       const heal = ab.healAmount + getEffectiveStat(state, ab.stat);
       p.hp = Math.min(p.maxHp, p.hp + heal);
       logs.push(`${ab.name} restores ${heal} health.`);
+    }
+    if (ab.restoreResolve) {
+      p.resolve = Math.min(p.maxResolve, p.resolve + ab.restoreResolve);
+      logs.push(`Steadied ${ab.restoreResolve} resolve.`);
     }
     if (ab.purgeNegativeStatuses) {
       p.statuses = clearNegativeStatuses(p.statuses);
@@ -633,20 +771,22 @@ export function executeCombatAction(
 
     if (p.heirloom === 'kiln_lantern') {
       primaryEnemy.turnArmor = 0;
-      const dealt = dealDamageToEnemy(primaryEnemy, 8, true);
+      const hit = dealDamageToEnemy(state, primaryEnemy, 8, 'fire', { pierceArmor: true });
       p.focus = Math.min(p.maxFocus, p.focus + 3);
-      logs.push(`Kiln Lantern sears ${getEnemyDisplayName(state, primaryEnemy)} for ${dealt} damage.`);
+      logs.push(`Kiln Lantern sears ${getEnemyDisplayName(state, primaryEnemy)} for ${hit.dealt} fire damage.${hit.relationNote}`);
     } else if (p.heirloom === 'orin_bell_shard') {
       for (const idx of getLivingEnemyIndices(combat)) {
         pushStatus(combat.enemies[idx].statuses, { type: 'staggered', turns: 1, power: 1 });
       }
       pushStatus(p.statuses, { type: 'guarded', turns: 3, power: 4 });
-      logs.push('Orin Bell-Shard rings clear, staggering your foes.');
+      p.resolve = Math.min(p.maxResolve, p.resolve + 4);
+      logs.push('Orin Bell-Shard rings clear, staggering your foes and steadying your mind.');
     } else if (p.heirloom === 'star_dew_vial') {
       p.hp = Math.min(p.maxHp, p.hp + 14);
+      p.resolve = Math.min(p.maxResolve, p.resolve + 6);
       p.statuses = clearNegativeStatuses(p.statuses);
       pushStatus(p.statuses, { type: 'blessed', turns: 4, power: 2 });
-      logs.push('Star-Dew Vial restores 14 health and clears your wounds.');
+      logs.push('Star-Dew Vial restores 14 health, steadies resolve, and clears wounds.');
     } else if (p.heirloom === 'grixi_chronometer') {
       combat.guaranteedDodgeThisTurn = true;
       combat.counterDamagePending =
@@ -660,12 +800,17 @@ export function executeCombatAction(
       return { messages: ['You do not have that item.'] };
     }
     if (item.throwDamage) {
-      const dealt = dealDamageToEnemy(primaryEnemy, item.throwDamage, true);
+      const dType: DamageType = item.throwDamageType ?? 'fire';
+      const hit = dealDamageToEnemy(state, primaryEnemy, item.throwDamage, dType, {
+        pierceArmor: true,
+      });
       const tName = getEnemyDisplayName(state, primaryEnemy);
-      logs.push(`You hurl ${item.name} at ${tName} for ${dealt} damage.`);
+      logs.push(
+        `You hurl ${item.name} at ${tName} for ${hit.dealt} ${DAMAGE_TYPE_META[dType].label.toLowerCase()} damage.${hit.relationNote}`,
+      );
       if (item.throwStatus && primaryEnemy.hp > 0) {
         pushStatus(primaryEnemy.statuses, item.throwStatus);
-        logs.push(`${tName} catches fire.`);
+        logs.push(`${tName} becomes ${item.throwStatus.type}.`);
       }
     }
     if (item.healHp) {
@@ -679,6 +824,10 @@ export function executeCombatAction(
     if (item.restoreFocus) {
       p.focus = Math.min(p.maxFocus, p.focus + item.restoreFocus);
       logs.push(`Restored ${item.restoreFocus} focus.`);
+    }
+    if (item.restoreResolve) {
+      p.resolve = Math.min(p.maxResolve, p.resolve + item.restoreResolve);
+      logs.push(`Restored ${item.restoreResolve} resolve.`);
     }
     if (item.cureNegative) {
       p.statuses = clearNegativeStatuses(p.statuses);
@@ -715,6 +864,9 @@ export function executeCombatAction(
     if (tick.dmg > 0) {
       enemy.hp = Math.max(0, enemy.hp - tick.dmg);
       logs.push(...tick.logs.map((l) => `${eName}: ${l}`));
+      if (enemy.hp <= 0) {
+        enemy.defeatedState = determineEnemyDefeatOutcome(enemy, 'blight', 0, false, state);
+      }
     }
     if (enemy.hp <= 0) {
       logs.push(`${eName} collapses.`);
@@ -724,6 +876,8 @@ export function executeCombatAction(
   if (getLivingEnemyIndices(combat).length === 0) {
     return { messages: [...logs, ...resolveVictory(state)] };
   }
+
+  const playerResistances = getEffectivePlayerResistances(state);
 
   for (const idx of getLivingEnemyIndices(combat)) {
     const enemy = combat.enemies[idx];
@@ -742,18 +896,38 @@ export function executeCombatAction(
         logs.push(`${eName} uses ${intent.label} and raises its guard.`);
       } else if (combat.guaranteedDodgeThisTurn) {
         combat.guaranteedDodgeThisTurn = false;
-        const cDmg = dealDamageToEnemy(enemy, combat.counterDamagePending, false);
+        const hit = dealDamageToEnemy(state, enemy, combat.counterDamagePending, 'piercing');
         combat.counterDamagePending = 0;
-        logs.push(`You slip past ${eName}'s ${intent.label} and counter for ${cDmg} damage.`);
+        logs.push(`You slip past ${eName}'s ${intent.label} and counter for ${hit.dealt} damage.`);
       } else {
         const dazed = enemy.statuses.find((s) => s.type === 'dazed');
         const dmgReduction = dazed ? dazed.power : 0;
         const playerArmor = getPlayerArmor(state, Boolean(enemy.isBoss));
-        const incoming = Math.max(0, intent.damage - dmgReduction - playerArmor);
-        p.hp = Math.max(0, p.hp - incoming);
-        logs.push(`${eName} strikes with ${intent.label} for ${incoming} damage.`);
+        const preRes = Math.max(0, intent.damage - dmgReduction - playerArmor);
+        const res = preRes > 0
+          ? computeDamageAfterResistance(preRes, intent.damageType, playerResistances, state.clock.weather)
+          : { finalDamage: 0, relation: 'neutral' as const };
+        p.hp = Math.max(0, p.hp - res.finalDamage);
+        const relText =
+          res.relation === 'immune'
+            ? ' Your body shrugs it off completely.'
+            : res.relation === 'resistant'
+              ? ' You resist part of the impact.'
+              : res.relation === 'vulnerable'
+                ? ' It tears straight into your weakness.'
+                : '';
+        logs.push(
+          `${eName} strikes with ${intent.label} for ${res.finalDamage} ${DAMAGE_TYPE_META[intent.damageType].label.toLowerCase()} damage.${relText}`,
+        );
+        if (intent.resolveDamage && intent.resolveDamage > 0) {
+          p.resolve = Math.max(0, p.resolve - intent.resolveDamage);
+          logs.push(`Your resolve frays by ${intent.resolveDamage}.`);
+        }
+        if (intent.defilementGain && intent.defilementGain > 0) {
+          p.defilement = Math.min(100, p.defilement + intent.defilementGain);
+        }
         if (intent.status) {
-          const half = p.race === 'durnfolk' && (intent.status.type === 'bleeding' || intent.status.type === 'blighted');
+          const half = p.race === 'durnfolk' && (intent.status.type === 'bleeding' || intent.status.type === 'blighted' || intent.status.type === 'poisoned');
           pushStatus(p.statuses, intent.status, half);
           logs.push(`You suffer ${intent.status.type}.`);
         }
@@ -761,7 +935,7 @@ export function executeCombatAction(
     }
 
     enemy.nextIntentIndex = (enemy.nextIntentIndex + 1) % enemy.intents.length;
-    if (p.hp <= 0) break;
+    if (p.hp <= 0 || p.resolve <= 0) break;
   }
 
   if (getLivingEnemyIndices(combat).length === 0) {
@@ -776,10 +950,10 @@ export function executeCombatAction(
   }
 
   if (p.hp <= 0) {
-    state.combat = null;
-    state.scene = 'dead';
-    logs.push('Your knees buckle into the ash. The Gloaming Reach claims another traveler.');
-    return { messages: logs };
+    return { messages: [...logs, ...resolvePlayerDefeat(state, 'hp')] };
+  }
+  if (p.resolve <= 0) {
+    return { messages: [...logs, ...resolvePlayerDefeat(state, 'resolve')] };
   }
 
   combat.round += 1;

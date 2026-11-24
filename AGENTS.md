@@ -15,7 +15,7 @@ node --test test/engine.test.ts
 ```
 And verify CLI startup in stealth mode:
 ```powershell
-"1`n2`n2`n1`n1`nAelindra`n1`n2`nJournal`nSelf`nBack`nArts`nBack`nBack`nquit`n" | node src/index.ts --stealth
+"1`n1`n2`n2`n1`n1`nAelindra`n1`n2`nJournal`nSelf`nBack`nArts`nBack`nBack`nquit`n" | node src/index.ts --stealth
 ```
 
 ## Writing Framework & Writer Agent

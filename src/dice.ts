@@ -1,6 +1,8 @@
 import type { GameState, StatName } from './types.ts';
 import { ITEMS } from './content/items.ts';
 import { PERKS } from './content/characters.ts';
+import { BODY_MODS } from './systems/bodymods.ts';
+import { INJURIES } from './systems/injuries.ts';
 
 export function nextRandom(state?: GameState): number {
   if (state && typeof state.rngState === 'number') {
@@ -39,6 +41,20 @@ export function getEffectiveStat(state: GameState, stat: StatName): number {
     const perk = PERKS[perkId];
     if (perk?.statBonus?.[stat]) {
       total += perk.statBonus[stat] ?? 0;
+    }
+  }
+
+  for (const modId of Object.values(p.bodyMods)) {
+    const mod = modId ? BODY_MODS[modId] : undefined;
+    if (mod?.statMods?.[stat]) {
+      total += mod.statMods[stat] ?? 0;
+    }
+  }
+
+  for (const injId of p.injuries) {
+    const inj = INJURIES[injId];
+    if (inj?.statPenalty?.[stat]) {
+      total += inj.statPenalty[stat] ?? 0;
     }
   }
 

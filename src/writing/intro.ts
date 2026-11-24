@@ -22,7 +22,7 @@ export function getIntroBeat(state: GameState, beatIndex: number): IntroBeat {
       title: 'THE BROKEN KILN',
       body: [
         'Seven generations past, the Crown-Wrought cracked the First Kiln of Aethel to burn soul-amber from the deep roots of the world. Their fire bought an empire, and their arrogance left an open wound beneath the valley.',
-        'Now the Gloaming Reach rots from below. Pale roots split old Imperial flagstones, bronze bells ring without wind, and a calcifying curse called the Husk-Tide turns living marrow to chalk. In fourteen days, Malakor will strike the Third Drowning Toll beneath the Sunken Belfry and seal every soul in stone.',
+        'Now the Gloaming Reach rots from below. Pale roots split old Imperial flagstones, bronze bells ring without wind, and a slow calcifying blight creeps outward from the Sunken Belfry where Malakor gathers breath for the Third Drowning Toll.',
       ].join('\n\n'),
     };
   }
@@ -81,7 +81,7 @@ export function getIntroBeat(state: GameState, beatIndex: number): IntroBeat {
     title: 'THE GATE OF CINDERFORD',
     body: [
       `Cold rain hisses across wet ash as the timber palisades of Cinderford Keep rise through the fog ahead. Pitch-lanterns sway over the Iron-Vow muster yard, and a low, wet hum drifts upward from the valley floor.`,
-      `Somewhere beyond the causeway and the weeping barrows, the great bell gathers breath. Fourteen days remain, ${p.name}. Step through the gate.`,
+      `The whole frontier lies open before you, ${p.name}: ruined barrows, subterranean looms, flooded forges, and the drowned amphitheater waiting in the mist. Step through the gate.`,
     ].join('\n\n'),
   };
 }

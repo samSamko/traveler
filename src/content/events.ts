@@ -595,6 +595,9 @@ export const EVENTS: EventCard[] = [
     id: 'ash_hound_pack',
     title: 'Smoke Beneath the Cart',
     locations: ['kings_causeway', 'weeping_barrow', 'petrified_starwood'],
+    periods: ['dusk', 'night', 'midnight', 'dawn'],
+    repeatable: true,
+    cooldownHours: 24,
     weight: 2,
     prompt: () =>
       'Thin ribbons of grey smoke drift from beneath an overturned wain. Out of the haze step two starved, charcoal-furred beasts with sunken ribs; bright orange embers glimmer inside their blackened jaws as they crouch low to the flagstones.',
@@ -623,6 +626,8 @@ export const EVENTS: EventCard[] = [
     id: 'choir_procession',
     title: 'Chanting on the Ridge',
     locations: ['petrified_starwood', 'crown_watchtower', 'drowned_forge'],
+    repeatable: true,
+    cooldownHours: 36,
     weight: 2,
     prompt: () =>
       'A tall, blindfolded figure in damp ash-robes glides along the ridge swinging a smoking bronze censer, trailed closely by a stooped chalk-ribbed walker whose throat rattles with pale tendrils.',

@@ -254,8 +254,12 @@ export function renderAnatomyProse(
 
 export function getNpcAppearanceReaction(state: GameState, npcId: string): string | null {
   const tags = state.player.anatomy.visibleTags;
+  const def = state.player.defilement;
 
   if (npcId === 'captain_vane') {
+    if (tags.includes('chitin_plated') || tags.includes('mutated') || def >= 45) {
+      return 'His hand shifts instinctively toward his sword hilt as he takes in the unnatural alterations upon your flesh.';
+    }
     if (tags.includes('scarred_face') && tags.includes('muscular')) {
       return 'His eyes linger on the scar across your face and the corded bulk of your shoulders, measuring a veteran.';
     }
@@ -271,8 +275,11 @@ export function getNpcAppearanceReaction(state: GameState, npcId: string): strin
   }
 
   if (npcId === 'matron_veyra') {
-    if (tags.includes('root_veined')) {
-      return 'Her blind head cocks sharply as if hearing the pale root-veins etched beneath your shirt.';
+    if (tags.includes('star_eyed') || tags.includes('implanted')) {
+      return 'Her blind gaze turns sharply toward the subtle arcane hum of your implanted flesh.';
+    }
+    if (tags.includes('root_veined') || def >= 45) {
+      return 'Her blind head cocks sharply as if hearing the defilement resonating beneath your skin.';
     }
     if (tags.includes('kiln_branded')) {
       return 'Her fingers twitch at the faint smell of old kiln-burn upon your flesh.';

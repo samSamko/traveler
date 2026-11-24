@@ -58,6 +58,7 @@ export const LOCATIONS: Record<string, LocationNode> = {
         { itemId: 'antitoxin', price: 11 },
         { itemId: 'vesper_tonic', price: 16, underWarrenOnly: true },
         { itemId: 'grixi_loupe', price: 28, underWarrenOnly: true },
+        { itemId: 'iron_wire_kit', price: 36, underWarrenOnly: true },
         { itemId: 'vesper_needle', price: 52, underWarrenOnly: true },
       ],
     },
@@ -700,6 +701,7 @@ export const LOCATIONS: Record<string, LocationNode> = {
       items: [
         { itemId: 'vesper_tonic', price: 14 },
         { itemId: 'antitoxin', price: 10 },
+        { itemId: 'star_sap_drop', price: 34 },
         { itemId: 'chitin_mantle', price: 46 },
         { itemId: 'silken_veil', price: 42 },
       ],

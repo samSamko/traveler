@@ -4,6 +4,7 @@ import { ITEMS } from './content/items.ts';
 import { LOCATIONS } from './content/locations.ts';
 import { getEffectiveStat } from './dice.ts';
 import { FACTION_NAMES, getFactionStance, countBrokenSeals } from './memory.ts';
+import { formatClockLabel } from './systems/clock.ts';
 
 const ANSI = {
   reset: '\x1b[0m',
@@ -97,21 +98,34 @@ export function formatStatusHeader(state: GameState): string {
   const seals = countBrokenSeals(state);
 
   const top = `${p.name} - ${sexLabel} ${raceName} ${bgName} Lv${p.level} | ${loc?.name ?? state.locationId}`;
-  const bar = `Day ${state.day}/${state.maxDays} | HP ${p.hp}/${p.maxHp} | STM ${p.stamina}/${p.maxStamina} | FOC ${p.focus}/${p.maxFocus} | Rations ${p.rations} | Torches ${p.torches} | Crowns ${p.crowns} | Seals ${seals}/3`;
+  const clockBar = `${formatClockLabel(state.clock)} | Crowns ${p.crowns} | Rations ${p.rations} | Torches ${p.torches} | Seals ${seals}/3`;
+  const vitalsBar = `HP ${p.hp}/${p.maxHp} | RES ${p.resolve}/${p.maxResolve} | STM ${p.stamina}/${p.maxStamina} | FOC ${p.focus}/${p.maxFocus} | DEF ${p.defilement}/100`;
 
-  const statusLine =
-    p.statuses.length > 0
-      ? `Statuses: ${p.statuses.map((st) => `${st.type} ${st.turns}t`).join(', ')}`
-      : '';
+  const alerts: string[] = [];
+  if (p.statuses.length > 0) {
+    alerts.push(`Statuses: ${p.statuses.map((st) => `${st.type} ${st.turns}t`).join(', ')}`);
+  }
+  if (p.injuries.length > 0) {
+    alerts.push(`Injuries: ${p.injuries.length}`);
+  }
+  const statusLine = alerts.join(' | ');
 
   if (s) {
-    return [divider(true, '='), top, bar, ...(statusLine ? [statusLine] : []), divider(true, '=')].join('\n');
+    return [
+      divider(true, '='),
+      top,
+      clockBar,
+      vitalsBar,
+      ...(statusLine ? [statusLine] : []),
+      divider(true, '='),
+    ].join('\n');
   }
 
   return [
     divider(false, '='),
     paint(top, 'cyan', false),
-    paint(bar, 'yellow', false),
+    paint(clockBar, 'white', false),
+    paint(vitalsBar, 'yellow', false),
     ...(statusLine ? [paint(statusLine, 'red', false)] : []),
     divider(false, '='),
   ].join('\n');

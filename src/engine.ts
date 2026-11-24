@@ -3,12 +3,14 @@ import type {
   ActionOutcome,
   AnatomyProfile,
   BackgroundId,
+  BodySlot,
   GameState,
   HeirloomId,
   JournalTab,
   RaceId,
   RecipeDef,
   SexId,
+  SurvivalMode,
 } from './types.ts';
 import { BACKGROUNDS, PERKS, RACES } from './content/characters.ts';
 import { ITEMS, RECIPES } from './content/items.ts';
@@ -45,6 +47,15 @@ import {
 import { INTRO_BEAT_COUNT, getIntroBeat } from './writing/intro.ts';
 import { formatCombatEnemyCard } from './writing/appraisal.ts';
 import { getJournalChoices, renderJournalBody } from './writing/journal.ts';
+import {
+  WEATHER_DATA,
+  advanceHours,
+  createInitialClock,
+  getTimePeriod,
+} from './systems/clock.ts';
+import { BODY_MODS, exciseBodyMod, installBodyMod } from './systems/bodymods.ts';
+import { executeAftermathAction, getAftermathChoices, tendInjury } from './systems/injuries.ts';
+import { enterMobileCamp, executeCampAction, getCampChoices } from './systems/camp.ts';
 
 const SHORT_LOCATION_NAMES: Record<string, string> = {
   cinderford: 'Cinderford Keep',
@@ -64,6 +75,7 @@ export interface CreateCharacterInput {
   race: RaceId;
   background: BackgroundId;
   heirloom: HeirloomId;
+  survivalMode?: SurvivalMode;
   anatomy?: AnatomyProfile;
   skipIntro?: boolean;
   stealthMode?: boolean;
@@ -99,6 +111,11 @@ export function createNewGame(input: CreateCharacterInput): GameState {
     (weapon?.maxFocusBonus ?? 0) +
     (armor?.maxFocusBonus ?? 0) +
     (trinket?.maxFocusBonus ?? 0);
+  const maxResolve =
+    12 +
+    Math.max(0, stats.grit * 2 + stats.wit) +
+    (armor?.maxResolveBonus ?? 0) +
+    (trinket?.maxResolveBonus ?? 0);
 
   const abilities = [raceDef.racialAbilityId, ...bgDef.abilityIds];
   const anatomy =
@@ -112,11 +129,13 @@ export function createNewGame(input: CreateCharacterInput): GameState {
   ];
 
   const skipIntro = Boolean(input.skipIntro);
+  const clock = createInitialClock();
 
   return {
     runId: randomUUID(),
-    day: 1,
-    maxDays: 14,
+    survivalMode: input.survivalMode ?? 'scarred',
+    clock,
+    day: clock.day,
     stealthMode: Boolean(input.stealthMode),
     player: {
       name: input.name.trim() || 'Vesper',
@@ -125,6 +144,8 @@ export function createNewGame(input: CreateCharacterInput): GameState {
       background: input.background,
       heirloom: input.heirloom,
       anatomy,
+      bodyMods: {},
+      injuries: [],
       level: 1,
       xp: 0,
       xpToNext: 35,
@@ -134,6 +155,9 @@ export function createNewGame(input: CreateCharacterInput): GameState {
       maxStamina,
       focus: maxFocus,
       maxFocus,
+      resolve: maxResolve,
+      maxResolve,
+      defilement: 0,
       baseStats: stats,
       weaponId: bgDef.startingWeaponId,
       weaponHoned: false,
@@ -151,6 +175,7 @@ export function createNewGame(input: CreateCharacterInput): GameState {
     locationId: 'cinderford',
     visitedLocations: ['cinderford'],
     seenEvents: [],
+    eventCooldowns: {},
     memory: {
       flags: {},
       factions: {
@@ -171,12 +196,12 @@ export function createNewGame(input: CreateCharacterInput): GameState {
     activeNpcId: null,
     activeEvent: null,
     combat: null,
+    aftermath: null,
+    camp: null,
     pendingPerkIds: [],
     endingSummary: null,
     lastMessages: skipIntro
-      ? [
-          'You step through the rain-slicked timber gate with fourteen days before the Third Drowning Toll.',
-        ]
+      ? ['You step through the rain-slicked timber gate of Cinderford Keep.']
       : [],
     rngState: input.rngState,
   };
@@ -210,6 +235,30 @@ export function getSceneChoices(state: GameState): MenuEntry[] {
     return getJournalChoices(state);
   }
 
+  if (state.scene === 'camp') {
+    if (state.subMenu === 'pack_craft') {
+      const expert = state.player.race === 'grixi' || state.player.background === 'root_scholar';
+      for (const recipe of RECIPES) {
+        if (recipe.grixiOrScholarOnly && !expert) continue;
+        const ok = canCraftRecipe(state, recipe);
+        entries.push({
+          index: entries.length + 1,
+          id: `craft:${recipe.id}`,
+          label: recipe.name,
+          enabled: ok,
+          reason: ok ? undefined : 'Missing reagents',
+        });
+      }
+      entries.push({ index: entries.length + 1, id: 'camp:back', label: 'Back', enabled: true });
+      return entries;
+    }
+    return getCampChoices(state);
+  }
+
+  if (state.scene === 'aftermath') {
+    return getAftermathChoices(state);
+  }
+
   if (state.scene === 'location') {
     const loc = LOCATIONS[state.locationId];
 
@@ -225,7 +274,11 @@ export function getSceneChoices(state: GameState): MenuEntry[] {
       if (loc.shop && !hasFlag(state, 'cinderford_fallen') && !hasFlag(state, 'stole_cistern_vesper')) {
         entries.push({ index: entries.length + 1, id: 'open_shop', label: 'Trade', enabled: true });
       }
-      entries.push({ index: entries.length + 1, id: 'rest_action', label: 'Rest', enabled: true });
+      if (loc.regionType === 'settlement' && !hasFlag(state, 'cinderford_fallen')) {
+        entries.push({ index: entries.length + 1, id: 'rest_action', label: 'Rest', enabled: true });
+      } else {
+        entries.push({ index: entries.length + 1, id: 'camp_action', label: 'Camp', enabled: true });
+      }
       entries.push({ index: entries.length + 1, id: 'sub:pack', label: 'Pack', enabled: true });
       entries.push({ index: entries.length + 1, id: 'open_journal', label: 'Journal', enabled: true });
       entries.push({ index: entries.length + 1, id: 'sub:travel', label: 'Travel', enabled: true });
@@ -298,8 +351,9 @@ export function getSceneChoices(state: GameState): MenuEntry[] {
       entries.push({ index: 1, id: 'sub:pack_use', label: 'Use', enabled: true });
       entries.push({ index: 2, id: 'sub:pack_equip', label: 'Equip', enabled: true });
       entries.push({ index: 3, id: 'sub:pack_craft', label: 'Craft', enabled: true });
-      entries.push({ index: 4, id: 'open_journal', label: 'Journal', enabled: true });
-      entries.push({ index: 5, id: 'sub:root', label: 'Back', enabled: true });
+      entries.push({ index: 4, id: 'sub:pack_mods', label: 'Body Mods', enabled: true });
+      entries.push({ index: 5, id: 'open_journal', label: 'Journal', enabled: true });
+      entries.push({ index: 6, id: 'sub:root', label: 'Back', enabled: true });
       return entries;
     }
 
@@ -347,6 +401,23 @@ export function getSceneChoices(state: GameState): MenuEntry[] {
           enabled: ok,
           reason: ok ? undefined : 'Missing reagents',
         });
+      }
+      entries.push({ index: entries.length + 1, id: 'sub:pack', label: 'Back', enabled: true });
+      return entries;
+    }
+
+    if (state.subMenu === 'pack_mods') {
+      for (const [slot, modId] of Object.entries(state.player.bodyMods)) {
+        const mod = modId ? BODY_MODS[modId] : undefined;
+        if (mod) {
+          entries.push({
+            index: entries.length + 1,
+            id: `excise:${slot}`,
+            label: `Excise ${mod.name}`,
+            enabled: state.player.hp > 6,
+            reason: state.player.hp > 6 ? undefined : 'Too wounded for excision',
+          });
+        }
       }
       entries.push({ index: entries.length + 1, id: 'sub:pack', label: 'Back', enabled: true });
       return entries;
@@ -452,44 +523,14 @@ function closeJournal(state: GameState): void {
   state.journalDetailId = null;
 }
 
-function advanceFrontierDays(state: GameState, days: number): string[] {
-  const msgs: string[] = [];
-  for (let i = 0; i < days; i += 1) {
-    state.day += 1;
-    if (state.player.rations > 0) {
-      state.player.rations -= 1;
-    } else {
-      state.player.hp = Math.max(0, state.player.hp - 4);
-      msgs.push('No rations remain. Hunger hollows your strength.');
-      if (state.player.hp <= 0) {
-        state.scene = 'dead';
-        msgs.push('You starve upon the frozen road.');
-        return msgs;
-      }
-    }
-  }
-
-  if (state.day === state.maxDays && !hasFlag(state, 'malakor_slain')) {
-    msgs.push(
-      'Day 14 has dawned. The Sunken Belfry groans; reach Malakor before sunset.',
-    );
-  }
-
-  if (state.day > state.maxDays && !hasFlag(state, 'malakor_slain')) {
-    state.scene = 'dead';
-    msgs.push(
-      'The Third Drowning Toll sounds across the valley. Chalk and bronze resonance sweep the Gloaming Reach, turning every living soul to stone.',
-    );
-  }
-  return msgs;
-}
-
 function applyActionOutcome(state: GameState, outcome: ActionOutcome): string[] {
   const msgs = [...outcome.messages];
-  if (outcome.advanceDay && outcome.advanceDay > 0) {
-    msgs.push(...advanceFrontierDays(state, outcome.advanceDay));
-    if (state.scene === 'dead') return msgs;
+  if (outcome.advanceHours && outcome.advanceHours > 0) {
+    msgs.push(...advanceHours(state, outcome.advanceHours));
+  } else if (outcome.advanceDay && outcome.advanceDay > 0) {
+    msgs.push(...advanceHours(state, outcome.advanceDay * 8, { sheltered: true }));
   }
+
   if (outcome.triggerEnding) {
     state.scene = 'ending';
     state.subMenu = 'root';
@@ -517,11 +558,25 @@ function applyActionOutcome(state: GameState, outcome: ActionOutcome): string[] 
 
 function drawRoadEvent(state: GameState): boolean {
   const locId = state.locationId;
+  const period = getTimePeriod(state.clock.hour);
+  const weather = state.clock.weather;
+
   const candidates = EVENTS.filter((ev) => {
     if (!ev.locations.includes(locId)) return false;
-    if (state.seenEvents.includes(ev.id)) return false;
+    if (!ev.repeatable && state.seenEvents.includes(ev.id)) return false;
+    if (ev.repeatable) {
+      const readyHour = state.eventCooldowns[ev.id] ?? 0;
+      if (state.clock.totalHours < readyHour) return false;
+    }
     if (ev.minDay && state.day < ev.minDay) return false;
     if (ev.maxDay && state.day > ev.maxDay) return false;
+    if (ev.periods && !ev.periods.includes(period)) return false;
+    if (ev.weathers && !ev.weathers.includes(weather)) return false;
+    if (ev.minDefilement !== undefined && state.player.defilement < ev.minDefilement) return false;
+    if (ev.maxDefilement !== undefined && state.player.defilement > ev.maxDefilement) return false;
+    if (ev.requiredTags && !ev.requiredTags.every((t) => state.player.anatomy.visibleTags.includes(t))) {
+      return false;
+    }
     if (ev.condition && !ev.condition(state)) return false;
     return true;
   });
@@ -539,7 +594,12 @@ function drawRoadEvent(state: GameState): boolean {
     }
   }
 
-  state.seenEvents.push(chosen.id);
+  if (!state.seenEvents.includes(chosen.id)) {
+    state.seenEvents.push(chosen.id);
+  }
+  if (chosen.repeatable) {
+    state.eventCooldowns[chosen.id] = state.clock.totalHours + (chosen.cooldownHours ?? 24);
+  }
   state.scene = 'event';
   state.subMenu = 'root';
   state.activeEvent = { eventId: chosen.id, resolved: false };
@@ -553,8 +613,7 @@ function travelTo(state: GameState, destId: string): string[] {
   }
   const dest = LOCATIONS[destId];
   const msgs = [`You set out along the ash-strewn trail toward ${dest.name}.`];
-  msgs.push(...advanceFrontierDays(state, 1));
-  if (state.scene === 'dead') return msgs;
+  msgs.push(...advanceHours(state, 4));
 
   state.locationId = destId;
   state.subMenu = 'root';
@@ -594,7 +653,8 @@ function travelTo(state: GameState, destId: string): string[] {
   state.player.stamina = Math.min(state.player.maxStamina, state.player.stamina + 1);
 
   if (dest.regionType === 'road' || dest.regionType === 'ruin') {
-    const chance = dest.regionType === 'road' ? 0.85 : 0.65;
+    const weatherBonus = WEATHER_DATA[state.clock.weather].ambushBonus;
+    const chance = (dest.regionType === 'road' ? 0.8 : 0.6) + weatherBonus;
     if (nextRandom(state) <= chance) {
       drawRoadEvent(state);
     }
@@ -603,43 +663,31 @@ function travelTo(state: GameState, destId: string): string[] {
   return msgs;
 }
 
-function performRest(state: GameState): string[] {
-  if (state.locationId === 'cinderford' && !hasFlag(state, 'cinderford_fallen')) {
-    const free = hasFlag(state, 'granary_purified');
-    const cost = free ? 0 : 6;
-    if (state.player.crowns < cost) {
-      return [`Martha asks ${cost} Crowns for hearth and straw.`];
-    }
-    state.player.crowns -= cost;
-    const dayMsgs = advanceFrontierDays(state, 1);
-    if (state.scene === 'dead') return dayMsgs;
-    state.player.hp = state.player.maxHp;
-    state.player.stamina = state.player.maxStamina;
-    state.player.focus = state.player.maxFocus;
-    state.player.statuses = [];
-    state.player.determinationAvailable = true;
-    state.subMenu = 'root';
-    return [
-      free
-        ? 'Martha refuses your silver, offering warm broth and quiet sleep until dawn.'
-        : 'Warm stew and deep sleep beside the peat hearth restore your strength.',
-      ...dayMsgs,
-    ];
+function performSettlementRest(state: GameState): string[] {
+  const free = hasFlag(state, 'granary_purified');
+  const cost = free ? 0 : 6;
+  if (state.player.crowns < cost) {
+    return [`Martha asks ${cost} Crowns for hearth and straw.`];
   }
-
-  const msgs = ['You pitch a cold camp beneath broken stonework.'];
-  msgs.push(...advanceFrontierDays(state, 1));
-  if (state.scene === 'dead') return msgs;
-  state.player.hp = Math.min(state.player.maxHp, state.player.hp + 10);
+  state.player.crowns -= cost;
+  const clockMsgs = advanceHours(state, 8, { sheltered: true });
+  state.player.hp = state.player.maxHp;
   state.player.stamina = state.player.maxStamina;
   state.player.focus = state.player.maxFocus;
+  state.player.resolve = state.player.maxResolve;
   state.player.statuses = [];
   state.player.determinationAvailable = true;
   state.subMenu = 'root';
-  if (state.player.race === 'durnfolk' && !state.player.weaponHoned) {
-    state.player.weaponHoned = true;
-    msgs.push('By emberlight you whet your blade with a basalt stone.');
+
+  const msgs: string[] = [
+    free
+      ? 'Martha refuses your silver, offering warm broth and quiet sleep until the next watch.'
+      : 'Warm stew and deep sleep beside the peat hearth restore your strength and resolve.',
+  ];
+  if (state.player.injuries.length > 0) {
+    msgs.push(...tendInjury(state, state.player.injuries[0], false));
   }
+  msgs.push(...clockMsgs);
   return msgs;
 }
 
@@ -671,22 +719,27 @@ function handleEquipCommand(state: GameState, query: string): string[] {
     const old = ITEMS[p.armorId];
     if (old?.maxHpBonus) p.maxHp = Math.max(10, p.maxHp - old.maxHpBonus);
     if (old?.maxFocusBonus) p.maxFocus = Math.max(4, p.maxFocus - old.maxFocusBonus);
+    if (old?.maxResolveBonus) p.maxResolve = Math.max(6, p.maxResolve - old.maxResolveBonus);
     p.armorId = newDef.id;
     if (newDef.maxHpBonus) p.maxHp += newDef.maxHpBonus;
     if (newDef.maxFocusBonus) p.maxFocus += newDef.maxFocusBonus;
+    if (newDef.maxResolveBonus) p.maxResolve += newDef.maxResolveBonus;
     p.hp = Math.min(p.hp, p.maxHp);
     p.focus = Math.min(p.focus, p.maxFocus);
+    p.resolve = Math.min(p.resolve, p.maxResolve);
     addItemToInventory(state, old.id, 1);
   } else if (newDef.slot === 'trinket') {
     if (p.trinketId) {
       const old = ITEMS[p.trinketId];
       if (old?.maxHpBonus) p.maxHp = Math.max(10, p.maxHp - old.maxHpBonus);
       if (old?.maxFocusBonus) p.maxFocus = Math.max(4, p.maxFocus - old.maxFocusBonus);
+      if (old?.maxResolveBonus) p.maxResolve = Math.max(6, p.maxResolve - old.maxResolveBonus);
       addItemToInventory(state, old.id, 1);
     }
     p.trinketId = newDef.id;
     if (newDef.maxHpBonus) p.maxHp += newDef.maxHpBonus;
     if (newDef.maxFocusBonus) p.maxFocus += newDef.maxFocusBonus;
+    if (newDef.maxResolveBonus) p.maxResolve += newDef.maxResolveBonus;
   }
 
   return [`Equipped ${newDef.name}.`];
@@ -713,6 +766,10 @@ function handleUseCommand(state: GameState, query: string): string[] {
     state.player.inventory = state.player.inventory.filter((e) => e.id !== entry.id);
   }
 
+  if (item.grantsBodyModId) {
+    return installBodyMod(state, item.grantsBodyModId);
+  }
+
   const msgs = [`Used ${item.name}.`];
   if (item.healHp) {
     state.player.hp = Math.min(state.player.maxHp, state.player.hp + item.healHp);
@@ -726,9 +783,16 @@ function handleUseCommand(state: GameState, query: string): string[] {
     state.player.focus = Math.min(state.player.maxFocus, state.player.focus + item.restoreFocus);
     msgs.push(`Restored ${item.restoreFocus} focus.`);
   }
+  if (item.restoreResolve) {
+    state.player.resolve = Math.min(state.player.maxResolve, state.player.resolve + item.restoreResolve);
+    msgs.push(`Restored ${item.restoreResolve} resolve.`);
+  }
   if (item.cureNegative) {
     state.player.statuses = [];
     msgs.push('Cleared all afflictions.');
+  }
+  if (item.tendsInjury && state.player.injuries.length > 0) {
+    msgs.push(...tendInjury(state, state.player.injuries[0], false));
   }
   return msgs;
 }
@@ -744,6 +808,10 @@ function handleBackShortcut(state: GameState): boolean {
     }
     return true;
   }
+  if (state.scene === 'camp' && state.subMenu === 'pack_craft') {
+    state.subMenu = 'root';
+    return true;
+  }
   if (state.scene === 'combat' && state.combat && state.combat.subMenu !== 'root') {
     executeCombatAction(state, 'menu:back');
     return true;
@@ -757,7 +825,12 @@ function handleBackShortcut(state: GameState): boolean {
     if (state.subMenu === 'dialogue') {
       state.subMenu = 'talk';
       state.activeNpcId = null;
-    } else if (state.subMenu === 'pack_use' || state.subMenu === 'pack_equip' || state.subMenu === 'pack_craft') {
+    } else if (
+      state.subMenu === 'pack_use' ||
+      state.subMenu === 'pack_equip' ||
+      state.subMenu === 'pack_craft' ||
+      state.subMenu === 'pack_mods'
+    ) {
       state.subMenu = 'pack';
     } else {
       state.subMenu = 'root';
@@ -837,16 +910,26 @@ export function processInput(
     return { messages: handleUseCommand(state, input.slice(4)), shouldQuit: false };
   }
 
-  if (lower === 'camp' || lower === 'rest') {
+  if (lower === 'camp') {
     if (state.scene !== 'location') {
-      return { messages: ['You cannot rest during an encounter.'], shouldQuit: false };
+      return { messages: ['You cannot pitch camp right now.'], shouldQuit: false };
     }
-    return { messages: performRest(state), shouldQuit: false };
+    return { messages: enterMobileCamp(state), shouldQuit: false };
+  }
+
+  if (lower === 'rest') {
+    if (state.scene !== 'location') {
+      return { messages: ['You cannot rest right now.'], shouldQuit: false };
+    }
+    if (LOCATIONS[state.locationId].regionType === 'settlement' && !hasFlag(state, 'cinderford_fallen')) {
+      return { messages: performSettlementRest(state), shouldQuit: false };
+    }
+    return { messages: enterMobileCamp(state), shouldQuit: false };
   }
 
   if (lower.startsWith('go ')) {
     if (state.scene !== 'location') {
-      return { messages: ['Resolve your current encounter before traveling.'], shouldQuit: false };
+      return { messages: ['Resolve your current state before traveling.'], shouldQuit: false };
     }
     const target = lower.slice(3).trim();
     const loc = LOCATIONS[state.locationId];
@@ -878,7 +961,7 @@ export function processInput(
     };
   }
 
-  // Intro progression
+  // Intro
   if (chosen.id === 'intro:next') {
     if (state.introBeat + 1 < INTRO_BEAT_COUNT) {
       state.introBeat += 1;
@@ -894,7 +977,7 @@ export function processInput(
     return { messages: [LOCATIONS.cinderford.firstSightProse(state)], shouldQuit: false };
   }
 
-  // Journal navigation
+  // Journal
   if (chosen.id === 'open_journal') {
     openJournal(state, 'root');
     return { messages: [], shouldQuit: false };
@@ -917,7 +1000,28 @@ export function processInput(
     return { messages: [], shouldQuit: false };
   }
 
-  // Location sub-menu navigation
+  // Camp
+  if (chosen.id === 'camp_action') {
+    return { messages: enterMobileCamp(state), shouldQuit: false };
+  }
+  if (chosen.id === 'camp:craft') {
+    state.subMenu = 'pack_craft';
+    return { messages: [], shouldQuit: false };
+  }
+  if (chosen.id === 'camp:back') {
+    state.subMenu = 'root';
+    return { messages: [], shouldQuit: false };
+  }
+  if (chosen.id.startsWith('camp:')) {
+    return { messages: executeCampAction(state, chosen.id), shouldQuit: false };
+  }
+
+  // Aftermath
+  if (chosen.id.startsWith('after:')) {
+    return { messages: executeAftermathAction(state, chosen.id), shouldQuit: false };
+  }
+
+  // Sub-menus
   if (chosen.id === 'sub:root') {
     state.subMenu = 'root';
     state.activeNpcId = null;
@@ -952,9 +1056,13 @@ export function processInput(
     state.subMenu = 'pack_craft';
     return { messages: [], shouldQuit: false };
   }
+  if (chosen.id === 'sub:pack_mods') {
+    state.subMenu = 'pack_mods';
+    return { messages: [], shouldQuit: false };
+  }
 
   if (chosen.id === 'rest_action') {
-    return { messages: performRest(state), shouldQuit: false };
+    return { messages: performSettlementRest(state), shouldQuit: false };
   }
   if (chosen.id.startsWith('use_item:')) {
     const itemId = chosen.id.slice(9);
@@ -968,6 +1076,12 @@ export function processInput(
     state.subMenu = 'pack';
     return { messages: msgs, shouldQuit: false };
   }
+  if (chosen.id.startsWith('excise:')) {
+    const slot = chosen.id.slice(7) as BodySlot;
+    const msgs = [...exciseBodyMod(state, slot), ...advanceHours(state, 1)];
+    state.subMenu = 'pack';
+    return { messages: msgs, shouldQuit: false };
+  }
   if (chosen.id.startsWith('craft:')) {
     const recipeId = chosen.id.slice(6);
     const recipe = RECIPES.find((r) => r.id === recipeId);
@@ -978,8 +1092,9 @@ export function processInput(
       consumeInventoryItem(state, ing.itemId, ing.qty);
     }
     addItemToInventory(state, recipe.outputItemId, recipe.outputQty);
+    const clockMsgs = advanceHours(state, 1, { sheltered: state.scene === 'camp' });
     return {
-      messages: [`Crafted ${ITEMS[recipe.outputItemId]?.name ?? recipe.name}.`],
+      messages: [`Crafted ${ITEMS[recipe.outputItemId]?.name ?? recipe.name}.`, ...clockMsgs],
       shouldQuit: false,
     };
   }
@@ -1009,7 +1124,11 @@ export function processInput(
     const actionId = chosen.id.slice(4);
     const action = LOCATIONS[state.locationId].actions.find((a) => a.id === actionId);
     if (!action) return { messages: ['Action unavailable.'], shouldQuit: false };
-    const msgs = applyActionOutcome(state, action.resolve(state));
+    const outcome = action.resolve(state);
+    if (!outcome.advanceHours && !outcome.advanceDay && !outcome.startCombat && !outcome.triggerEnding) {
+      outcome.advanceHours = 2;
+    }
+    const msgs = applyActionOutcome(state, outcome);
     if (state.scene === 'location') {
       state.subMenu = 'root';
     }
@@ -1103,6 +1222,10 @@ export function processInput(
       state.player.maxFocus += perk.maxFocusBonus;
       state.player.focus += perk.maxFocusBonus;
     }
+    if (perk.maxResolveBonus) {
+      state.player.maxResolve += perk.maxResolveBonus;
+      state.player.resolve += perk.maxResolveBonus;
+    }
     state.pendingPerkIds = [];
     state.scene = 'location';
     state.subMenu = 'root';
@@ -1149,6 +1272,30 @@ export function renderCurrentScreen(state: GameState, messages: string[]): strin
     for (const line of lines) {
       out.push(wrapText(line));
     }
+  } else if (state.scene === 'camp' && state.camp) {
+    const loc = LOCATIONS[state.locationId];
+    if (state.subMenu === 'pack_craft') {
+      out.push(paint('CAMP - CRAFT', 'cyan', s));
+    } else {
+      out.push(paint(`CAMP - ${loc.name.toUpperCase()}`, 'cyan', s));
+      out.push(
+        wrapText(
+          state.camp.fireLit
+            ? `Low embers hiss beneath sheltered stone as ${WEATHER_DATA[state.clock.weather].label.toLowerCase()} settles around your solo camp.`
+            : `You crouch in cold dark beneath sheltered stone while ${WEATHER_DATA[state.clock.weather].label.toLowerCase()} drifts past your camp.`,
+        ),
+      );
+    }
+  } else if (state.scene === 'aftermath' && state.aftermath) {
+    const current = state.aftermath.downedEnemies[state.aftermath.activeIndex];
+    out.push(paint('AFTERMATH', 'yellow', s));
+    if (current) {
+      out.push(
+        wrapText(
+          `${current.displayName} lies broken and breathing in the wet ash at your boots. Decide its fate.`,
+        ),
+      );
+    }
   } else if (state.scene === 'location') {
     const loc = LOCATIONS[state.locationId];
     if (state.subMenu === 'root') {
@@ -1174,6 +1321,11 @@ export function renderCurrentScreen(state: GameState, messages: string[]): strin
       out.push(paint('EQUIP GEAR', 'cyan', s));
     } else if (state.subMenu === 'pack_craft') {
       out.push(paint('CRAFT', 'cyan', s));
+    } else if (state.subMenu === 'pack_mods') {
+      out.push(paint('BODY MODIFICATIONS', 'cyan', s));
+      if (Object.keys(state.player.bodyMods).length === 0) {
+        out.push('Your body currently bears no active mutations, surgeries, or implants.');
+      }
     }
   } else if (state.scene === 'event' && state.activeEvent) {
     const ev = EVENTS.find((e) => e.id === state.activeEvent!.eventId);

@@ -14,6 +14,8 @@ export type HeirloomId =
   | 'star_dew_vial'
   | 'grixi_chronometer';
 
+export type SurvivalMode = 'scarred' | 'ironman';
+
 export type StatName = 'might' | 'agility' | 'wit' | 'grit';
 
 export interface Stats {
@@ -23,12 +25,54 @@ export interface Stats {
   grit: number;
 }
 
+export type DamageType =
+  | 'slashing'
+  | 'piercing'
+  | 'bludgeoning'
+  | 'fire'
+  | 'cold'
+  | 'lightning'
+  | 'acid'
+  | 'poison'
+  | 'blight'
+  | 'resonant';
+
+export type ResistanceLevel = 'immune' | 'resistant' | 'neutral' | 'vulnerable';
+
+export type DamageProfile = Partial<Record<DamageType, ResistanceLevel>>;
+
+export type TimePeriod =
+  | 'dawn'
+  | 'morning'
+  | 'midday'
+  | 'dusk'
+  | 'night'
+  | 'midnight';
+
+export type WeatherId =
+  | 'clear'
+  | 'ash_rain'
+  | 'spore_fog'
+  | 'biting_wind'
+  | 'dead_still';
+
+export interface WorldClock {
+  day: number;
+  hour: number; // 0..23
+  totalHours: number;
+  weather: WeatherId;
+  weatherHoursLeft: number;
+}
+
 export type FactionId = 'iron_vow' | 'silken_cistern' | 'under_warren' | 'husk_choir';
 
 export type StatusType =
   | 'bleeding'
   | 'burned'
   | 'blighted'
+  | 'poisoned'
+  | 'chilled'
+  | 'shocked'
   | 'corroded'
   | 'staggered'
   | 'dazed'
@@ -40,6 +84,63 @@ export interface StatusEffect {
   type: StatusType;
   turns: number;
   power: number;
+}
+
+export type BodySlot =
+  | 'eyes'
+  | 'skin'
+  | 'face'
+  | 'chest'
+  | 'arms'
+  | 'hands'
+  | 'legs'
+  | 'blood';
+
+export type BodyModKind = 'mutation' | 'surgery' | 'implant';
+
+export interface BodyModDef {
+  id: string;
+  name: string;
+  kind: BodyModKind;
+  slot: BodySlot;
+  defilementLoad: number;
+  description: string;
+  bonusSummary: string;
+  drawbackSummary: string;
+  statMods?: Partial<Stats>;
+  maxHpMod?: number;
+  maxStaminaMod?: number;
+  maxFocusMod?: number;
+  maxResolveMod?: number;
+  armorMod?: number;
+  resistances?: DamageProfile;
+  grantedAbilityId?: string;
+  anatomyOverlay: {
+    field:
+      | 'faceDetail'
+      | 'chestTorsoDetail'
+      | 'armsHandsDetail'
+      | 'legsStanceDetail'
+      | 'distinguishingMark';
+    appendText: string;
+    eyeColorOverride?: string;
+    skinColorOverride?: string;
+  };
+  addedTags: string[];
+  excisionScar: string;
+}
+
+export interface InjuryDef {
+  id: string;
+  name: string;
+  severity: 'minor' | 'severe';
+  description: string;
+  statPenalty?: Partial<Stats>;
+  maxHpPenalty?: number;
+  maxStaminaPenalty?: number;
+  maxResolvePenalty?: number;
+  healDc: number;
+  scarOnHeal: string;
 }
 
 export interface AnatomyProfile {
@@ -85,6 +186,9 @@ export interface AbilityDef {
   id: string;
   name: string;
   kind: AbilityKind;
+  damageType?: DamageType;
+  resolveDamage?: number;
+  nonLethal?: boolean;
   staminaCost: number;
   focusCost: number;
   hpCost?: number;
@@ -92,6 +196,7 @@ export interface AbilityDef {
   baseDamage?: number;
   damageDice?: [number, number];
   healAmount?: number;
+  restoreResolve?: number;
   applyEnemyStatus?: StatusEffect;
   applySelfStatus?: StatusEffect;
   restoreStamina?: number;
@@ -116,6 +221,7 @@ export interface RaceDef {
   subtitle: string;
   lore: string;
   statMods: Partial<Stats>;
+  resistances?: DamageProfile;
   passive: PassiveDef;
   racialAbilityId: string;
   worldReactions: string;
@@ -154,19 +260,26 @@ export interface ItemDef {
   slot: ItemSlot;
   value: number;
   description: string;
+  damageType?: DamageType;
   damageDice?: [number, number];
   bonusDamage?: number;
   statScaling?: StatName;
   armorBonus?: number;
+  resistances?: DamageProfile;
   maxHpBonus?: number;
   maxFocusBonus?: number;
   maxStaminaBonus?: number;
+  maxResolveBonus?: number;
   statBonus?: Partial<Stats>;
   healHp?: number;
   restoreStamina?: number;
   restoreFocus?: number;
+  restoreResolve?: number;
   cureNegative?: boolean;
+  tendsInjury?: boolean;
+  grantsBodyModId?: string;
   throwDamage?: number;
+  throwDamageType?: DamageType;
   throwStatus?: StatusEffect;
 }
 
@@ -193,6 +306,7 @@ export interface PerkDef {
   maxHpBonus?: number;
   maxStaminaBonus?: number;
   maxFocusBonus?: number;
+  maxResolveBonus?: number;
   armorBonus?: number;
   damageBonus?: number;
 }
@@ -203,6 +317,9 @@ export interface EnemyIntent {
   kind: EnemyIntentKind;
   label: string;
   damage: number;
+  damageType: DamageType;
+  resolveDamage?: number;
+  defilementGain?: number;
   status?: StatusEffect;
   armorGain?: number;
   description: string;
@@ -222,6 +339,7 @@ export interface EnemyTemplate {
   maxHp: number;
   armor: number;
   stats: Stats;
+  resistances?: DamageProfile;
   visibleGear: EnemyVisibleGear;
   anatomy: AnatomyProfile;
   firstSightProse: string;
@@ -229,6 +347,9 @@ export interface EnemyTemplate {
   xpReward: number;
   crownReward: [number, number];
   lootTable: Array<{ itemId: string; chance: number }>;
+  harvestItemId?: string;
+  harvestModId?: string;
+  interrogateHint?: string;
   isBoss?: boolean;
   isElite?: boolean;
   intents: EnemyIntent[];
@@ -246,9 +367,13 @@ export interface ActiveEnemy {
   baseArmor: number;
   turnArmor: number;
   stats: Stats;
+  resistances: DamageProfile;
   visibleGear: EnemyVisibleGear;
   appraisalTier: 0 | 1 | 2;
   identified: boolean;
+  defeatedState?: 'alive' | 'downed' | 'killed';
+  lastHitDamageType?: DamageType;
+  lastHitOverkill?: number;
   statuses: StatusEffect[];
   intents: EnemyIntent[];
   nextIntentIndex: number;
@@ -257,6 +382,28 @@ export interface ActiveEnemy {
   xpReward: number;
   crownReward: [number, number];
   lootTable: Array<{ itemId: string; chance: number }>;
+}
+
+export interface DownedEnemyEntry {
+  templateId: string;
+  displayName: string;
+  category: 'husk' | 'beast' | 'humanoid' | 'construct' | 'boss';
+  questioned: boolean;
+  stripped: boolean;
+  resolved: boolean;
+}
+
+export interface AftermathState {
+  downedEnemies: DownedEnemyEntry[];
+  activeIndex: number;
+  victorySummary: string[];
+}
+
+export interface CampState {
+  fireLit: boolean;
+  hoursCamped: number;
+  tendedThisCamp: boolean;
+  foragedThisCamp: boolean;
 }
 
 export type CombatSubMenu = 'root' | 'skills' | 'spells' | 'items' | 'target';
@@ -319,6 +466,8 @@ export interface PlayerCharacter {
   background: BackgroundId;
   heirloom: HeirloomId;
   anatomy: AnatomyProfile;
+  bodyMods: Partial<Record<BodySlot, string>>;
+  injuries: string[];
   level: number;
   xp: number;
   xpToNext: number;
@@ -328,6 +477,9 @@ export interface PlayerCharacter {
   maxStamina: number;
   focus: number;
   maxFocus: number;
+  resolve: number;
+  maxResolve: number;
+  defilement: number; // 0..100
   baseStats: Stats;
   weaponId: string;
   weaponHoned: boolean;
@@ -357,6 +509,13 @@ export interface EventCard {
   locations: string[];
   minDay?: number;
   maxDay?: number;
+  periods?: TimePeriod[];
+  weathers?: WeatherId[];
+  minDefilement?: number;
+  maxDefilement?: number;
+  requiredTags?: string[];
+  repeatable?: boolean;
+  cooldownHours?: number;
   weight?: number;
   condition?: (state: GameState) => boolean;
   prompt: (state: GameState) => string;
@@ -420,8 +579,10 @@ export interface LocationNode {
 export type SceneMode =
   | 'intro'
   | 'location'
+  | 'camp'
   | 'event'
   | 'combat'
+  | 'aftermath'
   | 'shop'
   | 'journal'
   | 'level_up'
@@ -437,7 +598,8 @@ export type LocationSubMenu =
   | 'pack'
   | 'pack_use'
   | 'pack_equip'
-  | 'pack_craft';
+  | 'pack_craft'
+  | 'pack_mods';
 
 export type JournalTab =
   | 'root'
@@ -471,6 +633,7 @@ export interface ActionOutcome {
     title: string;
     openingText: string;
   };
+  advanceHours?: number;
   advanceDay?: number;
   stayInDialogue?: boolean;
 }
@@ -494,13 +657,15 @@ export interface MetaProfile {
 
 export interface GameState {
   runId: string;
+  survivalMode: SurvivalMode;
+  clock: WorldClock;
   day: number;
-  maxDays: number;
   stealthMode: boolean;
   player: PlayerCharacter;
   locationId: string;
   visitedLocations: string[];
   seenEvents: string[];
+  eventCooldowns: Record<string, number>;
   memory: WorldMemory;
   discovery: EntityDiscoveryState;
   scene: SceneMode;
@@ -512,6 +677,8 @@ export interface GameState {
   activeNpcId: string | null;
   activeEvent: ActiveEventState | null;
   combat: CombatState | null;
+  aftermath: AftermathState | null;
+  camp: CampState | null;
   pendingPerkIds: string[];
   endingSummary: string | null;
   lastMessages: string[];
