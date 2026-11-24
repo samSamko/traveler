@@ -58,12 +58,19 @@ import {
 import { BODY_MODS, exciseBodyMod, installBodyMod } from './systems/bodymods.ts';
 import { executeAftermathAction, getAftermathChoices, tendInjury } from './systems/injuries.ts';
 import { enterMobileCamp, executeCampAction, getCampChoices } from './systems/camp.ts';
+import {
+  applyWeaponCoating,
+  castAshTextOutOfCombat,
+  drinkDraught,
+  getEquippedVisibleTags,
+} from './systems/frontier.ts';
 
 registerRuleRuntime({
   resolveCheck,
   addItem: addItemToInventory,
   consumeItem: consumeInventoryItem,
   renderProse,
+  getEquippedVisibleTags,
 });
 
 const SHORT_LOCATION_NAMES: Record<string, string> = {
@@ -168,10 +175,20 @@ export function createNewGame(input: CreateCharacterInput): GameState {
       maxResolve,
       defilement: 0,
       baseStats: stats,
-      weaponId: bgDef.startingWeaponId,
+      equipment: {
+        mainHand: bgDef.startingWeaponId,
+        offHand: null,
+        armor: bgDef.startingArmorId,
+        cloak: null,
+        trinket: bgDef.startingTrinketId ?? null,
+      },
       weaponHoned: false,
-      armorId: bgDef.startingArmorId,
-      trinketId: bgDef.startingTrinketId ?? null,
+      weaponCoating: null,
+      armorTierCurrent: armor?.armorTier ?? 0,
+      reserves: 2,
+      maxReserves: 2,
+      grace: 2,
+      maxGrace: 2,
       inventory: bgDef.startingItems.map((i) => ({ ...i })),
       abilities,
       perks: [],
@@ -709,49 +726,61 @@ function handleEquipCommand(state: GameState, query: string): string[] {
   });
   if (!entry) return [`No item matching "${query}" found in your pack.`];
   const newDef = ITEMS[entry.id];
-  if (!newDef || !['weapon', 'armor', 'trinket'].includes(newDef.slot)) {
+  const equipSlots = ['mainHand', 'offHand', 'armor', 'cloak', 'trinket'] as const;
+  if (!newDef || !equipSlots.includes(newDef.slot as (typeof equipSlots)[number])) {
     return [`${newDef?.name ?? entry.id} cannot be equipped.`];
   }
 
   const p = state.player;
+  const targetSlot = newDef.slot as (typeof equipSlots)[number];
+  const currentMain = p.equipment.mainHand ? ITEMS[p.equipment.mainHand] : undefined;
+  if (targetSlot === 'offHand' && currentMain?.twoHanded) {
+    return [`Cannot equip ${newDef.name} while wielding two-handed ${currentMain.name}.`];
+  }
+
   entry.qty -= 1;
   if (entry.qty <= 0) {
     p.inventory = p.inventory.filter((e) => e.id !== entry.id);
   }
 
-  if (newDef.slot === 'weapon') {
-    const oldId = p.weaponId;
-    p.weaponId = newDef.id;
-    p.weaponHoned = false;
+  const msgs: string[] = [];
+  const oldId = p.equipment[targetSlot];
+  if (oldId) {
+    const oldDef = ITEMS[oldId];
+    if (oldDef?.maxHpBonus) p.maxHp = Math.max(10, p.maxHp - oldDef.maxHpBonus);
+    if (oldDef?.maxFocusBonus) p.maxFocus = Math.max(4, p.maxFocus - oldDef.maxFocusBonus);
+    if (oldDef?.maxResolveBonus) p.maxResolve = Math.max(6, p.maxResolve - oldDef.maxResolveBonus);
     addItemToInventory(state, oldId, 1);
-  } else if (newDef.slot === 'armor') {
-    const old = ITEMS[p.armorId];
-    if (old?.maxHpBonus) p.maxHp = Math.max(10, p.maxHp - old.maxHpBonus);
-    if (old?.maxFocusBonus) p.maxFocus = Math.max(4, p.maxFocus - old.maxFocusBonus);
-    if (old?.maxResolveBonus) p.maxResolve = Math.max(6, p.maxResolve - old.maxResolveBonus);
-    p.armorId = newDef.id;
-    if (newDef.maxHpBonus) p.maxHp += newDef.maxHpBonus;
-    if (newDef.maxFocusBonus) p.maxFocus += newDef.maxFocusBonus;
-    if (newDef.maxResolveBonus) p.maxResolve += newDef.maxResolveBonus;
-    p.hp = Math.min(p.hp, p.maxHp);
-    p.focus = Math.min(p.focus, p.maxFocus);
-    p.resolve = Math.min(p.resolve, p.maxResolve);
-    addItemToInventory(state, old.id, 1);
-  } else if (newDef.slot === 'trinket') {
-    if (p.trinketId) {
-      const old = ITEMS[p.trinketId];
-      if (old?.maxHpBonus) p.maxHp = Math.max(10, p.maxHp - old.maxHpBonus);
-      if (old?.maxFocusBonus) p.maxFocus = Math.max(4, p.maxFocus - old.maxFocusBonus);
-      if (old?.maxResolveBonus) p.maxResolve = Math.max(6, p.maxResolve - old.maxResolveBonus);
-      addItemToInventory(state, old.id, 1);
-    }
-    p.trinketId = newDef.id;
-    if (newDef.maxHpBonus) p.maxHp += newDef.maxHpBonus;
-    if (newDef.maxFocusBonus) p.maxFocus += newDef.maxFocusBonus;
-    if (newDef.maxResolveBonus) p.maxResolve += newDef.maxResolveBonus;
   }
 
-  return [`Equipped ${newDef.name}.`];
+  if (targetSlot === 'mainHand') {
+    p.weaponHoned = false;
+    p.weaponCoating = null;
+    if (newDef.twoHanded && p.equipment.offHand) {
+      const offId = p.equipment.offHand;
+      const offDef = ITEMS[offId];
+      if (offDef?.maxHpBonus) p.maxHp = Math.max(10, p.maxHp - offDef.maxHpBonus);
+      if (offDef?.maxFocusBonus) p.maxFocus = Math.max(4, p.maxFocus - offDef.maxFocusBonus);
+      if (offDef?.maxResolveBonus) p.maxResolve = Math.max(6, p.maxResolve - offDef.maxResolveBonus);
+      addItemToInventory(state, offId, 1);
+      p.equipment.offHand = null;
+      msgs.push(`Returned ${offDef?.name ?? offId} to your pack to wield ${newDef.name} two-handed.`);
+    }
+  }
+
+  p.equipment[targetSlot] = newDef.id;
+  if (targetSlot === 'armor') {
+    p.armorTierCurrent = newDef.armorTier ?? 0;
+  }
+  if (newDef.maxHpBonus) p.maxHp += newDef.maxHpBonus;
+  if (newDef.maxFocusBonus) p.maxFocus += newDef.maxFocusBonus;
+  if (newDef.maxResolveBonus) p.maxResolve += newDef.maxResolveBonus;
+  p.hp = Math.min(p.hp, p.maxHp);
+  p.focus = Math.min(p.focus, p.maxFocus);
+  p.resolve = Math.min(p.resolve, p.maxResolve);
+
+  msgs.unshift(`Equipped ${newDef.name}.`);
+  return msgs;
 }
 
 function handleUseCommand(state: GameState, query: string): string[] {
@@ -762,17 +791,37 @@ function handleUseCommand(state: GameState, query: string): string[] {
   if (!q) return ['Use what?'];
   const entry = state.player.inventory.find((e) => {
     const def = ITEMS[e.id];
-    return def && def.slot === 'consumable' && (def.id === q || def.name.toLowerCase().includes(q));
+    return (
+      def &&
+      (def.slot === 'consumable' ||
+        def.slot === 'draught' ||
+        def.slot === 'coating' ||
+        def.slot === 'ash_text') &&
+      (def.id === q || def.name.toLowerCase().includes(q))
+    );
   });
-  if (!entry) return [`No consumable matching "${query}" in your pack.`];
+  if (!entry) return [`No usable item matching "${query}" in your pack.`];
   const item = ITEMS[entry.id];
   if (!item || item.throwDamage) {
     return [`${item?.name ?? query} can only be thrown during combat.`];
+  }
+  if (item.slot === 'ash_text' && (item.ashTextEffect === 'bone_shatter' || item.ashTextEffect === 'blight_wave')) {
+    return [`${item.name} must be read facing an enemy in combat.`];
   }
 
   entry.qty -= 1;
   if (entry.qty <= 0) {
     state.player.inventory = state.player.inventory.filter((e) => e.id !== entry.id);
+  }
+
+  if (item.slot === 'draught') {
+    return drinkDraught(state, item.id);
+  }
+  if (item.slot === 'coating') {
+    return applyWeaponCoating(state, item.id);
+  }
+  if (item.slot === 'ash_text') {
+    return castAshTextOutOfCombat(state, item.id);
   }
 
   if (item.grantsBodyModId) {
@@ -1345,7 +1394,14 @@ export function renderCurrentScreen(state: GameState, messages: string[]): strin
       }
     }
   } else if (state.scene === 'combat' && state.combat) {
-    out.push(paint(`COMBAT - Round ${state.combat.round}`, 'red', s));
+    const c = state.combat;
+    out.push(
+      paint(
+        `COMBAT - Round ${c.round} | Main ${c.mainLeft} | Swift ${c.swiftLeft} | Free ${c.freeLeft}`,
+        'red',
+        s,
+      ),
+    );
     for (const enemy of state.combat.enemies) {
       if (enemy.hp <= 0) continue;
       for (const line of formatCombatEnemyCard(state, enemy)) {

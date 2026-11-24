@@ -1,4 +1,4 @@
-import type { GameState, StatName } from './types.ts';
+import type { GameState, RollMode, StatName } from './types.ts';
 import { ITEMS } from './content/items.ts';
 import { PERKS } from './content/characters.ts';
 import { BODY_MODS } from './systems/bodymods.ts';
@@ -30,8 +30,8 @@ export function getEffectiveStat(state: GameState, stat: StatName): number {
   const p = state.player;
   let total = p.baseStats[stat];
 
-  const equipped = [ITEMS[p.weaponId], ITEMS[p.armorId], p.trinketId ? ITEMS[p.trinketId] : undefined];
-  for (const item of equipped) {
+  for (const itemId of Object.values(p.equipment)) {
+    const item = itemId ? ITEMS[itemId] : undefined;
     if (item?.statBonus?.[stat]) {
       total += item.statBonus[stat] ?? 0;
     }
@@ -61,9 +61,25 @@ export function getEffectiveStat(state: GameState, stat: StatName): number {
   return total;
 }
 
+export function rollD20WithMode(
+  mode: RollMode,
+  state?: GameState,
+): { roll: number; rolls: [number] | [number, number] } {
+  const first = rollDie(20, state);
+  if (mode === 'normal') {
+    return { roll: first, rolls: [first] };
+  }
+  const second = rollDie(20, state);
+  return {
+    roll: mode === 'edge' ? Math.max(first, second) : Math.min(first, second),
+    rolls: [first, second],
+  };
+}
+
 export interface CheckResult {
   success: boolean;
   naturalRoll: number;
+  rollMode: RollMode;
   statMod: number;
   traitBonus: number;
   total: number;
@@ -78,12 +94,23 @@ export function resolveCheck(
   options?: {
     label?: string;
     extraBonus?: number;
+    mode?: RollMode;
     isLoreOrPerception?: boolean;
     isCraftOrStealth?: boolean;
   },
 ): CheckResult {
   const p = state.player;
-  let roll = rollDie(20, state);
+  const hasEdge =
+    options?.mode === 'edge' || p.statuses.some((s) => s.type === 'blessed');
+  const hasBurden =
+    options?.mode === 'burden' ||
+    p.statuses.some((s) => s.type === 'dazed' || s.type === 'staggered') ||
+    (Boolean(options?.isLoreOrPerception) && state.clock?.weather === 'spore_fog');
+
+  const rollMode: RollMode =
+    hasEdge && hasBurden ? 'normal' : hasEdge ? 'edge' : hasBurden ? 'burden' : 'normal';
+
+  let { roll } = rollD20WithMode(rollMode, state);
   const statMod = getEffectiveStat(state, stat);
   let traitBonus = options?.extraBonus ?? 0;
 
@@ -117,14 +144,17 @@ export function resolveCheck(
 
   const success = roll === 20 || (roll !== 1 && total >= dc);
   const actionLabel = options?.label ? `${options.label}: ` : '';
+  const modeNote =
+    rollMode === 'edge' ? 'With Edge, ' : rollMode === 'burden' ? 'Under Burden, ' : '';
   const rerollProse = rerolled ? 'Stubborn will pulls you through at the brink. ' : '';
   const outcomeProse = success
-    ? `${rerollProse}${actionLabel}Your nerve holds steady.`
-    : `${actionLabel}Your footing slips at the crucial moment.`;
+    ? `${rerollProse}${modeNote}${actionLabel}your nerve holds steady.`
+    : `${modeNote}${actionLabel}your footing slips at the crucial moment.`;
 
   return {
     success,
     naturalRoll: roll,
+    rollMode,
     statMod,
     traitBonus,
     total,

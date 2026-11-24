@@ -18,9 +18,17 @@ import { advanceHours, getTimePeriod } from '../src/systems/clock.ts';
 import { computeDamageAfterResistance, getEffectivePlayerResistances } from '../src/systems/damage.ts';
 import { exciseBodyMod, installBodyMod } from '../src/systems/bodymods.ts';
 import { inflictInjury, resolvePlayerDefeat, tendInjury } from '../src/systems/injuries.ts';
-import { getEffectiveStat } from '../src/dice.ts';
+import { getEffectiveStat, resolveCheck, rollD20WithMode } from '../src/dice.ts';
 import { getWorldDatabase } from '../src/db/loader.ts';
 import { evaluateCondition, executeEffect, selectProseVariant } from '../src/db/rules.ts';
+import { enterMobileCamp, executeCampAction } from '../src/systems/camp.ts';
+import {
+  applyWeaponCoating,
+  degradeArmor,
+  drinkDraught,
+  repairEquippedArmor,
+  rollArmorTierReduction,
+} from '../src/systems/frontier.ts';
 import type { BackgroundId, HeirloomId, RaceId, SexId } from '../src/types.ts';
 
 function assertNoParensOrBrackets(text: string, context: string): void {
@@ -380,5 +388,148 @@ describe('Combat Qualitative UI, Appraisal, Mid-Combat Journal & Persistence', (
     });
     assert.equal(hasFlag(state, 'dsl_test_flag'), true);
     assert.equal(outcome.messages[0], 'DSL executed cleanly.');
+  });
+});
+
+describe('5-Slot Equipment, Action Economy, Draughts & Tabletop Mechanics', () => {
+  it('supports 5-slot equipment, two-handed lock, gear visibleTags, and legacy save migration', () => {
+    const state = createNewGame({
+      name: 'Vane',
+      sex: 'male',
+      race: 'vaelorian',
+      background: 'ashen_blade',
+      heirloom: 'kiln_lantern',
+      skipIntro: true,
+      rngState: 12,
+    });
+
+    assert.equal(state.player.equipment.mainHand, 'notched_broadsword');
+    assert.equal(state.player.equipment.armor, 'chain_hauberk');
+    assert.equal(state.player.armorTierCurrent, 2);
+
+    // Equip off-hand buckler and cistern veil cloak
+    addItemToInventory(state, 'iron_buckler', 1);
+    addItemToInventory(state, 'cistern_veil', 1);
+    processInput(state, 'equip Iron Buckler');
+    processInput(state, 'equip Cistern Shroud');
+    assert.equal(state.player.equipment.offHand, 'iron_buckler');
+    assert.equal(state.player.equipment.cloak, 'cistern_veil');
+    assert.equal(evaluateCondition(state, { hasTag: 'cistern_garb' }), true);
+
+    // Equipping two-handed weapon auto-unequips offHand
+    addItemToInventory(state, 'runic_warhammer', 1);
+    const twoHandRes = processInput(state, 'equip Runic Warhammer');
+    assert.ok(twoHandRes.messages.some((m) => m.includes('two-handed')));
+    assert.equal(state.player.equipment.mainHand, 'runic_warhammer');
+    assert.equal(state.player.equipment.offHand, null);
+    assert.ok(state.player.inventory.some((i) => i.id === 'iron_buckler'));
+
+    // Legacy save migration
+    const tempDir = mkdtempSync(join(tmpdir(), 'traveler-legacy-'));
+    try {
+      const legacyPayload = {
+        ...state,
+        player: {
+          ...state.player,
+          weaponId: 'notched_broadsword',
+          armorId: 'chain_hauberk',
+          trinketId: 'imperial_signet',
+        },
+      } as Record<string, unknown>;
+      delete (legacyPayload.player as Record<string, unknown>).equipment;
+      delete (legacyPayload.player as Record<string, unknown>).reserves;
+      delete (legacyPayload.player as Record<string, unknown>).grace;
+      saveGame(legacyPayload as unknown as typeof state, tempDir);
+      const migrated = loadGame(tempDir);
+      assert.ok(migrated);
+      assert.equal(migrated.player.equipment.mainHand, 'notched_broadsword');
+      assert.equal(migrated.player.equipment.trinket, 'imperial_signet');
+      assert.equal(migrated.player.reserves, 2);
+      assert.equal(migrated.player.grace, 2);
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('enforces Main/Swift/Free action economy, Grace max damage, Armor Tiers, Draughts, and Rests', () => {
+    const state = createNewGame({
+      name: 'Sable',
+      sex: 'female',
+      race: 'grixi',
+      background: 'barrow_stalker',
+      heirloom: 'grixi_chronometer',
+      skipIntro: true,
+      rngState: 77,
+    });
+    state.player.perks.push('relentless_tempo');
+
+    // Edge/Burden dice check
+    const edge = rollD20WithMode('edge', state);
+    assert.equal(edge.rolls.length, 2);
+    assert.equal(edge.roll, Math.max(edge.rolls[0], edge.rolls[1]));
+    const check = resolveCheck(state, 'wit', 10, { mode: 'burden', label: 'Trap' });
+    assert.equal(check.rollMode, 'burden');
+
+    // Draughts raise/purge Defilement
+    const beforeDef = state.player.defilement;
+    const drinkMsgs = drinkDraught(state, 'amber_tonic');
+    assert.ok(drinkMsgs.some((m) => m.includes('Defilement')));
+    assert.equal(state.player.defilement, beforeDef + 8);
+    drinkDraught(state, 'ash_purge_draught');
+    assert.equal(state.player.defilement, beforeDef);
+
+    // Armor Tier DR, degradation, and repair
+    state.player.equipment.armor = 'basalt_plate';
+    state.player.armorTierCurrent = 3;
+    const dr = rollArmorTierReduction(state.player.armorTierCurrent, state);
+    assert.ok(dr >= 1 && dr <= 6);
+    const degMsg = degradeArmor(state);
+    assert.ok(degMsg?.includes('Tier 2'));
+    assert.equal(state.player.armorTierCurrent, 2);
+    const repMsgs = repairEquippedArmor(state, false);
+    assert.ok(repMsgs[0].includes('Tier 3'));
+    assert.equal(state.player.armorTierCurrent, 3);
+
+    // Brief Rest & Full Rest at Camp
+    state.locationId = 'kings_causeway';
+    enterMobileCamp(state);
+    executeCampAction(state, 'camp:kindle');
+    state.player.hp = 10;
+    state.player.grace = 0;
+    const briefMsgs = executeCampAction(state, 'camp:brief_rest');
+    assert.ok(briefMsgs.some((m) => m.includes('Reserve')));
+    assert.equal(state.player.reserves, 1);
+    assert.ok(state.player.hp > 10);
+    const fullMsgs = executeCampAction(state, 'camp:full_rest');
+    assert.ok(fullMsgs.some((m) => m.includes('Reserves and Grace')));
+    assert.ok(state.player.grace >= 1);
+    executeCampAction(state, 'camp:pack_up');
+
+    // Combat Action Economy (1 Main, 2 Swift from relentless_tempo, 1 Free)
+    applyWeaponCoating(state, 'kiln_pitch');
+    startCombatEncounter(state, { enemyId: 'ash_hound', canFlee: true });
+    assert.equal(state.combat?.mainLeft, 1);
+    assert.equal(state.combat?.swiftLeft, 2);
+    assert.equal(state.combat?.freeLeft, 1);
+
+    // Free action: Spend Grace
+    executeCombatAction(state, 'grace');
+    assert.equal(state.combat?.freeLeft, 0);
+    assert.equal(state.combat?.graceMaxDamagePending, true);
+
+    // Main action: Strike (does not end turn yet because Swift actions remain)
+    const strikeRes = executeCombatAction(state, 'strike');
+    assert.ok(strikeRes.messages.some((m) => m.includes('Grace guides')));
+    if (state.combat) {
+      assert.equal(state.combat.round, 1);
+      assert.equal(state.combat.mainLeft, 0);
+      assert.ok(getCombatMenuOptions(state).some((o) => o.id === 'end_turn'));
+      executeCombatAction(state, 'end_turn');
+      if (state.combat) {
+        assert.equal(state.combat.round, 2);
+        assert.equal(state.combat.mainLeft, 1);
+        assert.equal(state.combat.swiftLeft, 2);
+      }
+    }
   });
 });

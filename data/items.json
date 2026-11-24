@@ -3,7 +3,7 @@
     "notched_broadsword": {
       "id": "notched_broadsword",
       "name": "Notched Broadsword",
-      "slot": "weapon",
+      "slot": "mainHand",
       "value": 18,
       "damageType": "slashing",
       "damageDice": [
@@ -17,7 +17,13 @@
     "ash_staff": {
       "id": "ash_staff",
       "name": "Whispering Ash-Staff",
-      "slot": "weapon",
+      "slot": "mainHand",
+      "twoHanded": true,
+      "traits": [
+        "twoHanded",
+        "catalyst",
+        "subdueBonus"
+      ],
       "value": 18,
       "damageType": "bludgeoning",
       "damageDice": [
@@ -32,7 +38,12 @@
     "horn_bow": {
       "id": "horn_bow",
       "name": "Horn-Bow & Knife",
-      "slot": "weapon",
+      "slot": "mainHand",
+      "twoHanded": true,
+      "traits": [
+        "twoHanded",
+        "finesse"
+      ],
       "value": 18,
       "damageType": "piercing",
       "damageDice": [
@@ -46,7 +57,10 @@
     "flanged_mace": {
       "id": "flanged_mace",
       "name": "Sanctified Mace",
-      "slot": "weapon",
+      "slot": "mainHand",
+      "traits": [
+        "subdueBonus"
+      ],
       "value": 18,
       "damageType": "bludgeoning",
       "damageDice": [
@@ -60,7 +74,13 @@
     "runic_warhammer": {
       "id": "runic_warhammer",
       "name": "Runic Warhammer",
-      "slot": "weapon",
+      "slot": "mainHand",
+      "twoHanded": true,
+      "traits": [
+        "twoHanded",
+        "armorPiercing",
+        "subdueBonus"
+      ],
       "value": 55,
       "damageType": "bludgeoning",
       "damageDice": [
@@ -77,7 +97,12 @@
     "star_glaive": {
       "id": "star_glaive",
       "name": "Star-Glaive",
-      "slot": "weapon",
+      "slot": "mainHand",
+      "twoHanded": true,
+      "traits": [
+        "twoHanded",
+        "finesse"
+      ],
       "value": 52,
       "damageType": "cold",
       "damageDice": [
@@ -94,7 +119,12 @@
     "bell_cleaver": {
       "id": "bell_cleaver",
       "name": "Bell-Cleaver",
-      "slot": "weapon",
+      "slot": "mainHand",
+      "twoHanded": true,
+      "traits": [
+        "twoHanded",
+        "armorPiercing"
+      ],
       "value": 65,
       "damageType": "resonant",
       "damageDice": [
@@ -111,7 +141,11 @@
     "vesper_needle": {
       "id": "vesper_needle",
       "name": "Vesper Stiletto",
-      "slot": "weapon",
+      "slot": "mainHand",
+      "traits": [
+        "finesse",
+        "armorPiercing"
+      ],
       "value": 54,
       "damageType": "piercing",
       "damageDice": [
@@ -129,74 +163,80 @@
       "id": "chain_hauberk",
       "name": "Chain Hauberk",
       "slot": "armor",
+      "armorTier": 2,
+      "visibleTags": [
+        "iron_vow_garb"
+      ],
       "value": 20,
-      "armorBonus": 2,
       "resistances": {
         "slashing": "resistant",
         "lightning": "vulnerable"
       },
-      "description": "Heavy Iron-Vow links greased against mire-rot."
+      "description": "Heavy Iron-Vow links greased against mire-rot; Tier 2 armor."
     },
     "warded_greatcloak": {
       "id": "warded_greatcloak",
       "name": "Scribe-Cloak",
       "slot": "armor",
+      "armorTier": 1,
       "value": 20,
-      "armorBonus": 1,
       "maxFocusBonus": 2,
       "resistances": {
         "resonant": "resistant",
         "cold": "resistant"
       },
-      "description": "Hemmed with silver ward-thread to preserve focus and deflect chill."
+      "description": "Hemmed with silver ward-thread to preserve focus; Tier 1 armor."
     },
     "brigandine_coat": {
       "id": "brigandine_coat",
       "name": "Brigandine Coat",
       "slot": "armor",
+      "armorTier": 1,
       "value": 20,
-      "armorBonus": 1,
       "statBonus": {
         "agility": 1
       },
       "resistances": {
         "piercing": "resistant"
       },
-      "description": "Supple hide pinned with brass rivets for swift footing."
+      "description": "Supple hide pinned with brass rivets for swift footing; Tier 1 armor."
     },
     "penitent_wrap": {
       "id": "penitent_wrap",
       "name": "Iron-Wrap",
       "slot": "armor",
+      "armorTier": 2,
       "value": 20,
-      "armorBonus": 2,
       "maxHpBonus": 3,
       "maxResolveBonus": 3,
       "resistances": {
         "blight": "resistant"
       },
-      "description": "Heavy chains worn over boiled leather that steel both flesh and will."
+      "description": "Heavy chains worn over boiled leather; Tier 2 armor."
     },
     "basalt_plate": {
       "id": "basalt_plate",
       "name": "Basalt Cuirass",
       "slot": "armor",
+      "armorTier": 3,
       "value": 60,
-      "armorBonus": 4,
       "maxHpBonus": 4,
       "resistances": {
         "slashing": "resistant",
         "fire": "resistant",
         "lightning": "vulnerable"
       },
-      "description": "Slate-forged plate of the deep gates."
+      "description": "Slate-forged plate of the deep gates; Tier 3 armor."
     },
     "chitin_mantle": {
       "id": "chitin_mantle",
       "name": "Silk Mantle",
       "slot": "armor",
+      "armorTier": 2,
+      "visibleTags": [
+        "cistern_garb"
+      ],
       "value": 48,
-      "armorBonus": 2,
       "statBonus": {
         "agility": 1,
         "wit": 1
@@ -206,7 +246,7 @@
         "poison": "resistant",
         "fire": "vulnerable"
       },
-      "description": "Woven by the blind Matrons of the Silken Cistern."
+      "description": "Woven by the blind Matrons of the Silken Cistern; Tier 2 armor."
     },
     "imperial_signet": {
       "id": "imperial_signet",
@@ -366,6 +406,197 @@
       "slot": "reagent",
       "value": 7,
       "description": "Volatile amber sap scraped from petrified timber."
+    },
+    "iron_buckler": {
+      "id": "iron_buckler",
+      "name": "Iron Buckler",
+      "slot": "offHand",
+      "value": 22,
+      "armorBonus": 2,
+      "visibleTags": [
+        "iron_vow_garb"
+      ],
+      "description": "Small bossed shield strapped to the off-arm for parrying frontier steel."
+    },
+    "parry_dirk": {
+      "id": "parry_dirk",
+      "name": "Parry Dirk",
+      "slot": "offHand",
+      "traits": [
+        "finesse"
+      ],
+      "value": 20,
+      "statBonus": {
+        "agility": 1
+      },
+      "bonusDamage": 1,
+      "description": "Notched off-hand dagger balanced to turn blades and dart through gaps."
+    },
+    "tallow_lantern": {
+      "id": "tallow_lantern",
+      "name": "Tallow Lantern",
+      "slot": "offHand",
+      "traits": [
+        "lightSource"
+      ],
+      "value": 15,
+      "description": "Shuttered brass lantern that holds back cavern dark without burning pack torches."
+    },
+    "amber_censer": {
+      "id": "amber_censer",
+      "name": "Amber Censer",
+      "slot": "offHand",
+      "traits": [
+        "catalyst"
+      ],
+      "value": 28,
+      "maxFocusBonus": 2,
+      "resistances": {
+        "resonant": "resistant"
+      },
+      "description": "Swinging brass thurible burning soul-amber to deepen spellcraft focus."
+    },
+    "ash_mantle": {
+      "id": "ash_mantle",
+      "name": "Ash-Weave Mantle",
+      "slot": "cloak",
+      "value": 24,
+      "resistances": {
+        "fire": "resistant",
+        "cold": "resistant"
+      },
+      "description": "Oiled wool cloak that sheds soot-rain and biting ridge wind."
+    },
+    "cistern_veil": {
+      "id": "cistern_veil",
+      "name": "Cistern Shroud",
+      "slot": "cloak",
+      "value": 30,
+      "statBonus": {
+        "wit": 1
+      },
+      "visibleTags": [
+        "cistern_garb"
+      ],
+      "resistances": {
+        "blight": "resistant"
+      },
+      "description": "Luminous pale silk shawl worn by surface envoys of the Silken Cistern."
+    },
+    "vow_tabard": {
+      "id": "vow_tabard",
+      "name": "Iron-Vow Cloak",
+      "slot": "cloak",
+      "value": 26,
+      "maxResolveBonus": 2,
+      "visibleTags": [
+        "iron_vow_garb"
+      ],
+      "description": "Heavy grey ranger cloak bearing the iron key of Cinderford Keep."
+    },
+    "kiln_pitch": {
+      "id": "kiln_pitch",
+      "name": "Kiln-Pitch Oil",
+      "slot": "coating",
+      "actionCost": "swift",
+      "value": 14,
+      "coatingDamageType": "fire",
+      "coatingBonusDamage": 3,
+      "coatingCharges": 3,
+      "description": "Alchemical ember-tar brushed onto a weapon for three fiery strikes."
+    },
+    "silver_ash_oil": {
+      "id": "silver_ash_oil",
+      "name": "Silver-Ash Oil",
+      "slot": "coating",
+      "actionCost": "swift",
+      "value": 16,
+      "coatingDamageType": "resonant",
+      "coatingBonusDamage": 3,
+      "coatingCharges": 3,
+      "description": "Resonant silver-dust oil brushed onto steel to harm bell-born husks."
+    },
+    "amber_tonic": {
+      "id": "amber_tonic",
+      "name": "Amber Draught",
+      "slot": "draught",
+      "actionCost": "swift",
+      "value": 18,
+      "healHp": 14,
+      "restoreFocus": 4,
+      "draughtDefilement": 8,
+      "description": "Potent distilled amber that knits flesh and restores focus at the cost of Defilement."
+    },
+    "iron_sap_draught": {
+      "id": "iron_sap_draught",
+      "name": "Iron-Sap Draught",
+      "slot": "draught",
+      "actionCost": "swift",
+      "value": 18,
+      "restoreStamina": 6,
+      "draughtDefilement": 7,
+      "draughtStatus": {
+        "type": "guarded",
+        "turns": 2,
+        "power": 2
+      },
+      "description": "Thick root-brine that surges stamina and hardens skin while raising Defilement."
+    },
+    "veil_elixir": {
+      "id": "veil_elixir",
+      "name": "Veil Elixir",
+      "slot": "draught",
+      "actionCost": "swift",
+      "value": 20,
+      "restoreResolve": 8,
+      "draughtDefilement": 8,
+      "draughtStatus": {
+        "type": "blessed",
+        "turns": 2,
+        "power": 2
+      },
+      "description": "Cold star-dew draught that steadies resolve and grants Edge while raising Defilement."
+    },
+    "ash_purge_draught": {
+      "id": "ash_purge_draught",
+      "name": "Ash-Purge Draught",
+      "slot": "draught",
+      "actionCost": "swift",
+      "value": 22,
+      "healHp": 4,
+      "cureNegative": true,
+      "draughtPurgeDefilement": 12,
+      "description": "Bitter charcoal tincture that scours afflictions and lowers Defilement."
+    },
+    "writ_bone_shatter": {
+      "id": "writ_bone_shatter",
+      "name": "Ash-Text: Shatter",
+      "slot": "ash_text",
+      "actionCost": "main",
+      "value": 28,
+      "ashTextDc": 12,
+      "ashTextEffect": "bone_shatter",
+      "description": "Charred vellum writ that breaks enemy bone and armor on a Wit check or triggers Ruin."
+    },
+    "writ_star_ward": {
+      "id": "writ_star_ward",
+      "name": "Ash-Text: Ward",
+      "slot": "ash_text",
+      "actionCost": "main",
+      "value": 26,
+      "ashTextDc": 11,
+      "ashTextEffect": "star_ward",
+      "description": "Silver-inked writ that wraps the reader in a shimmering ward on a Wit check or triggers Ruin."
+    },
+    "writ_blight_wave": {
+      "id": "writ_blight_wave",
+      "name": "Ash-Text: Blight",
+      "slot": "ash_text",
+      "actionCost": "main",
+      "value": 32,
+      "ashTextDc": 13,
+      "ashTextEffect": "blight_wave",
+      "description": "Forbidden mire-scroll that sweeps all foes with rot on a Wit check or triggers Ruin."
     }
   },
   "recipes": [
@@ -473,6 +704,62 @@
         }
       ],
       "grixiOrScholarOnly": true
+    },
+    {
+      "id": "craft_kiln_pitch",
+      "name": "Kiln-Pitch Oil",
+      "outputItemId": "kiln_pitch",
+      "outputQty": 1,
+      "ingredients": [
+        {
+          "itemId": "ash_resin",
+          "qty": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_amber_tonic",
+      "name": "Amber Draught",
+      "outputItemId": "amber_tonic",
+      "outputQty": 1,
+      "ingredients": [
+        {
+          "itemId": "bog_herb",
+          "qty": 1
+        },
+        {
+          "itemId": "ash_resin",
+          "qty": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_iron_sap_draught",
+      "name": "Iron-Sap Draught",
+      "outputItemId": "iron_sap_draught",
+      "outputQty": 1,
+      "ingredients": [
+        {
+          "itemId": "husk_gland",
+          "qty": 1
+        },
+        {
+          "itemId": "bog_herb",
+          "qty": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_ash_purge_draught",
+      "name": "Ash-Purge Draught",
+      "outputItemId": "ash_purge_draught",
+      "outputQty": 1,
+      "ingredients": [
+        {
+          "itemId": "bog_herb",
+          "qty": 2
+        }
+      ]
     }
   ]
 }

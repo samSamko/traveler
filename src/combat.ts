@@ -1,13 +1,23 @@
 import type {
+  AbilityDef,
+  ActionCost,
   ActiveEnemy,
   CombatState,
   DamageType,
   DownedEnemyEntry,
   GameState,
+  ItemDef,
   StatusEffect,
   StatusType,
 } from './types.ts';
-import { getEffectiveStat, nextRandom, rollDice } from './dice.ts';
+import { getEffectiveStat, nextRandom, resolveCheck, rollDice, rollDie } from './dice.ts';
+import {
+  applyWeaponCoating,
+  degradeArmor,
+  drinkDraught,
+  rollArmorTierReduction,
+  spendGrace,
+} from './systems/frontier.ts';
 import { ABILITIES, PERKS } from './content/characters.ts';
 import { ITEMS } from './content/items.ts';
 import { ENEMIES } from './content/enemies.ts';
@@ -65,11 +75,10 @@ export function getPlayerArmor(state: GameState, enemyIsBoss = false): number {
   if (p.race === 'durnfolk') armor += 2;
   if (p.background === 'shrine_penitent' && enemyIsBoss) armor += 2;
 
-  const armorItem = ITEMS[p.armorId];
-  if (armorItem?.armorBonus) armor += armorItem.armorBonus;
-
-  const trinket = p.trinketId ? ITEMS[p.trinketId] : undefined;
-  if (trinket?.armorBonus) armor += trinket.armorBonus;
+  for (const itemId of Object.values(p.equipment)) {
+    const item = itemId ? ITEMS[itemId] : undefined;
+    if (item?.armorBonus) armor += item.armorBonus;
+  }
 
   for (const perkId of p.perks) {
     const perk = PERKS[perkId];
@@ -99,7 +108,53 @@ function getPerkDamageBonus(state: GameState): number {
     const perk = PERKS[perkId];
     if (perk?.damageBonus) bonus += perk.damageBonus;
   }
+  const offHand = state.player.equipment.offHand ? ITEMS[state.player.equipment.offHand] : undefined;
+  if (offHand?.bonusDamage) bonus += offHand.bonusDamage;
   return bonus;
+}
+
+export function getTurnActionBudget(state: GameState): { main: number; swift: number; free: number } {
+  let main = 1;
+  let swift = 1;
+  for (const perkId of state.player.perks) {
+    const perk = PERKS[perkId];
+    if (perk?.extraMainActions) main += perk.extraMainActions;
+    if (perk?.extraSwiftActions) swift += perk.extraSwiftActions;
+  }
+  return { main, swift, free: 1 };
+}
+
+function getAbilityActionCost(ab: AbilityDef): ActionCost {
+  return ab.actionCost ?? 'main';
+}
+
+function getItemActionCost(state: GameState, item: ItemDef): ActionCost {
+  if (item.actionCost) return item.actionCost;
+  const hasQuickHands = state.player.perks.some((pid) => PERKS[pid]?.swiftItems);
+  if (hasQuickHands && (item.slot === 'consumable' || item.slot === 'draught' || item.slot === 'coating')) {
+    return 'swift';
+  }
+  return 'main';
+}
+
+function getEffectiveFocusCost(state: GameState, ab: AbilityDef): number {
+  if (ab.focusCost <= 0) return 0;
+  if (state.clock.paleShift === 'silent_bells' && (ab.kind === 'cantrip' || ab.kind === 'spell')) {
+    return Math.max(1, ab.focusCost - 1);
+  }
+  return ab.focusCost;
+}
+
+function hasActionPool(combat: CombatState, cost: ActionCost): boolean {
+  if (cost === 'free') return combat.freeLeft > 0;
+  if (cost === 'swift') return combat.swiftLeft > 0;
+  return combat.mainLeft > 0;
+}
+
+function spendActionPool(combat: CombatState, cost: ActionCost): void {
+  if (cost === 'free') combat.freeLeft = Math.max(0, combat.freeLeft - 1);
+  else if (cost === 'swift') combat.swiftLeft = Math.max(0, combat.swiftLeft - 1);
+  else combat.mainLeft = Math.max(0, combat.mainLeft - 1);
 }
 
 function pushStatus(
@@ -220,12 +275,17 @@ export function startCombatEncounter(
     };
   });
 
+  const budget = getTurnActionBudget(state);
   const combat: CombatState = {
     enemies,
     subMenu: 'root',
     pendingActionId: null,
     observedUsedThisRound: false,
     round: 1,
+    mainLeft: budget.main,
+    swiftLeft: budget.swift,
+    freeLeft: budget.free,
+    graceMaxDamagePending: false,
     heirloomUsedThisFight: false,
     guaranteedDodgeThisTurn: false,
     counterDamagePending: 0,
@@ -267,15 +327,32 @@ export function getCombatMenuOptions(state: GameState): CombatMenuOption[] {
   const opts: CombatMenuOption[] = [];
 
   if (combat.subMenu === 'root') {
-    opts.push({ index: 1, id: 'strike', label: 'Strike', enabled: true });
+    opts.push({
+      index: 1,
+      id: 'strike',
+      label: 'Strike',
+      enabled: combat.mainLeft > 0,
+      reason: combat.mainLeft > 0 ? undefined : 'No Main action left',
+    });
     opts.push({
       index: 2,
       id: 'subdue',
       label: 'Subdue',
-      enabled: p.stamina >= 1,
-      reason: p.stamina >= 1 ? undefined : 'Insufficient stamina',
+      enabled: combat.mainLeft > 0 && p.stamina >= 1,
+      reason:
+        combat.mainLeft <= 0
+          ? 'No Main action left'
+          : p.stamina >= 1
+            ? undefined
+            : 'Insufficient stamina',
     });
-    opts.push({ index: 3, id: 'guard', label: 'Guard', enabled: true });
+    opts.push({
+      index: 3,
+      id: 'guard',
+      label: 'Guard',
+      enabled: combat.mainLeft > 0,
+      reason: combat.mainLeft > 0 ? undefined : 'No Main action left',
+    });
 
     const hasSkills = p.abilities.some((id) => ABILITIES[id]?.kind === 'skill');
     if (hasSkills) {
@@ -290,17 +367,35 @@ export function getCombatMenuOptions(state: GameState): CombatMenuOption[] {
       opts.push({ index: opts.length + 1, id: 'menu:spells', label: 'Spells', enabled: true });
     }
 
-    if (!combat.observedUsedThisRound) {
+    if (!combat.observedUsedThisRound && combat.freeLeft > 0) {
       opts.push({ index: opts.length + 1, id: 'observe', label: 'Observe', enabled: true });
     }
 
+    if (p.grace > 0 && combat.freeLeft > 0 && !combat.graceMaxDamagePending) {
+      opts.push({ index: opts.length + 1, id: 'grace', label: 'Spend Grace', enabled: true });
+    }
+
     if (!combat.heirloomUsedThisFight) {
-      opts.push({ index: opts.length + 1, id: 'heirloom', label: 'Heirloom', enabled: true });
+      opts.push({
+        index: opts.length + 1,
+        id: 'heirloom',
+        label: 'Heirloom',
+        enabled: combat.swiftLeft > 0,
+        reason: combat.swiftLeft > 0 ? undefined : 'No Swift action left',
+      });
     }
 
     const hasCombatItems = p.inventory.some((entry) => {
       const item = ITEMS[entry.id];
-      return item && item.slot === 'consumable' && !item.grantsBodyModId && entry.qty > 0;
+      return (
+        item &&
+        (item.slot === 'consumable' ||
+          item.slot === 'draught' ||
+          item.slot === 'coating' ||
+          item.slot === 'ash_text') &&
+        !item.grantsBodyModId &&
+        entry.qty > 0
+      );
     });
     if (hasCombatItems) {
       opts.push({ index: opts.length + 1, id: 'menu:items', label: 'Item', enabled: true });
@@ -308,8 +403,18 @@ export function getCombatMenuOptions(state: GameState): CombatMenuOption[] {
 
     opts.push({ index: opts.length + 1, id: 'open_journal', label: 'Journal', enabled: true });
 
+    if (combat.mainLeft <= 0 && combat.swiftLeft > 0) {
+      opts.push({ index: opts.length + 1, id: 'end_turn', label: 'End Turn', enabled: true });
+    }
+
     if (combat.canFlee) {
-      opts.push({ index: opts.length + 1, id: 'flee', label: 'Flee', enabled: true });
+      opts.push({
+        index: opts.length + 1,
+        id: 'flee',
+        label: 'Flee',
+        enabled: combat.mainLeft > 0,
+        reason: combat.mainLeft > 0 ? undefined : 'No Main action left',
+      });
     }
     return opts;
   }
@@ -318,16 +423,24 @@ export function getCombatMenuOptions(state: GameState): CombatMenuOption[] {
     for (const abId of p.abilities) {
       const ab = ABILITIES[abId];
       if (!ab || ab.kind !== 'skill') continue;
+      const cost = getAbilityActionCost(ab);
+      const hasAct = hasActionPool(combat, cost);
+      const focusCost = getEffectiveFocusCost(state, ab);
       const canPay =
+        hasAct &&
         p.stamina >= ab.staminaCost &&
-        p.focus >= ab.focusCost &&
+        p.focus >= focusCost &&
         (!ab.hpCost || p.hp > ab.hpCost);
       opts.push({
         index: opts.length + 1,
         id: `ability:${ab.id}`,
         label: ab.name,
         enabled: canPay,
-        reason: canPay ? undefined : 'Insufficient stamina or focus',
+        reason: !hasAct
+          ? `No ${cost} action left`
+          : canPay
+            ? undefined
+            : 'Insufficient stamina or focus',
       });
     }
     opts.push({ index: opts.length + 1, id: 'menu:back', label: 'Back', enabled: true });
@@ -338,13 +451,20 @@ export function getCombatMenuOptions(state: GameState): CombatMenuOption[] {
     for (const abId of p.abilities) {
       const ab = ABILITIES[abId];
       if (!ab || (ab.kind !== 'cantrip' && ab.kind !== 'spell')) continue;
-      const canPay = p.stamina >= ab.staminaCost && p.focus >= ab.focusCost;
+      const cost = getAbilityActionCost(ab);
+      const hasAct = hasActionPool(combat, cost);
+      const focusCost = getEffectiveFocusCost(state, ab);
+      const canPay = hasAct && p.stamina >= ab.staminaCost && p.focus >= focusCost;
       opts.push({
         index: opts.length + 1,
         id: `ability:${ab.id}`,
         label: ab.name,
         enabled: canPay,
-        reason: canPay ? undefined : 'Insufficient focus',
+        reason: !hasAct
+          ? `No ${cost} action left`
+          : canPay
+            ? undefined
+            : 'Insufficient focus',
       });
     }
     opts.push({ index: opts.length + 1, id: 'menu:back', label: 'Back', enabled: true });
@@ -354,12 +474,23 @@ export function getCombatMenuOptions(state: GameState): CombatMenuOption[] {
   if (combat.subMenu === 'items') {
     for (const entry of p.inventory) {
       const item = ITEMS[entry.id];
-      if (item && item.slot === 'consumable' && !item.grantsBodyModId && entry.qty > 0) {
+      if (
+        item &&
+        (item.slot === 'consumable' ||
+          item.slot === 'draught' ||
+          item.slot === 'coating' ||
+          item.slot === 'ash_text') &&
+        !item.grantsBodyModId &&
+        entry.qty > 0
+      ) {
+        const cost = getItemActionCost(state, item);
+        const hasAct = hasActionPool(combat, cost);
         opts.push({
           index: opts.length + 1,
           id: `item:${item.id}`,
           label: item.name,
-          enabled: true,
+          enabled: hasAct,
+          reason: hasAct ? undefined : `No ${cost} action left`,
         });
       }
     }
@@ -422,12 +553,15 @@ function dealDamageToEnemy(
 
   let downedOrKilled: 'downed' | 'killed' | undefined;
   if (enemy.hp <= 0 && prevHp > 0) {
+    const weapon = state.player.equipment.mainHand ? ITEMS[state.player.equipment.mainHand] : undefined;
+    const subdueBonus = Boolean(weapon?.traits?.includes('subdueBonus'));
     downedOrKilled = determineEnemyDefeatOutcome(
       enemy,
       damageType,
       enemy.lastHitOverkill,
       Boolean(options?.forcedSubdue),
       state,
+      subdueBonus,
     );
     enemy.defeatedState = downedOrKilled;
   }
@@ -643,9 +777,27 @@ export function executeCombatAction(
   }
 
   if (actionId === 'observe') {
+    if (combat.freeLeft <= 0) {
+      return { messages: ['No Free action left this round.'] };
+    }
+    spendActionPool(combat, 'free');
     const msgs = runActiveObserveCheck(state, targetIdx);
     combat.log = msgs.slice(-5);
     return { messages: msgs };
+  }
+
+  if (actionId === 'grace') {
+    if (combat.freeLeft <= 0) {
+      return { messages: ['No Free action left this round.'] };
+    }
+    if (!spendGrace(state)) {
+      return { messages: ['No Grace remains.'] };
+    }
+    spendActionPool(combat, 'free');
+    combat.graceMaxDamagePending = true;
+    const msg = 'You burn a spark of Grace. Your next blow or spell this turn will strike for maximum force.';
+    combat.log = [...combat.log, msg].slice(-5);
+    return { messages: [msg] };
   }
 
   const logs: string[] = [];
@@ -654,38 +806,67 @@ export function executeCombatAction(
   const roundOneBonus = combat.round === 1 && p.background === 'barrow_stalker' ? 3 : 0;
   const perkDmg = getPerkDamageBonus(state);
 
-  if (actionId === 'strike' || actionId === 'subdue') {
+  let skipAutoTurnCheck = false;
+
+  if (actionId === 'end_turn') {
+    combat.mainLeft = 0;
+    combat.swiftLeft = 0;
+    logs.push('You hold your stance and yield the initiative.');
+  } else if (actionId === 'strike' || actionId === 'subdue') {
+    if (combat.mainLeft <= 0) return { messages: ['No Main action left this turn.'] };
     const isSubdue = actionId === 'subdue';
     if (isSubdue) {
       if (p.stamina < 1) return { messages: ['Insufficient stamina.'] };
       p.stamina -= 1;
     }
-    const weapon = ITEMS[p.weaponId];
+    spendActionPool(combat, 'main');
+    const weapon = p.equipment.mainHand ? ITEMS[p.equipment.mainHand] : undefined;
     const [cnt, sides] = weapon?.damageDice ?? [1, 6];
     const statName = weapon?.statScaling ?? 'might';
     const statBonus = getEffectiveStat(state, statName);
     const honed = p.weaponHoned ? 1 : 0;
     const poise = p.background === 'ashen_blade' ? 1 : 0;
+    const moonBonus = state.clock.paleShift === 'blood_ash_moon' ? 2 : 0;
+    let coatingBonus = 0;
+    let coatingNote = '';
+    if (p.weaponCoating && p.weaponCoating.charges > 0 && !isSubdue) {
+      coatingBonus = p.weaponCoating.bonusDamage;
+      p.weaponCoating.charges -= 1;
+      coatingNote = ` ${p.weaponCoating.name} flares for +${coatingBonus} ${p.weaponCoating.damageType} damage.`;
+      if (p.weaponCoating.charges <= 0) {
+        p.weaponCoating = null;
+      }
+    }
+    const diceTotal = combat.graceMaxDamagePending ? cnt * sides : rollDice(cnt, sides, state);
+    if (combat.graceMaxDamagePending) {
+      combat.graceMaxDamagePending = false;
+      logs.push('Grace guides the blow to its peak.');
+    }
     const dType: DamageType = isSubdue ? 'bludgeoning' : (weapon?.damageType ?? 'slashing');
     const rawBase =
-      rollDice(cnt, sides, state) +
+      diceTotal +
       (weapon?.bonusDamage ?? 0) +
       statBonus +
       honed +
       poise +
+      moonBonus +
+      coatingBonus +
       roundOneBonus +
       perkDmg;
     const raw = isSubdue ? Math.max(2, Math.floor(rawBase * 0.85)) : rawBase;
     const hit = dealDamageToEnemy(state, primaryEnemy, raw, dType, {
       forcedSubdue: isSubdue,
+      pierceArmor: Boolean(weapon?.traits?.includes('armorPiercing')),
     });
     const tName = getEnemyDisplayName(state, primaryEnemy);
     const verb = isSubdue ? 'strike to subdue' : 'strike';
     logs.push(
-      `You ${verb} ${tName} with ${DAMAGE_TYPE_META[dType].label.toLowerCase()} force for ${hit.dealt} damage.${hit.relationNote}`,
+      `You ${verb} ${tName} with ${DAMAGE_TYPE_META[dType].label.toLowerCase()} force for ${hit.dealt} damage.${hit.relationNote}${coatingNote}`,
     );
     if (hit.weatherNote) logs.push(hit.weatherNote);
   } else if (actionId === 'guard') {
+    if (combat.mainLeft <= 0) return { messages: ['No Main action left this turn.'] };
+    spendActionPool(combat, 'main');
     pushStatus(p.statuses, { type: 'guarded', turns: 1, power: 4 });
     p.stamina = Math.min(p.maxStamina, p.stamina + 1);
     p.focus = Math.min(p.maxFocus, p.focus + 2);
@@ -695,17 +876,29 @@ export function executeCombatAction(
     const abId = actionId.slice(8);
     const ab = ABILITIES[abId];
     if (!ab) return { messages: ['Unknown ability.'] };
-    if (p.stamina < ab.staminaCost || p.focus < ab.focusCost || (ab.hpCost && p.hp <= ab.hpCost)) {
+    const cost = getAbilityActionCost(ab);
+    if (!hasActionPool(combat, cost)) {
+      return { messages: [`No ${cost} action left this turn.`] };
+    }
+    const focusCost = getEffectiveFocusCost(state, ab);
+    if (p.stamina < ab.staminaCost || p.focus < focusCost || (ab.hpCost && p.hp <= ab.hpCost)) {
       return { messages: ['Insufficient stamina, focus, or health.'] };
     }
 
+    spendActionPool(combat, cost);
     p.stamina -= ab.staminaCost;
-    p.focus -= ab.focusCost;
+    p.focus -= focusCost;
     if (ab.hpCost) p.hp -= ab.hpCost;
 
     const affected = ab.isAoE
       ? getLivingEnemyIndices(combat).map((i) => combat.enemies[i])
       : [primaryEnemy];
+
+    const maximize = combat.graceMaxDamagePending && Boolean(ab.damageDice);
+    if (maximize) {
+      combat.graceMaxDamagePending = false;
+      logs.push('Grace sharpens your art to its peak.');
+    }
 
     for (const target of affected) {
       if (ab.shatterGuard) target.turnArmor = 0;
@@ -715,8 +908,9 @@ export function executeCombatAction(
         const statBonus = getEffectiveStat(state, ab.stat);
         const debuffBonus =
           ab.bonusVsDebuffed && target.statuses.length > 0 ? ab.bonusVsDebuffed : 0;
+        const diceTotal = maximize ? cnt * sides : rollDice(cnt, sides, state);
         const raw =
-          rollDice(cnt, sides, state) +
+          diceTotal +
           (ab.baseDamage ?? 0) +
           statBonus +
           debuffBonus +
@@ -764,9 +958,13 @@ export function executeCombatAction(
       logs.push(`You become ${ab.applySelfStatus.type}.`);
     }
   } else if (actionId === 'heirloom') {
+    if (combat.swiftLeft <= 0) {
+      return { messages: ['No Swift action left this turn.'] };
+    }
     if (combat.heirloomUsedThisFight) {
       return { messages: ['Your heirloom is already spent for this battle.'] };
     }
+    spendActionPool(combat, 'swift');
     combat.heirloomUsedThisFight = true;
 
     if (p.heirloom === 'kiln_lantern') {
@@ -796,47 +994,114 @@ export function executeCombatAction(
   } else if (actionId.startsWith('item:')) {
     const itemId = actionId.slice(5);
     const item = ITEMS[itemId];
-    if (!item || !consumeInventoryItem(state, itemId, 1)) {
+    if (!item) return { messages: ['Unknown item.'] };
+    const cost = getItemActionCost(state, item);
+    if (!hasActionPool(combat, cost)) {
+      return { messages: [`No ${cost} action left this turn.`] };
+    }
+    if (!consumeInventoryItem(state, itemId, 1)) {
       return { messages: ['You do not have that item.'] };
     }
-    if (item.throwDamage) {
-      const dType: DamageType = item.throwDamageType ?? 'fire';
-      const hit = dealDamageToEnemy(state, primaryEnemy, item.throwDamage, dType, {
-        pierceArmor: true,
+    spendActionPool(combat, cost);
+
+    if (item.slot === 'draught') {
+      logs.push(...drinkDraught(state, item.id));
+    } else if (item.slot === 'coating') {
+      logs.push(...applyWeaponCoating(state, item.id));
+    } else if (item.slot === 'ash_text') {
+      const check = resolveCheck(state, 'wit', item.ashTextDc ?? 12, {
+        label: item.name,
+        isLoreOrPerception: true,
       });
-      const tName = getEnemyDisplayName(state, primaryEnemy);
-      logs.push(
-        `You hurl ${item.name} at ${tName} for ${hit.dealt} ${DAMAGE_TYPE_META[dType].label.toLowerCase()} damage.${hit.relationNote}`,
-      );
-      if (item.throwStatus && primaryEnemy.hp > 0) {
-        pushStatus(primaryEnemy.statuses, item.throwStatus);
-        logs.push(`${tName} becomes ${item.throwStatus.type}.`);
+      if (!check.success) {
+        const ruinRoll = rollDie(4, state);
+        if (ruinRoll === 1) {
+          p.defilement = Math.min(100, p.defilement + 8);
+          logs.push(check.logLine, 'Ruin backlash scorches your tongue. Defilement rises by 8.');
+        } else if (ruinRoll === 2) {
+          p.hp = Math.max(1, p.hp - 5);
+          logs.push(check.logLine, 'Ruin backlash snaps ribs for 5 damage.');
+        } else if (ruinRoll === 3) {
+          const deg = degradeArmor(state);
+          logs.push(check.logLine, deg ?? 'Ruin shockwave drains 3 Resolve.');
+          if (!deg) p.resolve = Math.max(0, p.resolve - 3);
+        } else {
+          p.resolve = Math.max(0, p.resolve - 4);
+          logs.push(check.logLine, 'Hollow bronze echoes from the vellum cost 4 Resolve.');
+        }
+      } else if (item.ashTextEffect === 'bone_shatter') {
+        primaryEnemy.turnArmor = 0;
+        primaryEnemy.baseArmor = Math.max(0, primaryEnemy.baseArmor - 2);
+        const hit = dealDamageToEnemy(
+          state,
+          primaryEnemy,
+          rollDice(3, 6, state) + getEffectiveStat(state, 'wit'),
+          'resonant',
+          { pierceArmor: true },
+        );
+        logs.push(
+          check.logLine,
+          `${item.name} shatters ${getEnemyDisplayName(state, primaryEnemy)} for ${hit.dealt} resonant damage.`,
+        );
+      } else if (item.ashTextEffect === 'blight_wave') {
+        const witMod = getEffectiveStat(state, 'wit');
+        for (const idx of getLivingEnemyIndices(combat)) {
+          const foe = combat.enemies[idx];
+          const hit = dealDamageToEnemy(state, foe, rollDice(2, 6, state) + witMod, 'blight', {
+            pierceArmor: true,
+          });
+          if (foe.hp > 0) pushStatus(foe.statuses, { type: 'blighted', turns: 3, power: 3 });
+          logs.push(`${item.name} sweeps ${getEnemyDisplayName(state, foe)} for ${hit.dealt} blight damage.`);
+        }
+      } else {
+        pushStatus(p.statuses, { type: 'guarded', turns: 4, power: 3 });
+        pushStatus(p.statuses, { type: 'blessed', turns: 4, power: 2 });
+        logs.push(check.logLine, 'Silver wards wrap your shoulders in guarded calm and Edge.');
+      }
+    } else {
+      if (item.throwDamage) {
+        const dType: DamageType = item.throwDamageType ?? 'fire';
+        const hit = dealDamageToEnemy(state, primaryEnemy, item.throwDamage, dType, {
+          pierceArmor: true,
+        });
+        const tName = getEnemyDisplayName(state, primaryEnemy);
+        logs.push(
+          `You hurl ${item.name} at ${tName} for ${hit.dealt} ${DAMAGE_TYPE_META[dType].label.toLowerCase()} damage.${hit.relationNote}`,
+        );
+        if (item.throwStatus && primaryEnemy.hp > 0) {
+          pushStatus(primaryEnemy.statuses, item.throwStatus);
+          logs.push(`${tName} becomes ${item.throwStatus.type}.`);
+        }
+      }
+      if (item.healHp) {
+        p.hp = Math.min(p.maxHp, p.hp + item.healHp);
+        logs.push(`Used ${item.name}, restoring ${item.healHp} health.`);
+      }
+      if (item.restoreStamina) {
+        p.stamina = Math.min(p.maxStamina, p.stamina + item.restoreStamina);
+        logs.push(`Restored ${item.restoreStamina} stamina.`);
+      }
+      if (item.restoreFocus) {
+        p.focus = Math.min(p.maxFocus, p.focus + item.restoreFocus);
+        logs.push(`Restored ${item.restoreFocus} focus.`);
+      }
+      if (item.restoreResolve) {
+        p.resolve = Math.min(p.maxResolve, p.resolve + item.restoreResolve);
+        logs.push(`Restored ${item.restoreResolve} resolve.`);
+      }
+      if (item.cureNegative) {
+        p.statuses = clearNegativeStatuses(p.statuses);
+        logs.push('Afflictions purged.');
       }
     }
-    if (item.healHp) {
-      p.hp = Math.min(p.maxHp, p.hp + item.healHp);
-      logs.push(`Used ${item.name}, restoring ${item.healHp} health.`);
-    }
-    if (item.restoreStamina) {
-      p.stamina = Math.min(p.maxStamina, p.stamina + item.restoreStamina);
-      logs.push(`Restored ${item.restoreStamina} stamina.`);
-    }
-    if (item.restoreFocus) {
-      p.focus = Math.min(p.maxFocus, p.focus + item.restoreFocus);
-      logs.push(`Restored ${item.restoreFocus} focus.`);
-    }
-    if (item.restoreResolve) {
-      p.resolve = Math.min(p.maxResolve, p.resolve + item.restoreResolve);
-      logs.push(`Restored ${item.restoreResolve} resolve.`);
-    }
-    if (item.cureNegative) {
-      p.statuses = clearNegativeStatuses(p.statuses);
-      logs.push('Afflictions purged.');
-    }
   } else if (actionId === 'flee') {
+    if (combat.mainLeft <= 0) {
+      return { messages: ['No Main action left this turn.'] };
+    }
     if (!combat.canFlee) {
       return { messages: ['There is no escape from the Choir-Pit.'] };
     }
+    spendActionPool(combat, 'main');
     const agi = getEffectiveStat(state, 'agility');
     const roll = rollDice(1, 20, state);
     if (roll + agi >= 12) {
@@ -847,6 +1112,7 @@ export function executeCombatAction(
         messages: ['You slip clear into the mist before the circle closes.'],
       };
     }
+    skipAutoTurnCheck = true;
     logs.push('Your escape route is cut off.');
   } else {
     return { messages: ['Unknown combat action.'] };
@@ -854,6 +1120,11 @@ export function executeCombatAction(
 
   if (getLivingEnemyIndices(combat).length === 0) {
     return { messages: [...logs, ...resolveVictory(state)] };
+  }
+
+  if (!skipAutoTurnCheck && actionId !== 'end_turn' && (combat.mainLeft > 0 || combat.swiftLeft > 0)) {
+    combat.log = logs.slice(-5);
+    return { messages: logs };
   }
 
   for (const idx of getLivingEnemyIndices(combat)) {
@@ -903,11 +1174,13 @@ export function executeCombatAction(
         const dazed = enemy.statuses.find((s) => s.type === 'dazed');
         const dmgReduction = dazed ? dazed.power : 0;
         const playerArmor = getPlayerArmor(state, Boolean(enemy.isBoss));
-        const preRes = Math.max(0, intent.damage - dmgReduction - playerArmor);
+        const tierDr = rollArmorTierReduction(p.armorTierCurrent, state);
+        const preRes = Math.max(0, intent.damage - dmgReduction - playerArmor - tierDr);
         const res = preRes > 0
           ? computeDamageAfterResistance(preRes, intent.damageType, playerResistances, state.clock.weather)
           : { finalDamage: 0, relation: 'neutral' as const };
         p.hp = Math.max(0, p.hp - res.finalDamage);
+        const tierNote = tierDr > 0 ? ` Armor absorbs ${tierDr}.` : '';
         const relText =
           res.relation === 'immune'
             ? ' Your body shrugs it off completely.'
@@ -917,8 +1190,12 @@ export function executeCombatAction(
                 ? ' It tears straight into your weakness.'
                 : '';
         logs.push(
-          `${eName} strikes with ${intent.label} for ${res.finalDamage} ${DAMAGE_TYPE_META[intent.damageType].label.toLowerCase()} damage.${relText}`,
+          `${eName} strikes with ${intent.label} for ${res.finalDamage} ${DAMAGE_TYPE_META[intent.damageType].label.toLowerCase()} damage.${tierNote}${relText}`,
         );
+        if (res.finalDamage > 0 && p.armorTierCurrent > 0 && rollDie(10, state) === 1) {
+          const degMsg = degradeArmor(state);
+          if (degMsg) logs.push(degMsg);
+        }
         if (intent.resolveDamage && intent.resolveDamage > 0) {
           p.resolve = Math.max(0, p.resolve - intent.resolveDamage);
           logs.push(`Your resolve frays by ${intent.resolveDamage}.`);
@@ -958,6 +1235,11 @@ export function executeCombatAction(
 
   combat.round += 1;
   combat.observedUsedThisRound = false;
+  const nextBudget = getTurnActionBudget(state);
+  combat.mainLeft = nextBudget.main;
+  combat.swiftLeft = nextBudget.swift;
+  combat.freeLeft = nextBudget.free;
+  combat.graceMaxDamagePending = false;
   p.stamina = Math.min(p.maxStamina, p.stamina + 1);
   if (p.background === 'root_scholar') {
     p.focus = Math.min(p.maxFocus, p.focus + 1);

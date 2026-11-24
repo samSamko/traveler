@@ -54,8 +54,9 @@ export function getEffectivePlayerResistances(state: GameState): DamageProfile {
   };
 
   applyProfile(RACES[p.race]?.resistances);
-  applyProfile(ITEMS[p.armorId]?.resistances);
-  if (p.trinketId) applyProfile(ITEMS[p.trinketId]?.resistances);
+  for (const itemId of Object.values(p.equipment)) {
+    if (itemId) applyProfile(ITEMS[itemId]?.resistances);
+  }
 
   for (const modId of Object.values(p.bodyMods)) {
     if (modId && BODY_MODS[modId]?.resistances) {
@@ -109,6 +110,7 @@ export function determineEnemyDefeatOutcome(
   overkill: number,
   forcedSubdue: boolean,
   state: GameState,
+  subdueBonus = false,
 ): 'downed' | 'killed' {
   if (enemy.category === 'construct') {
     return forcedSubdue || damageType === 'lightning' ? 'downed' : 'killed';
@@ -119,10 +121,10 @@ export function determineEnemyDefeatOutcome(
 
   const overkillRatio = Math.max(0, overkill) / Math.max(1, enemy.maxHp);
   if (forcedSubdue) {
-    return overkillRatio >= 0.65 ? 'killed' : 'downed';
+    return overkillRatio >= (subdueBonus ? 0.85 : 0.65) ? 'killed' : 'downed';
   }
 
-  const baseLethality = DAMAGE_TYPE_META[damageType].baseLethality;
+  const baseLethality = DAMAGE_TYPE_META[damageType].baseLethality - (subdueBonus ? 0.15 : 0);
   const lethalityChance = Math.min(0.95, Math.max(0.08, baseLethality + overkillRatio * 0.5));
   return nextRandom(state) < lethalityChance ? 'killed' : 'downed';
 }

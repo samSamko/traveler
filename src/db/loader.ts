@@ -176,8 +176,10 @@ export function loadWorldDatabase(): WorldRepository {
         stat_scaling, armor_bonus, resistances_json, max_hp_bonus, max_focus_bonus,
         max_stamina_bonus, max_resolve_bonus, stat_bonus_json, heal_hp, restore_stamina,
         restore_focus, restore_resolve, cure_negative, tends_injury, grants_body_mod_id,
-        throw_damage, throw_damage_type, throw_status_json
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        throw_damage, throw_damage_type, throw_status_json, action_cost, two_handed,
+        armor_tier, traits_json, visible_tags_json, granted_ability_id,
+        coating_json, draught_json, ash_text_json
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     );
     for (const item of Object.values(itemsJson.items)) {
       insItem.run(
@@ -207,23 +209,47 @@ export function loadWorldDatabase(): WorldRepository {
         item.throwDamage ?? null,
         item.throwDamageType ?? null,
         item.throwStatus ? JSON.stringify(item.throwStatus) : null,
+        item.actionCost ?? null,
+        item.twoHanded ? 1 : 0,
+        item.armorTier ?? 0,
+        item.traits ? JSON.stringify(item.traits) : null,
+        item.visibleTags ? JSON.stringify(item.visibleTags) : null,
+        item.grantedAbilityId ?? null,
+        item.coatingDamageType
+          ? JSON.stringify({
+              damageType: item.coatingDamageType,
+              bonusDamage: item.coatingBonusDamage ?? 0,
+              charges: item.coatingCharges ?? 3,
+            })
+          : null,
+        item.draughtDefilement !== undefined || item.draughtPurgeDefilement !== undefined
+          ? JSON.stringify({
+              defilement: item.draughtDefilement ?? 0,
+              purge: item.draughtPurgeDefilement ?? 0,
+              status: item.draughtStatus ?? null,
+            })
+          : null,
+        item.ashTextEffect
+          ? JSON.stringify({ dc: item.ashTextDc ?? 12, effect: item.ashTextEffect })
+          : null,
       );
     }
 
     // 2. Abilities
     const insAbility = db.prepare(
       `INSERT INTO abilities (
-        id, name, kind, damage_type, non_lethal, stamina_cost, focus_cost, hp_cost,
+        id, name, kind, action_cost, damage_type, non_lethal, stamina_cost, focus_cost, hp_cost,
         stat, base_damage, damage_dice_json, heal_amount, restore_resolve,
         restore_stamina, restore_focus, apply_enemy_status_json, apply_self_status_json,
         pierce_armor, shatter_guard, bonus_vs_debuffed, purge_negative, is_aoe, description
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     );
     for (const ab of Object.values(charJson.abilities)) {
       insAbility.run(
         ab.id,
         ab.name,
         ab.kind,
+        ab.actionCost ?? null,
         ab.damageType ?? null,
         ab.nonLethal ? 1 : 0,
         ab.staminaCost,
@@ -301,8 +327,8 @@ export function loadWorldDatabase(): WorldRepository {
     }
 
     const insPerk = db.prepare(
-      `INSERT INTO perks (id, name, description, stat_bonus_json, max_hp_bonus, max_stamina_bonus, max_focus_bonus, max_resolve_bonus, armor_bonus, damage_bonus)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO perks (id, name, description, stat_bonus_json, max_hp_bonus, max_stamina_bonus, max_focus_bonus, max_resolve_bonus, armor_bonus, damage_bonus, extra_main_actions, extra_swift_actions, swift_items)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     );
     for (const pk of Object.values(charJson.perks)) {
       insPerk.run(
@@ -316,6 +342,9 @@ export function loadWorldDatabase(): WorldRepository {
         pk.maxResolveBonus ?? null,
         pk.armorBonus ?? null,
         pk.damageBonus ?? null,
+        pk.extraMainActions ?? null,
+        pk.extraSwiftActions ?? null,
+        pk.swiftItems ? 1 : 0,
       );
     }
 

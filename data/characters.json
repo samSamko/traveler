@@ -266,6 +266,7 @@
       "id": "kiln_spark",
       "name": "Kiln-Spark",
       "kind": "cantrip",
+      "actionCost": "swift",
       "damageType": "fire",
       "staminaCost": 0,
       "focusCost": 2,
@@ -633,6 +634,18 @@
       "armorBonus": 2,
       "maxFocusBonus": 2,
       "maxResolveBonus": 4
+    },
+    "quick_hands": {
+      "id": "quick_hands",
+      "name": "Quick Hands",
+      "description": "Use pack draughts, poultices, and coatings as a Swift action.",
+      "swiftItems": true
+    },
+    "relentless_tempo": {
+      "id": "relentless_tempo",
+      "name": "Relentless Tempo",
+      "description": "Grants one extra Swift action every combat round.",
+      "extraSwiftActions": 1
     }
   }
 }

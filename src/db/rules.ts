@@ -22,6 +22,7 @@ export interface RuleRuntime {
   addItem: (state: GameState, itemId: string, qty: number) => void;
   consumeItem: (state: GameState, itemId: string, qty: number) => boolean;
   renderProse: (template: string, state: GameState) => string;
+  getEquippedVisibleTags: (state: GameState) => string[];
 }
 
 let runtime: RuleRuntime = {
@@ -39,6 +40,7 @@ let runtime: RuleRuntime = {
     return true;
   },
   renderProse: (template) => template,
+  getEquippedVisibleTags: () => [],
 };
 
 export function registerRuleRuntime(rt: RuleRuntime): void {
@@ -165,7 +167,13 @@ export function evaluateCondition(
   ) {
     return false;
   }
-  if (cond.hasTag && !p.anatomy.visibleTags.includes(cond.hasTag)) return false;
+  if (
+    cond.hasTag &&
+    !p.anatomy.visibleTags.includes(cond.hasTag) &&
+    !runtime.getEquippedVisibleTags(state).includes(cond.hasTag)
+  ) {
+    return false;
+  }
   if (cond.minCrowns !== undefined && p.crowns < cond.minCrowns) return false;
   if (cond.minRations !== undefined && p.rations < cond.minRations) return false;
   if (cond.minTorches !== undefined && p.torches < cond.minTorches) return false;

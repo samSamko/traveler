@@ -102,9 +102,7 @@ export function getJournalChoices(state: GameState): JournalChoice[] {
   if (state.journalTab === 'items') {
     const allKnown = new Set<string>([
       ...state.discovery.knownItems,
-      state.player.weaponId,
-      state.player.armorId,
-      ...(state.player.trinketId ? [state.player.trinketId] : []),
+      ...(Object.values(state.player.equipment).filter(Boolean) as string[]),
       ...state.player.inventory.map((i) => i.id),
     ]);
     for (const itemId of allKnown) {
@@ -138,12 +136,16 @@ export function renderJournalBody(state: GameState): string[] {
   if (state.journalTab === 'self') {
     const race = RACES[p.race];
     const bg = BACKGROUNDS[p.background];
-    const weapon = ITEMS[p.weaponId];
-    const armor = ITEMS[p.armorId];
-    const trinket = p.trinketId ? ITEMS[p.trinketId] : null;
+    const weapon = p.equipment.mainHand ? ITEMS[p.equipment.mainHand] : null;
+    const offHand = p.equipment.offHand ? ITEMS[p.equipment.offHand] : null;
+    const armor = p.equipment.armor ? ITEMS[p.equipment.armor] : null;
+    const cloak = p.equipment.cloak ? ITEMS[p.equipment.cloak] : null;
+    const trinket = p.equipment.trinket ? ITEMS[p.equipment.trinket] : null;
     const gearParts = [
-      weapon ? `${weapon.name}${p.weaponHoned ? ' Honed' : ''}` : p.weaponId,
-      armor ? armor.name : p.armorId,
+      ...(weapon ? [`${weapon.name}${p.weaponHoned ? ' Honed' : ''}`] : []),
+      ...(offHand ? [offHand.name] : []),
+      ...(armor ? [`${armor.name} Tier ${p.armorTierCurrent}`] : []),
+      ...(cloak ? [cloak.name] : []),
       ...(trinket ? [trinket.name] : []),
     ];
     const statusLine =
@@ -202,7 +204,7 @@ export function renderJournalBody(state: GameState): string[] {
   }
 
   if (state.journalTab === 'arts') {
-    const weapon = ITEMS[p.weaponId];
+    const weapon = p.equipment.mainHand ? ITEMS[p.equipment.mainHand] : undefined;
     const heirloom = HEIRLOOMS[p.heirloom];
     const [wdCount, wdSides] = weapon?.damageDice ?? [1, 6];
     const wBonus = (weapon?.bonusDamage ?? 0) + (p.weaponHoned ? 1 : 0);

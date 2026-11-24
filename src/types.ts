@@ -56,12 +56,21 @@ export type WeatherId =
   | 'biting_wind'
   | 'dead_still';
 
+export type PaleShiftId =
+  | 'none'
+  | 'blood_ash_moon'
+  | 'silent_bells'
+  | 'root_bloom'
+  | 'iron_frost';
+
 export interface WorldClock {
   day: number;
   hour: number; // 0..23
   totalHours: number;
   weather: WeatherId;
   weatherHoursLeft: number;
+  paleShift: PaleShiftId;
+  paleShiftDaysLeft: number;
 }
 
 export type FactionId = 'iron_vow' | 'silken_cistern' | 'under_warren' | 'husk_choir';
@@ -182,10 +191,15 @@ export interface AppearanceSelections {
 
 export type AbilityKind = 'skill' | 'cantrip' | 'spell';
 
+export type ActionCost = 'main' | 'swift' | 'free';
+
+export type RollMode = 'normal' | 'edge' | 'burden';
+
 export interface AbilityDef {
   id: string;
   name: string;
   kind: AbilityKind;
+  actionCost?: ActionCost;
   damageType?: DamageType;
   resolveDamage?: number;
   nonLethal?: boolean;
@@ -252,7 +266,30 @@ export interface HeirloomDef {
   combatDescription: string;
 }
 
-export type ItemSlot = 'weapon' | 'armor' | 'trinket' | 'consumable' | 'relic' | 'reagent';
+export type EquipSlot = 'mainHand' | 'offHand' | 'armor' | 'cloak' | 'trinket';
+
+export type ItemSlot =
+  | 'mainHand'
+  | 'offHand'
+  | 'armor'
+  | 'cloak'
+  | 'trinket'
+  | 'consumable'
+  | 'draught'
+  | 'coating'
+  | 'ash_text'
+  | 'relic'
+  | 'reagent';
+
+export type WeaponTrait =
+  | 'twoHanded'
+  | 'subdueBonus'
+  | 'armorPiercing'
+  | 'finesse'
+  | 'lightSource'
+  | 'catalyst';
+
+export type ArmorTier = 0 | 1 | 2 | 3;
 
 export interface ItemDef {
   id: string;
@@ -260,6 +297,12 @@ export interface ItemDef {
   slot: ItemSlot;
   value: number;
   description: string;
+  actionCost?: ActionCost;
+  twoHanded?: boolean;
+  armorTier?: ArmorTier;
+  traits?: WeaponTrait[];
+  visibleTags?: string[];
+  grantedAbilityId?: string;
   damageType?: DamageType;
   damageDice?: [number, number];
   bonusDamage?: number;
@@ -281,6 +324,14 @@ export interface ItemDef {
   throwDamage?: number;
   throwDamageType?: DamageType;
   throwStatus?: StatusEffect;
+  coatingDamageType?: DamageType;
+  coatingBonusDamage?: number;
+  coatingCharges?: number;
+  draughtDefilement?: number;
+  draughtPurgeDefilement?: number;
+  draughtStatus?: StatusEffect;
+  ashTextDc?: number;
+  ashTextEffect?: 'blight_wave' | 'star_ward' | 'bone_shatter' | 'ash_step';
 }
 
 export interface RecipeDef {
@@ -309,6 +360,9 @@ export interface PerkDef {
   maxResolveBonus?: number;
   armorBonus?: number;
   damageBonus?: number;
+  extraMainActions?: number;
+  extraSwiftActions?: number;
+  swiftItems?: boolean;
 }
 
 export type EnemyIntentKind = 'attack' | 'heavy' | 'blight' | 'guard' | 'toll';
@@ -414,6 +468,10 @@ export interface CombatState {
   pendingActionId: string | null;
   observedUsedThisRound: boolean;
   round: number;
+  mainLeft: number;
+  swiftLeft: number;
+  freeLeft: number;
+  graceMaxDamagePending: boolean;
   heirloomUsedThisFight: boolean;
   guaranteedDodgeThisTurn: boolean;
   counterDamagePending: number;
@@ -481,10 +539,19 @@ export interface PlayerCharacter {
   maxResolve: number;
   defilement: number; // 0..100
   baseStats: Stats;
-  weaponId: string;
+  equipment: Record<EquipSlot, string | null>;
   weaponHoned: boolean;
-  armorId: string;
-  trinketId: string | null;
+  weaponCoating: {
+    name: string;
+    damageType: DamageType;
+    bonusDamage: number;
+    charges: number;
+  } | null;
+  armorTierCurrent: ArmorTier;
+  reserves: number;
+  maxReserves: number;
+  grace: number;
+  maxGrace: number;
   inventory: InventoryEntry[];
   abilities: string[];
   perks: string[];

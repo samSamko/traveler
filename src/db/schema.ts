@@ -19,6 +19,7 @@ CREATE TABLE abilities (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   kind TEXT NOT NULL,
+  action_cost TEXT,
   damage_type TEXT,
   non_lethal INTEGER NOT NULL DEFAULT 0,
   stamina_cost INTEGER NOT NULL DEFAULT 0,
@@ -67,7 +68,16 @@ CREATE TABLE items (
   grants_body_mod_id TEXT,
   throw_damage INTEGER,
   throw_damage_type TEXT,
-  throw_status_json TEXT
+  throw_status_json TEXT,
+  action_cost TEXT,
+  two_handed INTEGER NOT NULL DEFAULT 0,
+  armor_tier INTEGER NOT NULL DEFAULT 0,
+  traits_json TEXT,
+  visible_tags_json TEXT,
+  granted_ability_id TEXT,
+  coating_json TEXT,
+  draught_json TEXT,
+  ash_text_json TEXT
 );
 
 CREATE TABLE backgrounds (
@@ -107,7 +117,10 @@ CREATE TABLE perks (
   max_focus_bonus INTEGER,
   max_resolve_bonus INTEGER,
   armor_bonus INTEGER,
-  damage_bonus INTEGER
+  damage_bonus INTEGER,
+  extra_main_actions INTEGER,
+  extra_swift_actions INTEGER,
+  swift_items INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE recipes (

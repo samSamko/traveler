@@ -1,5 +1,6 @@
 import type { GameState, TimePeriod, WeatherId, WorldClock } from '../types.ts';
 import { nextRandom } from '../dice.ts';
+import { maybeRollPaleShiftAtDawn } from './frontier.ts';
 
 export const WEATHER_DATA: Record<
   WeatherId,
@@ -57,6 +58,8 @@ export function createInitialClock(): WorldClock {
     totalHours: 8,
     weather: 'ash_rain',
     weatherHoursLeft: 6,
+    paleShift: 'none',
+    paleShiftDaysLeft: 0,
   };
 }
 
@@ -112,6 +115,10 @@ export function advanceHours(
         state.player.hp = Math.max(1, state.player.hp - 4);
         state.player.resolve = Math.max(0, state.player.resolve - 3);
         msgs.push('Empty stomach and cold air gnaw at your strength.');
+      }
+      const shiftMsg = maybeRollPaleShiftAtDawn(state);
+      if (shiftMsg) {
+        msgs.push(shiftMsg);
       }
     }
   }

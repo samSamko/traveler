@@ -5,6 +5,7 @@ import { LOCATIONS } from './content/locations.ts';
 import { getEffectiveStat } from './dice.ts';
 import { FACTION_NAMES, getFactionStance, countBrokenSeals } from './memory.ts';
 import { formatClockLabel } from './systems/clock.ts';
+import { PALE_SHIFTS } from './systems/frontier.ts';
 
 const ANSI = {
   reset: '\x1b[0m',
@@ -99,9 +100,12 @@ export function formatStatusHeader(state: GameState): string {
 
   const top = `${p.name} - ${sexLabel} ${raceName} ${bgName} Lv${p.level} | ${loc?.name ?? state.locationId}`;
   const clockBar = `${formatClockLabel(state.clock)} | Crowns ${p.crowns} | Rations ${p.rations} | Torches ${p.torches} | Seals ${seals}/3`;
-  const vitalsBar = `HP ${p.hp}/${p.maxHp} | RES ${p.resolve}/${p.maxResolve} | STM ${p.stamina}/${p.maxStamina} | FOC ${p.focus}/${p.maxFocus} | DEF ${p.defilement}/100`;
+  const vitalsBar = `HP ${p.hp}/${p.maxHp} | RES ${p.resolve}/${p.maxResolve} | STM ${p.stamina}/${p.maxStamina} | FOC ${p.focus}/${p.maxFocus} | DEF ${p.defilement}/100 | RESV ${p.reserves}/${p.maxReserves} | GRACE ${p.grace}/${p.maxGrace}`;
 
   const alerts: string[] = [];
+  if (state.clock.paleShift && state.clock.paleShift !== 'none') {
+    alerts.push(`Pale-Shift: ${PALE_SHIFTS[state.clock.paleShift].label}`);
+  }
   if (p.statuses.length > 0) {
     alerts.push(`Statuses: ${p.statuses.map((st) => `${st.type} ${st.turns}t`).join(', ')}`);
   }
@@ -166,21 +170,26 @@ export function renderCharacterSheet(state: GameState): string {
   const race = RACES[p.race];
   const bg = BACKGROUNDS[p.background];
   const heirloom = HEIRLOOMS[p.heirloom];
-  const weapon = ITEMS[p.weaponId];
-  const armor = ITEMS[p.armorId];
-  const trinket = p.trinketId ? ITEMS[p.trinketId] : null;
+  const mainHand = p.equipment.mainHand ? ITEMS[p.equipment.mainHand] : null;
+  const offHand = p.equipment.offHand ? ITEMS[p.equipment.offHand] : null;
+  const armor = p.equipment.armor ? ITEMS[p.equipment.armor] : null;
+  const cloak = p.equipment.cloak ? ITEMS[p.equipment.cloak] : null;
+  const trinket = p.equipment.trinket ? ITEMS[p.equipment.trinket] : null;
 
   const lines: string[] = [
     `CHARACTER SHEET - ${p.name}`,
     `Identity: ${p.sex === 'female' ? 'Female' : 'Male'} ${race.name} ${bg.name}`,
     `Level ${p.level} | XP ${p.xp}/${p.xpToNext} | HP ${p.hp}/${p.maxHp} | Stamina ${p.stamina}/${p.maxStamina} | Focus ${p.focus}/${p.maxFocus}`,
+    `Reserves ${p.reserves}/${p.maxReserves} | Grace ${p.grace}/${p.maxGrace}`,
     `Stats: Might ${getEffectiveStat(state, 'might')} | Agility ${getEffectiveStat(state, 'agility')} | Wit ${getEffectiveStat(state, 'wit')} | Grit ${getEffectiveStat(state, 'grit')}`,
     `Passives: ${race.passive.name} - ${race.passive.description} | ${bg.passive.name} - ${bg.passive.description}`,
     `Heirloom: ${heirloom.name} - ${heirloom.combatDescription}`,
     'Equipment:',
-    `  Weapon : ${weapon?.name ?? p.weaponId}${p.weaponHoned ? ' Honed' : ''}`,
-    `  Armor  : ${armor?.name ?? p.armorId}`,
-    `  Trinket: ${trinket ? trinket.name : 'None'}`,
+    `  Main-Hand: ${mainHand ? mainHand.name : 'None'}${p.weaponHoned ? ' Honed' : ''}${p.weaponCoating ? ` - ${p.weaponCoating.name} ${p.weaponCoating.charges}x` : ''}`,
+    `  Off-Hand : ${offHand ? offHand.name : mainHand?.twoHanded ? 'Two-Handed Locked' : 'None'}`,
+    `  Armor    : ${armor ? `${armor.name} Tier ${p.armorTierCurrent}` : 'None'}`,
+    `  Cloak    : ${cloak ? cloak.name : 'None'}`,
+    `  Trinket  : ${trinket ? trinket.name : 'None'}`,
     'Abilities:',
   ];
 
@@ -204,12 +213,19 @@ export function renderCharacterSheet(state: GameState): string {
 
 export function renderInventory(state: GameState): string {
   const p = state.player;
+  const mainHand = p.equipment.mainHand ? ITEMS[p.equipment.mainHand] : null;
+  const offHand = p.equipment.offHand ? ITEMS[p.equipment.offHand] : null;
+  const armor = p.equipment.armor ? ITEMS[p.equipment.armor] : null;
+  const cloak = p.equipment.cloak ? ITEMS[p.equipment.cloak] : null;
+  const trinket = p.equipment.trinket ? ITEMS[p.equipment.trinket] : null;
   const lines = [
     'INVENTORY',
     `Crowns ${p.crowns} | Rations ${p.rations} | Torches ${p.torches}`,
-    `Weapon : ${ITEMS[p.weaponId]?.name ?? p.weaponId}${p.weaponHoned ? ' Honed' : ''}`,
-    `Armor  : ${ITEMS[p.armorId]?.name ?? p.armorId}`,
-    `Trinket: ${p.trinketId ? ITEMS[p.trinketId]?.name : 'None'}`,
+    `Main-Hand: ${mainHand ? mainHand.name : 'None'}${p.weaponHoned ? ' Honed' : ''}${p.weaponCoating ? ` - ${p.weaponCoating.name} ${p.weaponCoating.charges}x` : ''}`,
+    `Off-Hand : ${offHand ? offHand.name : mainHand?.twoHanded ? 'Two-Handed Locked' : 'None'}`,
+    `Armor    : ${armor ? `${armor.name} Tier ${p.armorTierCurrent}` : 'None'}`,
+    `Cloak    : ${cloak ? cloak.name : 'None'}`,
+    `Trinket  : ${trinket ? trinket.name : 'None'}`,
     '',
     'Pack:',
   ];

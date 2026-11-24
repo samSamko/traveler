@@ -27,7 +27,37 @@ export function loadGame(saveDir = DEFAULT_SAVE_DIR): GameState | null {
   if (!existsSync(path)) return null;
   try {
     const raw = readFileSync(path, 'utf8');
-    return JSON.parse(raw) as GameState;
+    const parsed = JSON.parse(raw) as GameState & {
+      player: GameState['player'] & {
+        weaponId?: string;
+        armorId?: string;
+        trinketId?: string | null;
+      };
+    };
+    const p = parsed.player;
+    if (!p.equipment) {
+      p.equipment = {
+        mainHand: p.weaponId ?? null,
+        offHand: null,
+        armor: p.armorId ?? null,
+        cloak: null,
+        trinket: p.trinketId ?? null,
+      };
+      delete p.weaponId;
+      delete p.armorId;
+      delete p.trinketId;
+    }
+    if (p.armorTierCurrent === undefined) p.armorTierCurrent = 1;
+    if (p.weaponCoating === undefined) p.weaponCoating = null;
+    if (p.reserves === undefined) p.reserves = 2;
+    if (p.maxReserves === undefined) p.maxReserves = 2;
+    if (p.grace === undefined) p.grace = 2;
+    if (p.maxGrace === undefined) p.maxGrace = 2;
+    if (parsed.clock) {
+      if (!parsed.clock.paleShift) parsed.clock.paleShift = 'none';
+      if (parsed.clock.paleShiftDaysLeft === undefined) parsed.clock.paleShiftDaysLeft = 0;
+    }
+    return parsed;
   } catch {
     return null;
   }

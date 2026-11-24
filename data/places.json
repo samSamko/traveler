@@ -60,6 +60,12 @@
           { "itemId": "stamina_draught", "price": 13 },
           { "itemId": "fire_pot", "price": 15 },
           { "itemId": "antitoxin", "price": 11 },
+          { "itemId": "iron_buckler", "price": 24 },
+          { "itemId": "tallow_lantern", "price": 16 },
+          { "itemId": "ash_mantle", "price": 26 },
+          { "itemId": "kiln_pitch", "price": 15 },
+          { "itemId": "amber_tonic", "price": 20 },
+          { "itemId": "writ_star_ward", "price": 28 },
           { "itemId": "vesper_tonic", "price": 16, "underWarrenOnly": true },
           { "itemId": "grixi_loupe", "price": 28, "underWarrenOnly": true },
           { "itemId": "iron_wire_kit", "price": 36, "underWarrenOnly": true },
@@ -809,7 +815,11 @@
           { "itemId": "antitoxin", "price": 10 },
           { "itemId": "star_sap_drop", "price": 34 },
           { "itemId": "chitin_mantle", "price": 46 },
-          { "itemId": "silken_veil", "price": 42 }
+          { "itemId": "silken_veil", "price": 42 },
+          { "itemId": "cistern_veil", "price": 32 },
+          { "itemId": "amber_censer", "price": 30 },
+          { "itemId": "ash_purge_draught", "price": 24 },
+          { "itemId": "writ_blight_wave", "price": 34 }
         ]
       },
       "actions": [
