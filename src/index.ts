@@ -235,7 +235,22 @@ async function main(): Promise<void> {
 
     let pendingMsgs = [...state.lastMessages];
     while (true) {
-      console.log('\n' + renderCurrentScreen(state, pendingMsgs));
+      let screenOut = '';
+      try {
+        screenOut = renderCurrentScreen(state, pendingMsgs);
+      } catch {
+        state.combat = null;
+        state.aftermath = null;
+        state.activeEvent = null;
+        state.activeMerchant = null;
+        state.locationId = 'camp_hub';
+        state.scene = 'camp_hub';
+        state.subMenu = 'root';
+        screenOut = renderCurrentScreen(state, [
+          'Cold fog disrupts your bearings; you fall back to your Lone Camp.',
+        ]);
+      }
+      console.log('\n' + screenOut);
       pendingMsgs = [];
 
       if (state.scene === 'dead') {

@@ -201,7 +201,7 @@ export function selectProseVariant(
       return runtime.renderProse(v.text, state);
     }
   }
-  return '';
+  return 'Cold wind sweeps across cracked stone and silent ash.';
 }
 
 export function executeEffect(state: GameState, spec: EffectSpec): ActionOutcome {

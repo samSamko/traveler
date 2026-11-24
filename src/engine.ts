@@ -268,7 +268,57 @@ function canCraftRecipe(state: GameState, recipe: RecipeDef): boolean {
   });
 }
 
+export function normalizeSceneFallback(state: GameState): string | null {
+  if (state.scene === 'location' && !LOCATIONS[state.locationId]) {
+    state.locationId = 'camp_hub';
+    state.scene = 'camp_hub';
+    state.subMenu = 'root';
+    return 'Trail markers blur in the ash; you pull back to your Lone Camp.';
+  }
+  if (state.scene === 'dungeon') {
+    const dId = state.frontier?.activeDungeonId;
+    const dDef = dId ? loadWorldDatabase().dungeons[dId] : undefined;
+    const rt = dId ? state.frontier?.dungeonStates[dId] : undefined;
+    if (!dDef || !rt || !dDef.rooms[rt.currentRoomId]) {
+      if (state.frontier) state.frontier.activeDungeonId = null;
+      state.scene = 'camp_hub';
+      state.subMenu = 'root';
+      return 'Collapsed stone forces you back out toward your Lone Camp.';
+    }
+  }
+  if (state.scene === 'camp' && !state.camp) {
+    state.scene = state.locationId === 'camp_hub' ? 'camp_hub' : 'location';
+    state.subMenu = 'root';
+    return 'Your embers burn low; you break camp and move on.';
+  }
+  if (state.scene === 'combat' && (!state.combat || state.combat.enemies.length === 0)) {
+    state.combat = null;
+    state.scene = state.locationId === 'camp_hub' ? 'camp_hub' : 'location';
+    state.subMenu = 'root';
+    return 'The clash disperses into the mist.';
+  }
+  if (state.scene === 'aftermath' && !state.aftermath) {
+    state.scene = state.locationId === 'camp_hub' ? 'camp_hub' : 'location';
+    state.subMenu = 'root';
+    return 'Nothing remains on the ground.';
+  }
+  if (state.scene === 'event' && (!state.activeEvent || !EVENTS.some((e) => e.id === state.activeEvent!.eventId))) {
+    state.activeEvent = null;
+    state.scene = state.locationId === 'camp_hub' ? 'camp_hub' : 'location';
+    state.subMenu = 'root';
+    return 'The encounter fades before anything comes of it.';
+  }
+  if (state.scene === 'shop' && !(state.activeMerchant ?? LOCATIONS[state.locationId]?.shop)) {
+    state.activeMerchant = null;
+    state.scene = state.locationId === 'camp_hub' ? 'camp_hub' : 'location';
+    state.subMenu = 'root';
+    return 'The stalls sit empty.';
+  }
+  return null;
+}
+
 export function getSceneChoices(state: GameState): MenuEntry[] {
+  normalizeSceneFallback(state);
   const entries: MenuEntry[] = [];
 
   if (state.scene === 'intro') {
@@ -1050,6 +1100,28 @@ export function processInput(
   state: GameState,
   rawInput: string,
 ): { messages: string[]; shouldQuit: boolean } {
+  try {
+    return processInputInner(state, rawInput);
+  } catch {
+    state.combat = null;
+    state.aftermath = null;
+    state.activeEvent = null;
+    state.activeMerchant = null;
+    if (state.frontier) state.frontier.activeDungeonId = null;
+    state.locationId = 'camp_hub';
+    state.scene = 'camp_hub';
+    state.subMenu = 'root';
+    return {
+      messages: ['The trail gives way under your boots; you steady yourself back at your Lone Camp.'],
+      shouldQuit: false,
+    };
+  }
+}
+
+function processInputInner(
+  state: GameState,
+  rawInput: string,
+): { messages: string[]; shouldQuit: boolean } {
   const input = rawInput.trim();
   const lower = input.toLowerCase();
 
@@ -1117,17 +1189,17 @@ export function processInput(
   }
 
   if (lower === 'camp') {
-    if (state.scene !== 'location') {
+    if (state.scene !== 'location' && state.scene !== 'camp_hub') {
       return { messages: ['You cannot pitch camp right now.'], shouldQuit: false };
     }
     return { messages: enterMobileCamp(state), shouldQuit: false };
   }
 
   if (lower === 'rest') {
-    if (state.scene !== 'location') {
+    if (state.scene !== 'location' && state.scene !== 'camp_hub') {
       return { messages: ['You cannot rest right now.'], shouldQuit: false };
     }
-    if (LOCATIONS[state.locationId].regionType === 'settlement' && !hasFlag(state, 'cinderford_fallen')) {
+    if (LOCATIONS[state.locationId]?.regionType === 'town' && !hasFlag(state, 'cinderford_fallen')) {
       return { messages: performSettlementRest(state), shouldQuit: false };
     }
     return { messages: enterMobileCamp(state), shouldQuit: false };
@@ -1519,6 +1591,8 @@ export function processInput(
 }
 
 export function renderCurrentScreen(state: GameState, messages: string[]): string {
+  const fallbackMsg = normalizeSceneFallback(state);
+  const effectiveMsgs = fallbackMsg ? [...messages, fallbackMsg] : messages;
   const s = state.stealthMode;
   const out: string[] = [];
 
@@ -1537,9 +1611,9 @@ export function renderCurrentScreen(state: GameState, messages: string[]): strin
 
   out.push(formatStatusHeader(state));
 
-  if (messages.length > 0) {
+  if (effectiveMsgs.length > 0) {
     out.push('');
-    for (const m of messages) {
+    for (const m of effectiveMsgs) {
       out.push(wrapText(m));
     }
   }
@@ -1560,7 +1634,9 @@ export function renderCurrentScreen(state: GameState, messages: string[]): strin
     if (state.subMenu === 'pack_craft') {
       out.push(paint('CAMP - CRAFT', 'cyan', s));
     } else {
-      out.push(paint(`CAMP - ${loc.name.toUpperCase()}`, 'cyan', s));
+      const campTitle =
+        state.locationId === 'camp_hub' ? 'LONE CAMP' : (loc?.name.toUpperCase() ?? 'CAMP');
+      out.push(paint(`CAMP - ${campTitle}`, 'cyan', s));
       out.push(
         wrapText(
           state.camp.fireLit

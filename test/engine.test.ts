@@ -665,4 +665,44 @@ describe('Core Frontier Loop: Hub, 10 Areas, Sub-Areas, Dungeons & Towns', () =>
     assert.ok(phasesSeen.has('full_moon'));
     assert.ok(phasesSeen.has('waning_moon'));
   });
+
+  it('recovers cleanly via fallbacks on unknown enemy IDs, broken locations, or missing dungeons', () => {
+    const state = createNewGame({
+      name: 'Bram',
+      sex: 'male',
+      race: 'vaelorian',
+      background: 'ashen_blade',
+      heirloom: 'kiln_lantern',
+      skipIntro: true,
+      stealthMode: true,
+      rngState: 33,
+    });
+
+    // Fallback when unknown enemy template requested
+    const { combat } = startCombatEncounter(state, { enemyId: 'nonexistent_monster_id', canFlee: true });
+    assert.ok(combat.enemies.length === 1);
+    assert.equal(combat.enemies[0].templateId, 'root_husk');
+    state.combat = null;
+
+    // Fallback when corrupted location scene is rendered
+    state.scene = 'location';
+    state.locationId = 'nonexistent_place_id';
+    const locFallbackScreen = renderCurrentScreen(state, []);
+    assert.equal(state.scene, 'camp_hub');
+    assert.equal(state.locationId, 'camp_hub');
+    assert.match(locFallbackScreen, /Lone Camp/i);
+
+    // Fallback when corrupted dungeon state is queried
+    state.scene = 'dungeon';
+    state.frontier.activeDungeonId = 'missing_dungeon_id';
+    const choices = getSceneChoices(state);
+    assert.equal(state.scene, 'camp_hub');
+    assert.ok(choices.some((c) => c.label === 'Explore'));
+
+    // Wild camp from camp_hub renders safely
+    processInput(state, 'Rest');
+    assert.equal(state.scene, 'camp');
+    const campScreen = renderCurrentScreen(state, []);
+    assert.match(campScreen, /CAMP - LONE CAMP/);
+  });
 });

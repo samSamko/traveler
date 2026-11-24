@@ -213,9 +213,9 @@ export function startCombatEncounter(
   const broken = opts.brokenSeals ?? [];
 
   const enemies: ActiveEnemy[] = ids.map((id, idx) => {
-    const template = ENEMIES[id];
+    const template = ENEMIES[id] ?? ENEMIES.root_husk ?? Object.values(ENEMIES)[0];
     if (!template) {
-      throw new Error(`Unknown enemy template: ${id}`);
+      throw new Error('No enemy templates loaded.');
     }
     const intents = template.intents.map((i) => ({ ...i, status: i.status ? { ...i.status } : undefined }));
     let baseArmor = template.armor;
