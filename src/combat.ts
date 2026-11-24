@@ -138,11 +138,7 @@ function getItemActionCost(state: GameState, item: ItemDef): ActionCost {
 }
 
 function getEffectiveFocusCost(state: GameState, ab: AbilityDef): number {
-  if (ab.focusCost <= 0) return 0;
-  if (state.clock.paleShift === 'silent_bells' && (ab.kind === 'cantrip' || ab.kind === 'spell')) {
-    return Math.max(1, ab.focusCost - 1);
-  }
-  return ab.focusCost;
+  return Math.max(0, ab.focusCost);
 }
 
 function hasActionPool(combat: CombatState, cost: ActionCost): boolean {
@@ -832,7 +828,7 @@ export function executeCombatAction(
     const statBonus = getEffectiveStat(state, statName);
     const honed = p.weaponHoned ? 1 : 0;
     const poise = p.background === 'ashen_blade' ? 1 : 0;
-    const moonBonus = state.clock.paleShift === 'blood_ash_moon' ? 2 : 0;
+    const moonBonus = 0;
     let coatingBonus = 0;
     let coatingNote = '';
     if (p.weaponCoating && p.weaponCoating.charges > 0 && !isSubdue) {

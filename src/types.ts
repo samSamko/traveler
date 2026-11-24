@@ -56,13 +56,6 @@ export type WeatherId =
   | 'biting_wind'
   | 'dead_still';
 
-export type PaleShiftId =
-  | 'none'
-  | 'blood_ash_moon'
-  | 'silent_bells'
-  | 'root_bloom'
-  | 'iron_frost';
-
 export type LunarPhaseId =
   | 'new_moon'
   | 'waxing_moon'
@@ -89,8 +82,6 @@ export interface WorldClock {
   weatherHoursLeft: number;
   lunarPhase: LunarPhaseId;
   lunarCycleDay: number; // 0..11 (3 days per phase)
-  paleShift: PaleShiftId;
-  paleShiftDaysLeft: number;
 }
 
 export type FactionId = 'iron_vow' | 'silken_cistern' | 'under_warren' | 'husk_choir';

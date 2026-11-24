@@ -5,7 +5,6 @@ import { LOCATIONS } from './content/locations.ts';
 import { getEffectiveStat } from './dice.ts';
 import { FACTION_NAMES, getFactionStance, countBrokenSeals } from './memory.ts';
 import { formatClockLabel } from './systems/clock.ts';
-import { PALE_SHIFTS } from './systems/frontier.ts';
 
 const ANSI = {
   reset: '\x1b[0m',
@@ -101,13 +100,10 @@ export function formatStatusHeader(state: GameState): string {
   const placeLabel =
     state.locationId === 'camp_hub' ? 'Lone Camp' : (loc?.name ?? state.locationId);
   const top = `${p.name} - ${sexLabel} ${raceName} ${bgName} Lv${p.level} | ${placeLabel}`;
-  const clockBar = `${formatClockLabel(state.clock)} | Onyx ${p.crowns} | Rations ${p.rations} | Torches ${p.torches} | Seals ${seals}/3`;
+  const clockBar = `${formatClockLabel(state.clock)} | Onyx ${p.crowns} | Rations ${p.rations} | Torches ${p.torches}`;
   const vitalsBar = `HP ${p.hp}/${p.maxHp} | RES ${p.resolve}/${p.maxResolve} | STM ${p.stamina}/${p.maxStamina} | FOC ${p.focus}/${p.maxFocus} | DEF ${p.defilement}/100 | RESV ${p.reserves}/${p.maxReserves} | GRACE ${p.grace}/${p.maxGrace}`;
 
   const alerts: string[] = [];
-  if (state.clock.paleShift && state.clock.paleShift !== 'none') {
-    alerts.push(`Pale-Shift: ${PALE_SHIFTS[state.clock.paleShift].label}`);
-  }
   if (p.statuses.length > 0) {
     alerts.push(`Statuses: ${p.statuses.map((st) => `${st.type} ${st.turns}t`).join(', ')}`);
   }

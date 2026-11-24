@@ -1,42 +1,6 @@
-import type { ArmorTier, GameState, PaleShiftId } from '../types.ts';
+import type { ArmorTier, GameState } from '../types.ts';
 import { ITEMS } from '../content/items.ts';
-import { getEffectiveStat, nextRandom, resolveCheck, rollDie } from '../dice.ts';
-import { recordChronicle } from '../memory.ts';
-
-export const PALE_SHIFTS: Record<
-  PaleShiftId,
-  {
-    label: string;
-    dawnProse: string;
-    effectNote: string;
-  }
-> = {
-  none: {
-    label: 'Quiet Sky',
-    dawnProse: 'Ash-clouds drift without omens.',
-    effectNote: 'No active Pale-Shift.',
-  },
-  blood_ash_moon: {
-    label: 'Blood-Ash Moon',
-    dawnProse: 'A bruised copper moon hangs low through dawn mist, sharpening blade and fang.',
-    effectNote: 'All physical strikes deal +2 damage across the Reach.',
-  },
-  silent_bells: {
-    label: 'Silent Bells',
-    dawnProse: 'Even the distant bronze bells of the Belfry fall eerily mute.',
-    effectNote: 'Focus costs drop by 1 on cantrips and spells, minimum 1.',
-  },
-  root_bloom: {
-    label: 'Root-Bloom',
-    dawnProse: 'Pale spore-threads drift upward from cracked flagstones like dry snow.',
-    effectNote: 'Blight and poison strike harder; foraging yields extra herbs.',
-  },
-  iron_frost: {
-    label: 'Iron Frost',
-    dawnProse: 'Rime coats iron hilts and buckles before sunrise.',
-    effectNote: 'Cold damage bites deeper; armor repairs take steady hands.',
-  },
-};
+import { getEffectiveStat, resolveCheck, rollDie } from '../dice.ts';
 
 export function rollArmorTierReduction(tier: ArmorTier, state: GameState): number {
   if (tier <= 0) return 0;
@@ -212,30 +176,5 @@ export function castAshTextOutOfCombat(state: GameState, itemId: string): string
   }
   const witBonus = Math.max(0, getEffectiveStat(state, 'wit'));
   p.focus = Math.min(p.maxFocus, p.focus + 4 + witBonus);
-  return [check.logLine, 'The Ash-Text burns to clean ember-dust, steadying your focus for battle.'];
-}
-
-export function maybeRollPaleShiftAtDawn(state: GameState): string | null {
-  const clock = state.clock;
-  if (clock.paleShift !== 'none') {
-    clock.paleShiftDaysLeft -= 1;
-    if (clock.paleShiftDaysLeft <= 0) {
-      const ended = PALE_SHIFTS[clock.paleShift].label;
-      clock.paleShift = 'none';
-      clock.paleShiftDaysLeft = 0;
-      return `The ${ended} fades from the Gloaming Reach.`;
-    }
-    return null;
-  }
-
-  if (nextRandom(state) < 0.2) {
-    const pool: PaleShiftId[] = ['blood_ash_moon', 'silent_bells', 'root_bloom', 'iron_frost'];
-    const picked = pool[Math.floor(nextRandom(state) * pool.length)];
-    clock.paleShift = picked;
-    clock.paleShiftDaysLeft = 2 + Math.floor(nextRandom(state) * 2);
-    const meta = PALE_SHIFTS[picked];
-    recordChronicle(state, `Pale-Shift: ${meta.label}`, meta.dawnProse, 'lore');
-    return `${meta.dawnProse} ${meta.effectNote}`;
-  }
-  return null;
+  return [check.logLine, 'The ancient text burns to clean ash, steadying your focus for battle.'];
 }

@@ -125,18 +125,15 @@ export function executeCampAction(state: GameState, actionId: string): string[] 
       isLoreOrPerception: true,
     });
     if (check.success) {
-      const bloomBonus = state.clock.paleShift === 'root_bloom' ? 1 : 0;
       if (state.locationId === 'ash_fen' || state.locationId === 'silken_cistern') {
-        addItemToInventory(state, 'bog_herb', 1 + bloomBonus);
+        addItemToInventory(state, 'bog_herb', 1);
         return [check.logLine, 'You gather fresh Bog Herb from damp reeds.', ...clockMsgs];
       }
       if (state.locationId === 'petrified_starwood' || state.locationId === 'drowned_forge') {
         addItemToInventory(state, 'ash_resin', 1);
-        if (bloomBonus > 0) addItemToInventory(state, 'bog_herb', 1);
         return [check.logLine, 'You scrape clear Ash Resin from scorched timber.', ...clockMsgs];
       }
       p.rations += 1;
-      if (bloomBonus > 0) addItemToInventory(state, 'bog_herb', 1);
       return [check.logLine, 'You snare lean trail meat and dry edible roots.', ...clockMsgs];
     }
     return [check.logLine, 'Only damp ash and barren stalks reward your search.', ...clockMsgs];

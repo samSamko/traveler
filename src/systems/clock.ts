@@ -1,6 +1,5 @@
 import type { GameState, LunarPhaseId, TimePeriod, WeatherId, WorldClock } from '../types.ts';
 import { nextRandom } from '../dice.ts';
-import { maybeRollPaleShiftAtDawn } from './frontier.ts';
 
 export const LUNAR_PHASE_DATA: Record<
   LunarPhaseId,
@@ -98,8 +97,6 @@ export function createInitialClock(): WorldClock {
     weatherHoursLeft: 6,
     lunarPhase: 'waxing_moon',
     lunarCycleDay: 3,
-    paleShift: 'none',
-    paleShiftDaysLeft: 0,
   };
 }
 
@@ -163,10 +160,6 @@ export function advanceHours(
         clock.lunarPhase = nextPhase;
         const meta = LUNAR_PHASE_DATA[nextPhase];
         msgs.push(`Lunar shift: ${meta.label} - ${meta.subtitle}. ${meta.atmosphere}`);
-      }
-      const shiftMsg = maybeRollPaleShiftAtDawn(state);
-      if (shiftMsg) {
-        msgs.push(shiftMsg);
       }
     }
   }

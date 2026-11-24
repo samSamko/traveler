@@ -570,7 +570,7 @@
     },
     "writ_bone_shatter": {
       "id": "writ_bone_shatter",
-      "name": "Ash-Text: Shatter",
+      "name": "Ancient Text: Shatter",
       "slot": "ash_text",
       "actionCost": "main",
       "value": 28,
@@ -580,7 +580,7 @@
     },
     "writ_star_ward": {
       "id": "writ_star_ward",
-      "name": "Ash-Text: Ward",
+      "name": "Ancient Text: Ward",
       "slot": "ash_text",
       "actionCost": "main",
       "value": 26,
@@ -590,7 +590,7 @@
     },
     "writ_blight_wave": {
       "id": "writ_blight_wave",
-      "name": "Ash-Text: Blight",
+      "name": "Ancient Text: Blight",
       "slot": "ash_text",
       "actionCost": "main",
       "value": 32,
