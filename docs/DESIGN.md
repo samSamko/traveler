@@ -1,4 +1,6 @@
-# Traveler — Setting Bible & Design Specification
+# [LEGACY ARCHIVE — SUPERSEDED] Traveler — Original Setting Sketch
+
+> **ARCHIVED / NON-CANON**: This file is an early Gloaming Reach sketch superseded by `docs/lore/WORLD.md` and `docs/WRITER_AGENT.md`. Do NOT use terms from this file (`Gloaming Reach`, `First Kiln`, `Vesper`, `Husk-Tide`, `Sunken Belfry`, `Malakor`, `Sir Vorne`, `Kale`, `Cinderford`, `Silken Cistern`, `Star-Wood`, `Ash-Born`) in active game prose or new content.
 
 ## 1. Setting: The Gloaming Reach
 Centuries ago, the **First Kiln of Aethel** shattered when the ancient Crown-Wrought hollowed out the deep root-veins of the earth to burn soul-amber (**Vesper**). Now, from the subterranean abyss rises **the Husk-Tide**: a slow calcifying curse of pale roots, chitin-ash, and resonant bronze chimes that hollows out the living.

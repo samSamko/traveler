@@ -4,8 +4,8 @@ import { ITEMS } from '../content/items.ts';
 import { LOCATIONS } from '../content/locations.ts';
 import { nextRandom } from '../dice.ts';
 import { hasFlag, recordChronicle, setFlag } from '../memory.ts';
-import { WEATHER_DATA, advanceHours } from './clock.ts';
-import { addItemToInventory, startCombatEncounter } from '../combat.ts';
+import { WEATHER_DATA, LUNAR_PHASE_DATA, advanceHours } from './clock.ts';
+import { addItemToInventory, beginCombatApproach, startCombatEncounter } from '../combat.ts';
 import { markPlaceSeen } from '../writing/discovery.ts';
 
 export function createInitialFrontierState(): FrontierState {
@@ -36,57 +36,11 @@ function pickWeightedEncounter(
 }
 
 function resolveEncounterOutcome(state: GameState, enc: ExploreEncounterDef): string[] {
-  const msgs: string[] = [enc.prose];
   const f = state.frontier;
-
-  if (enc.kind === 'unlock_area' && enc.targetUnlockId) {
-    if (!f.unlockedAreas.includes(enc.targetUnlockId)) {
-      f.unlockedAreas.push(enc.targetUnlockId);
-      markPlaceSeen(state, enc.targetUnlockId);
-      const loc = LOCATIONS[enc.targetUnlockId];
-      msgs.push(`Discovered new area: ${loc?.name ?? enc.targetUnlockId}. You can now Travel there from Camp.`);
-      recordChronicle(state, `Discovered ${loc?.name ?? enc.targetUnlockId}`, enc.prose, 'explore');
-    }
-    return msgs;
-  }
-
-  if (enc.kind === 'unlock_town' && enc.targetUnlockId) {
-    if (!f.unlockedTowns.includes(enc.targetUnlockId)) {
-      f.unlockedTowns.push(enc.targetUnlockId);
-      markPlaceSeen(state, enc.targetUnlockId);
-      const loc = LOCATIONS[enc.targetUnlockId];
-      msgs.push(`Discovered destination: ${loc?.name ?? enc.targetUnlockId}. You can now Travel there from Camp.`);
-      recordChronicle(state, `Discovered ${loc?.name ?? enc.targetUnlockId}`, enc.prose, 'explore');
-    }
-    return msgs;
-  }
-
-  if (enc.kind === 'unlock_sub_area' && enc.targetUnlockId) {
-    if (!f.unlockedSubAreas.includes(enc.targetUnlockId)) {
-      f.unlockedSubAreas.push(enc.targetUnlockId);
-      const sa = loadWorldDatabase().subAreas[enc.targetUnlockId];
-      msgs.push(`Discovered secret sub-area: ${sa?.name ?? enc.targetUnlockId}. Toggle Sub-Area under Explore to search it.`);
-      recordChronicle(state, `Secret: ${sa?.name ?? enc.targetUnlockId}`, enc.prose, 'explore');
-    }
-    return msgs;
-  }
-
-  if (enc.kind === 'unlock_dungeon' && enc.targetUnlockId) {
-    if (!f.unlockedDungeons.includes(enc.targetUnlockId)) {
-      f.unlockedDungeons.push(enc.targetUnlockId);
-      const d = loadWorldDatabase().dungeons[enc.targetUnlockId];
-      msgs.push(`Discovered dungeon: ${d?.name ?? enc.targetUnlockId}. Enter it directly from this area.`);
-      recordChronicle(state, `Dungeon: ${d?.name ?? enc.targetUnlockId}`, enc.prose, 'explore');
-    }
-    return msgs;
-  }
+  const returnScene: 'camp_hub' | 'location' = state.scene === 'camp_hub' ? 'camp_hub' : 'location';
 
   if (enc.kind === 'enemy' && enc.enemyIds && enc.enemyIds.length > 0) {
-    const { introMessages } = startCombatEncounter(state, {
-      enemyIds: enc.enemyIds,
-      canFlee: true,
-    });
-    return [...msgs, ...introMessages];
+    return [enc.prose, ...beginCombatApproach(state, { enemyIds: enc.enemyIds, canFlee: true })];
   }
 
   if (enc.kind === 'merchant' && enc.shop) {
@@ -97,24 +51,117 @@ function resolveEncounterOutcome(state: GameState, enc: ExploreEncounterDef): st
     };
     state.scene = 'shop';
     state.subMenu = 'root';
-    return msgs;
+    return [enc.prose];
   }
 
-  if (enc.itemId) {
-    addItemToInventory(state, enc.itemId, 1);
-    msgs.push(`Found ${ITEMS[enc.itemId]?.name ?? enc.itemId}.`);
-  }
-  if (enc.crownsMin !== undefined && enc.crownsMax !== undefined) {
-    const gain =
-      enc.crownsMin +
-      Math.floor(nextRandom(state) * (enc.crownsMax - enc.crownsMin + 1));
-    if (gain > 0) {
-      state.player.crowns += gain;
-      msgs.push(`Salvaged ${gain} Crowns.`);
+  if (enc.kind === 'unlock_area' && enc.targetUnlockId) {
+    let outcomeText = enc.prose;
+    if (!f.unlockedAreas.includes(enc.targetUnlockId)) {
+      f.unlockedAreas.push(enc.targetUnlockId);
+      markPlaceSeen(state, enc.targetUnlockId);
+      const loc = LOCATIONS[enc.targetUnlockId];
+      outcomeText = `${enc.prose}\n\nNew route marked: ${loc?.name ?? enc.targetUnlockId}. You can now Travel there from Camp.`;
+      recordChronicle(state, `Discovered ${loc?.name ?? enc.targetUnlockId}`, enc.prose, 'explore');
     }
+    state.exploreBeat = {
+      title: 'NEW ROUTE FOUND',
+      prose: outcomeText,
+      kind: 'discovery',
+      resolved: true,
+      returnScene,
+    };
+    state.scene = 'explore_beat';
+    return [outcomeText];
   }
 
-  return msgs;
+  if (enc.kind === 'unlock_town' && enc.targetUnlockId) {
+    let outcomeText = enc.prose;
+    if (!f.unlockedTowns.includes(enc.targetUnlockId)) {
+      f.unlockedTowns.push(enc.targetUnlockId);
+      markPlaceSeen(state, enc.targetUnlockId);
+      const loc = LOCATIONS[enc.targetUnlockId];
+      outcomeText = `${enc.prose}\n\nNew shelter marked: ${loc?.name ?? enc.targetUnlockId}. You can now Travel there from Camp.`;
+      recordChronicle(state, `Discovered ${loc?.name ?? enc.targetUnlockId}`, enc.prose, 'explore');
+    }
+    state.exploreBeat = {
+      title: 'SETTLEMENT SIGHTED',
+      prose: outcomeText,
+      kind: 'discovery',
+      resolved: true,
+      returnScene,
+    };
+    state.scene = 'explore_beat';
+    return [outcomeText];
+  }
+
+  if (enc.kind === 'unlock_sub_area' && enc.targetUnlockId) {
+    let outcomeText = enc.prose;
+    if (!f.unlockedSubAreas.includes(enc.targetUnlockId)) {
+      f.unlockedSubAreas.push(enc.targetUnlockId);
+      const sa = loadWorldDatabase().subAreas[enc.targetUnlockId];
+      outcomeText = `${enc.prose}\n\nSecret sub-area uncovered: ${sa?.name ?? enc.targetUnlockId}. Toggle Sub-Area under Explore to search it.`;
+      recordChronicle(state, `Secret: ${sa?.name ?? enc.targetUnlockId}`, enc.prose, 'explore');
+    }
+    state.exploreBeat = {
+      title: 'HIDDEN PASSAGE',
+      prose: outcomeText,
+      kind: 'discovery',
+      resolved: true,
+      returnScene,
+    };
+    state.scene = 'explore_beat';
+    return [outcomeText];
+  }
+
+  if (enc.kind === 'unlock_dungeon' && enc.targetUnlockId) {
+    let outcomeText = enc.prose;
+    if (!f.unlockedDungeons.includes(enc.targetUnlockId)) {
+      f.unlockedDungeons.push(enc.targetUnlockId);
+      const d = loadWorldDatabase().dungeons[enc.targetUnlockId];
+      outcomeText = `${enc.prose}\n\nDungeon entrance found: ${d?.name ?? enc.targetUnlockId}. Enter it directly from this area.`;
+      recordChronicle(state, `Dungeon: ${d?.name ?? enc.targetUnlockId}`, enc.prose, 'explore');
+    }
+    state.exploreBeat = {
+      title: 'DARK THRESHOLD',
+      prose: outcomeText,
+      kind: 'discovery',
+      resolved: true,
+      returnScene,
+    };
+    state.scene = 'explore_beat';
+    return [outcomeText];
+  }
+
+  if (enc.itemId || (enc.crownsMin !== undefined && enc.crownsMax !== undefined)) {
+    state.exploreBeat = {
+      title: 'SALVAGE ON THE TRAIL',
+      prose: `${enc.prose}\n\nCold frost crusts the edges; whatever lies here has been picked over or left in a hurry.`,
+      kind: 'salvage',
+      itemId: enc.itemId,
+      crownsMin: enc.crownsMin,
+      crownsMax: enc.crownsMax,
+      resolved: false,
+      returnScene,
+    };
+    state.scene = 'explore_beat';
+    return [enc.prose];
+  }
+
+  const title =
+    enc.kind === 'curiosity'
+      ? 'STRANGE SIGN'
+      : enc.kind === 'landscape'
+        ? 'THE NORTHERN WASTE'
+        : 'QUIET SCOUT';
+  state.exploreBeat = {
+    title,
+    prose: enc.prose,
+    kind: enc.kind === 'curiosity' ? 'curiosity' : enc.kind === 'landscape' ? 'landscape' : 'empty',
+    resolved: true,
+    returnScene,
+  };
+  state.scene = 'explore_beat';
+  return [enc.prose];
 }
 
 export function rollCampExplore(state: GameState): string[] {
@@ -133,7 +180,7 @@ export function rollCampExplore(state: GameState): string[] {
 
   const picked = pickWeightedEncounter(state, all);
   if (!picked) {
-    return ['You scout the perimeter around camp, finding only damp ash and quiet wind.', ...clockMsgs];
+    return ['You scout the perimeter around camp, finding only frozen mud and quiet wind.', ...clockMsgs];
   }
   return [...resolveEncounterOutcome(state, picked), ...clockMsgs];
 }
@@ -176,18 +223,19 @@ export function travelFromCamp(state: GameState, destId: string): string[] {
   const dest = LOCATIONS[destId];
   if (!dest) return ['Unknown destination.'];
 
-  const msgs: string[] = [`You shoulder your pack and strike out toward ${dest.name}.`];
+  const prevLoc = state.locationId;
+  const msgs: string[] = [];
+  let rationNote = 'You chew a strip of salted jerky as you break camp and shoulder your pack.';
   if (state.player.rations > 0) {
     state.player.rations -= 1;
   } else {
     state.player.stamina = Math.max(0, state.player.stamina - 1);
-    msgs.push('Traveling on an empty stomach costs 1 Stamina.');
+    rationNote = 'With no rations left, your stomach knots painfully as you shoulder your pack, costing 1 Stamina.';
   }
 
   msgs.push(...advanceHours(state, 3));
 
   state.locationId = destId;
-  state.scene = 'location';
   state.subMenu = 'root';
   state.activeNpcId = null;
 
@@ -195,9 +243,16 @@ export function travelFromCamp(state: GameState, destId: string): string[] {
   if (!state.visitedLocations.includes(destId)) {
     state.visitedLocations.push(destId);
   }
-  if (firstVisit) {
-    msgs.push(dest.firstSightProse(state));
-  }
+
+  const weatherLine = WEATHER_DATA[state.clock.weather].atmosphere;
+  const lunarLine = LUNAR_PHASE_DATA[state.clock.lunarPhase].atmosphere;
+  const departureBeat = [
+    `You strike out along the broken paving toward ${dest.name}. ${rationNote}`,
+    `${weatherLine} ${lunarLine}`,
+  ].join('\n\n');
+
+  const arrivalProse = firstVisit ? dest.firstSightProse(state) : dest.returnSightProse(state);
+  const arrivalBeat = [arrivalProse, `You reach the edge of ${dest.name} and take stock of your surroundings.`].join('\n\n');
 
   if (
     destId === 'cinderford' &&
@@ -208,12 +263,12 @@ export function travelFromCamp(state: GameState, destId: string): string[] {
     setFlag(state, 'cinderford_fallen', true);
     recordChronicle(
       state,
-      'Cinderford Fell',
-      'Because the infected granary went ignored past Day 8, Cinderford succumbed from within.',
+      'Timber Post Fell',
+      'Because the infected granary went ignored past Day 8, Timber Post succumbed from within.',
       'cinderford',
     );
     msgs.push(
-      'Cinderford Keep has succumbed to the granary spores. Two stooped figures burst from the gatehouse.',
+      'Timber Post has succumbed to the granary rot. Two stooped figures burst from the gatehouse.',
     );
     const { introMessages } = startCombatEncounter(state, {
       enemyIds: ['root_husk', 'root_husk'],
@@ -222,19 +277,23 @@ export function travelFromCamp(state: GameState, destId: string): string[] {
     return [...msgs, ...introMessages];
   }
 
+  let pendingAmbushEnemyId: string | undefined;
   if (dest.regionType === 'area') {
     const weatherBonus = WEATHER_DATA[state.clock.weather].ambushBonus;
     const chance = Math.min(0.45, dest.danger * 0.08 + weatherBonus);
     if (nextRandom(state) < chance) {
-      const ambusher = dest.danger >= 4 ? 'bell_acolyte' : dest.danger >= 2 ? 'root_husk' : 'ash_hound';
-      msgs.push('Shadows stir along the trail before you reach cover.');
-      const { introMessages } = startCombatEncounter(state, {
-        enemyId: ambusher,
-        canFlee: true,
-      });
-      return [...msgs, ...introMessages];
+      pendingAmbushEnemyId = dest.danger >= 4 ? 'bell_acolyte' : dest.danger >= 2 ? 'root_husk' : 'ash_hound';
     }
   }
+
+  state.travelState = {
+    fromId: prevLoc,
+    destId,
+    beatIndex: 0,
+    beats: [departureBeat, arrivalBeat],
+    pendingAmbushEnemyId,
+  };
+  state.scene = 'travel';
 
   return msgs;
 }

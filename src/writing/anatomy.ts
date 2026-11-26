@@ -27,14 +27,14 @@ export interface AppearanceOptionSet {
 
 const SKIN_BY_RACE: Record<RaceId, string[]> = {
   vaelorian: ['Pale Ivory', 'Warm Olive', 'Weathered Tan', 'Bronze', 'Deep Umber'],
-  ael_thalor: ['Moon-Pale', 'Silver-Ivory', 'Dusk-Ash', 'Frost-Grey', 'Starlit Alabaster'],
+  ael_thalor: ['Moon-Pale', 'Silver-Ivory', 'Frost-Slate', 'Frost-Grey', 'Cold Alabaster'],
   durnfolk: ['Slate-Grey', 'Iron-Tan', 'Weathered Ochre', 'Basalt-Brown', 'Soot-Bronze'],
   grixi: ['Mossy Olive', 'Soot-Green', 'Tarnished Brass', 'Chalk-Sage', 'Damp Lichen'],
 };
 
 const HAIR_COLOR_BY_RACE: Record<RaceId, string[]> = {
-  vaelorian: ['Raven Black', 'Chestnut', 'Ash-Blonde', 'Copper-Red', 'Iron-Grey'],
-  ael_thalor: ['Starlight Silver', 'Pale Gold', 'Ash-White', 'Midnight Blue', 'Obsidian'],
+  vaelorian: ['Raven Black', 'Chestnut', 'Pale Blonde', 'Copper-Red', 'Iron-Grey'],
+  ael_thalor: ['Silver-White', 'Pale Gold', 'Frost-White', 'Midnight Blue', 'Coal-Black'],
   durnfolk: ['Coal Black', 'Rust-Red', 'Forge-Grey', 'Bronze-Brown', 'Soot-White'],
   grixi: ['Soot Black', 'Mire-Brown', 'Copper-Tarnish', 'Chalk-Grey', 'Moss-Dark'],
 };
@@ -54,8 +54,8 @@ const HEIGHT_BY_RACE: Record<RaceId, string[]> = {
 };
 
 const MARK_BY_RACE: Record<RaceId, string[]> = {
-  vaelorian: ['None', 'Kiln-Ember Brand', 'Imperial Signet-Callus', 'Soot-Stained Knuckles', 'Cold Unblinking Gaze'],
-  ael_thalor: ['None', 'Silver Vein-Lines', 'Star-Script Ink', 'Hollow Collarbones', 'Ageless Stillness'],
+  vaelorian: ['None', 'Hearth-Brand', 'Imperial Signet-Callus', 'Soot-Stained Knuckles', 'Cold Unblinking Gaze'],
+  ael_thalor: ['None', 'Silver Vein-Lines', 'Runic Ink', 'Hollow Collarbones', 'Ageless Stillness'],
   durnfolk: ['None', 'Slate Knuckle-Ridges', 'Basalt Cheek-Striations', 'Forge-Soot Beard', 'Iron-Ringed Braids'],
   grixi: ['None', 'Notched Ears', 'Lantern-Sheen Pupils', 'Alchemical Acid-Stains', 'Brass Guild-Pin'],
 };
@@ -75,8 +75,8 @@ export function getAppearanceOptionsFor(sex: SexId, race: RaceId): AppearanceOpt
       sex === 'female'
         ? ['Spare', 'Slender', 'Trim', 'Curved', 'Full-Figured', 'Broad-Shouldered']
         : ['Spare', 'Lean', 'Trim', 'Broad-Chested', 'Stocky', 'Barrel-Chested'],
-    facialScars: ['Unmarked', 'Cheek Slash', 'Brow Split', 'Ash-Burn', 'Lip Notch', 'Ritual Brand'],
-    bodyScars: ['Unmarked', 'Lash Welts', 'Rib Seam', 'Kiln-Burn', 'Old Spear-Mark', 'Pale Root-Veins'],
+    facialScars: ['Unmarked', 'Cheek Slash', 'Brow Split', 'Frost-Burn', 'Lip Notch', 'Ritual Brand'],
+    bodyScars: ['Unmarked', 'Lash Welts', 'Rib Seam', 'Cinder-Burn', 'Old Spear-Mark', 'Pale Seam-Veins'],
     distinguishingMark: MARK_BY_RACE[race],
   };
 }
@@ -92,10 +92,12 @@ export function buildPlayerAnatomy(
   if (sel.height.toLowerCase().includes('tower') || sel.height.toLowerCase().includes('tall')) {
     tags.push('towering');
   }
-  if (sel.height === 'Small' || sel.height === 'Short' || sel.height === 'Squat') {
+  if (sel.height === 'Small' || sel.height === 'Short' || sel.height === 'Squat' || sel.height === 'Wiry-Short') {
     tags.push('small_stature');
   }
   if (sel.weight === 'Gaunt') tags.push('gaunt');
+  if (sel.weight === 'Gaunt' || sel.weight === 'Lean') tags.push('lean_build');
+  if (sel.weight === 'Heavy' || sel.weight === 'Burly') tags.push('heavy_build');
   if (sel.musculature === 'Corded' || sel.musculature === 'Hulking' || sel.musculature === 'Broad') {
     tags.push('muscular');
   }
@@ -103,13 +105,59 @@ export function buildPlayerAnatomy(
   if (sel.bodyShape === 'Curved' || sel.bodyShape === 'Full-Figured') {
     tags.push('curvaceous');
   }
-  if (sel.facialScars !== 'Unmarked') tags.push('scarred_face');
+
+  // Facial & body scar categories
+  if (sel.facialScars === 'Unmarked') {
+    tags.push('unmarked_face');
+  } else {
+    tags.push('scarred_face');
+    if (sel.facialScars === 'Frost-Burn') tags.push('burn_scarred');
+    if (sel.facialScars === 'Ritual Brand') tags.push('ritual_branded');
+  }
   if (sel.bodyScars !== 'Unmarked') tags.push('battle_worn');
-  if (sel.bodyScars === 'Pale Root-Veins') tags.push('root_veined');
-  if (sel.distinguishingMark.toLowerCase().includes('kiln')) tags.push('kiln_branded');
+  if (sel.bodyScars === 'Cinder-Burn') tags.push('burn_scarred');
+  if (sel.bodyScars === 'Pale Seam-Veins') tags.push('root_veined');
+  if (sel.distinguishingMark.toLowerCase().includes('brand')) tags.push('kiln_branded');
   if (sel.distinguishingMark.toLowerCase().includes('notched')) tags.push('notched_ears');
-  if (sel.skinColor.toLowerCase().includes('pale') || sel.skinColor.toLowerCase().includes('alabaster')) {
+
+  // Skin tone categories
+  if (
+    ['Pale Ivory', 'Moon-Pale', 'Silver-Ivory', 'Cold Alabaster', 'Chalk-Sage', 'Frost-Grey', 'Frost-Slate'].includes(
+      sel.skinColor,
+    )
+  ) {
     tags.push('pale_skin');
+  } else if (['Mossy Olive', 'Soot-Green', 'Damp Lichen'].includes(sel.skinColor)) {
+    tags.push('greenskin');
+  } else if (['Slate-Grey', 'Basalt-Brown', 'Soot-Bronze'].includes(sel.skinColor)) {
+    tags.push('stone_skin');
+  } else if (['Deep Umber', 'Bronze'].includes(sel.skinColor)) {
+    tags.push('dark_skin');
+  } else {
+    tags.push('weathered_skin');
+  }
+
+  // Eye categories
+  if (['Liquid Silver', 'Mist-Grey', 'Pale Violet'].includes(sel.eyeColor)) {
+    tags.push('silver_eyes');
+  } else if (['Lantern-Yellow', 'Tarnished Gold', 'Soot-Orange', 'Bright Amber', 'Star-Gold'].includes(sel.eyeColor)) {
+    tags.push('lantern_eyes');
+  } else if (['Amber', 'Ember-Amber', 'Deep Copper', 'Hazel'].includes(sel.eyeColor)) {
+    tags.push('amber_eyes');
+  } else if (['Dark Brown', 'Iron-Brown', 'Smoky Quartz', 'Flint-Grey'].includes(sel.eyeColor)) {
+    tags.push('dark_eyes');
+  } else {
+    tags.push('pale_eyes');
+  }
+
+  // Hair categories
+  if (sel.hairLength === 'Shaved') tags.push('shaved_head');
+  if (sel.hairLength === 'Long' || sel.hairLength === 'Waist-Length') tags.push('long_hair');
+  if (['Frost-White', 'Soot-White', 'Silver-White', 'Chalk-Grey'].includes(sel.hairColor)) {
+    tags.push('white_hair');
+  }
+  if (['Copper-Red', 'Rust-Red', 'Copper-Tarnish'].includes(sel.hairColor)) {
+    tags.push('red_hair');
   }
 
   const raceFaceNote =
@@ -147,7 +195,7 @@ export function buildPlayerAnatomy(
 
   const legNote =
     sel.musculature === 'Hulking' || sel.weight === 'Burly' || sel.weight === 'Heavy'
-      ? 'Heavy, planted stride that settles deep into wet ash.'
+      ? 'Heavy, planted stride that settles deep into frozen mud.'
       : sel.musculature === 'Wiry' || sel.weight === 'Lean' || sel.weight === 'Gaunt'
         ? 'Quiet, coiled footing balanced on the balls of the feet.'
         : 'Measured frontier stride kept ready to pivot or brace.';

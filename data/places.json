@@ -1,37 +1,38 @@
 {
   "places": [
     {
-      "id": "cinderford",
-      "name": "Cinderford Keep",
+      "id": "frostwall_redoubt",
+      "name": "Timber Post",
       "regionType": "town",
       "danger": 0,
       "dark": false,
       "neighbors": [
-        "weeping_barrow",
-        "kings_causeway",
-        "ash_fen"
+        "stepped_barrow",
+        "imperial_viaduct",
+        "brine_marsh",
+        "salt_hermitage"
       ],
       "asciiPos": {
         "row": 2,
         "col": 0,
-        "code": "CF"
+        "code": "TP"
       },
-      "sensorySummary": "Blackened timber palisades ring a squat border keep above the marsh. Pitch-lanterns hiss in the rain over the muddy garrison yard, peat smoke drifts from the Ashen Flagon inn, and nervous townsfolk eye the barred oak granary near the well.",
+      "sensorySummary": "Split pine logs and dry-stacked fieldstone wedge beneath a broken stone archway twice the height of a wagon. Wet peat smoke hangs low over frozen mud where gaunt deserters guard a timber storehouse and pitch braziers.",
       "firstSightVariants": [
         {
           "when": {
             "race": "grixi"
           },
-          "text": "Blackened timber palisades ring a squat border keep above the marsh. Pitch-lanterns hiss in the rain over the muddy garrison yard, peat smoke drifts from the Ashen Flagon inn, and nervous townsfolk eye the barred oak granary near the well. Guards in soot-stained mail watch your tinker's satchel warily from the catwalk."
+          "text": "Split pine logs and dry-stacked fieldstone wedge beneath a broken stone archway twice the height of a wagon. Pitch braziers crackle over frozen mud while ragged sentries stare hard at your pointed ears and clinking brass pack."
         },
         {
           "when": {
             "race": "vaelorian"
           },
-          "text": "Blackened timber palisades ring a squat border keep above the marsh. Pitch-lanterns hiss in the rain over the muddy garrison yard, peat smoke drifts from the Ashen Flagon inn, and nervous townsfolk eye the barred oak granary near the well. Weathered imperial eagles cling to the gate lintel above you."
+          "text": "Split pine logs and dry-stacked fieldstone wedge beneath a broken stone archway twice the height of a wagon. Wet peat smoke hangs over frozen ruts, and a faded southern garrison rag hangs nailed crookedly above the gate."
         },
         {
-          "text": "Blackened timber palisades ring a squat border keep above the marsh. Pitch-lanterns hiss in the rain over the muddy garrison yard, peat smoke drifts from the Ashen Flagon inn, and nervous townsfolk eye the barred oak granary near the well. Iron boots splash across wet slate as patrols change the watch."
+          "text": "Split pine logs and dry-stacked fieldstone wedge beneath a broken stone archway twice the height of a wagon. Iron-shod boots crunch in grey slush while cold sentries stamp their feet beside smoking pitch buckets."
         }
       ],
       "descriptionVariants": [
@@ -39,42 +40,42 @@
           "when": {
             "hasFlag": "cinderford_fallen"
           },
-          "text": "Cinderford's timber gate hangs crooked on rusted hinges. Pale tendrils curl out of the granary roof, and the watch-bell lies cracked in gray slush."
+          "text": "Timber Post stands unbarred and empty. Grey rot crusted like chalk coats the split storehouse doors, and the iron watch-kettle lies overturned in frozen mud."
         },
         {
           "when": {
             "race": "grixi"
           },
-          "text": "Timber palisades ring the blackened stone keep above the mire. Lanterns swing over the Iron-Vow muster yard while townsfolk watch the granary near the well. The quartermaster keeps a discreet under-ledger beneath the counter for Grixi coin."
+          "text": "Sharp pine stakes lean against huge cut stone while deserters huddle around peat fires. Beneath the plank counter, the quartermaster keeps a locked tin box for quiet Onyx trades."
         },
         {
           "when": {
             "race": "vaelorian"
           },
-          "text": "Timber palisades ring the blackened stone keep above the mire. Lanterns swing over the Iron-Vow muster yard while townsfolk watch the granary near the well. Old Imperial eagles still cling to the gate lintel."
+          "text": "Sharp pine stakes lean against huge cut stone while hollow-cheeked veterans guard their dwindling firewood and barred grain shed."
         },
         {
-          "text": "Timber palisades ring the blackened stone keep above the mire. Lanterns swing over the Iron-Vow muster yard while townsfolk watch the granary near the well."
+          "text": "Sharp pine stakes lean against huge cut stone while trapped southern exiles hoard dry kindling, salted pork, and black Onyx coin."
         }
       ],
       "shop": {
-        "name": "Cinderford Quartermaster",
+        "name": "Post Quartermaster",
         "keeper": "Quartermaster Harken",
         "greetingVariants": [
           {
             "when": {
               "hasFlag": "cinderford_fallen"
             },
-            "text": "Harken is gone; only empty crates remain."
+            "text": "Harken is gone; only splintered salt-crates remain in the frost."
           },
           {
             "when": {
               "hasFlag": "granary_burned"
             },
-            "text": "Harken taps a notched tally-stick. Grain prices remain steep since the fire."
+            "text": "Harken taps a charred tally-stick. Oats and lamp-oil cost double since the cellar fire."
           },
           {
-            "text": "Harken taps a notched tally-stick beside stacked crates."
+            "text": "Harken bites a sharp black Onyx coin beside stacked pine crates."
           }
         ],
         "items": [
@@ -137,13 +138,29 @@
             "itemId": "vesper_needle",
             "price": 52,
             "underWarrenOnly": true
+          },
+          {
+            "itemId": "rusty_shortsword",
+            "price": 22
+          },
+          {
+            "itemId": "boiled_hide_jerkin",
+            "price": 24
+          },
+          {
+            "itemId": "wolfskin_cloak",
+            "price": 26
+          },
+          {
+            "itemId": "healing_draught",
+            "price": 20
           }
         ]
       },
       "actions": [
         {
           "id": "cf_granary_outer",
-          "label": "Granary",
+          "label": "Grain Shed",
           "visible": {
             "allOf": [
               {
@@ -162,13 +179,13 @@
               "cf_granary_opened": true
             },
             "messages": [
-              "You unbar the swollen oak door. Sweet, chalky spore-mist curls up from the lower grain cellar."
+              "You lever back the swollen oak bar. Sour, chalk-white dust curls out from the damp barley cellar and stings your throat."
             ]
           }
         },
         {
           "id": "cf_granary_cellar",
-          "label": "Cellar Spores",
+          "label": "Cellar Rot",
           "visible": {
             "allOf": [
               {
@@ -209,12 +226,12 @@
                   "giveCrowns": 18,
                   "giveRations": 2,
                   "recordChronicle": {
-                    "title": "Purified Cinderford Granary",
-                    "summary": "Cleansed the infected grain stores without fire, saving the winter harvest.",
-                    "tag": "cinderford"
+                    "title": "Saved Timber Post Stores",
+                    "summary": "Cleared the spoiling frost-rot from the grain cellar without burning the winter barley.",
+                    "tag": "frostwall_redoubt"
                   },
                   "messages": [
-                    "You draw the pale spores into a clay brazier and turn them to harmless grey ash, sparing every sack of barley."
+                    "You shovel the chalk-crusted grain seams into an iron fire-pan and char them clean down to dead ash, saving every dry sack beneath."
                   ]
                 }
               },
@@ -239,12 +256,12 @@
                   "giveCrowns": 18,
                   "giveRations": 2,
                   "recordChronicle": {
-                    "title": "Purified Cinderford Granary",
-                    "summary": "Cleansed the infected grain stores without fire, saving the winter harvest.",
-                    "tag": "cinderford"
+                    "title": "Saved Timber Post Stores",
+                    "summary": "Cleared the spoiling frost-rot from the grain cellar without burning the winter barley.",
+                    "tag": "frostwall_redoubt"
                   },
                   "messages": [
-                    "You distill Vesper Tonic across the seed-bins, burning out the pale mycelium while sparing every sack of grain."
+                    "You trickle bitter tonic across the wet bin boards, killing the creeping white threads cleanly while sparing the oats."
                   ]
                 }
               },
@@ -266,12 +283,12 @@
                       "giveRations": 2,
                       "giveCrowns": 15,
                       "recordChronicle": {
-                        "title": "Purified Cinderford Granary",
-                        "summary": "Isolated and purged the spore-blight from the town grain stores.",
-                        "tag": "cinderford"
+                        "title": "Saved Timber Post Stores",
+                        "summary": "Cut out the spoiled grain casks before the cellar rot could ruin the winter stores.",
+                        "tag": "frostwall_redoubt"
                       },
                       "messages": [
-                        "You trace the damp root-vein to a single rotted cask and excise it cleanly before the blight spreads."
+                        "You trace the sour frost-mold to one split water-cask and drag it clear to the brazier before the damp spreads."
                       ]
                     },
                     "onFail": {
@@ -283,12 +300,12 @@
                         "iron_vow": 1
                       },
                       "recordChronicle": {
-                        "title": "Burned Cinderford Granary",
-                        "summary": "Put the contaminated granary to the torch to halt the Husk-Tide.",
-                        "tag": "cinderford"
+                        "title": "Burned Post Granary",
+                        "summary": "Torched the rotting grain shed to stop sickness from spreading through Timber Post.",
+                        "tag": "frostwall_redoubt"
                       },
                       "messages": [
-                        "The blight spreads too swiftly for steel. You bar the shutters and put the granary to the torch, sparing the keep at bitter cost."
+                        "The sour rot spreads faster than a knife can trim it. You bar the shutters and drop a pitch torch inside, saving the stockade at bitter cost."
                       ]
                     }
                   }
@@ -299,7 +316,7 @@
         },
         {
           "id": "cf_durnfolk_masonry",
-          "label": "Curtain Wall",
+          "label": "Wall Masonry",
           "visible": {
             "allOf": [
               {
@@ -320,9 +337,9 @@
             "adjustFactions": {
               "iron_vow": 1
             },
-            "giveCrowns": 18,
+            "giveCrowns": 14,
             "messages": [
-              "Your Durnfolk eyes spot settling mortar above the sluice-gate. You wedge basalt shims and instruct the masons in deep-forge bracing; the master builder pays your fee gratefully."
+              "You wedge flat slate shims beneath a sagging arch block and tighten the iron tie-rod. A shivering sentry tosses down Onyx coins in rough thanks."
             ]
           }
         },
@@ -343,7 +360,7 @@
             "setFlags": {
               "cf_looted_ruin": true
             },
-            "giveRations": 1,
+            "giveRations": 2,
             "giveItems": [
               {
                 "id": "poultice",
@@ -351,7 +368,7 @@
               }
             ],
             "messages": [
-              "Among spilled grain sacks you rescue a bundle of rations and a clean poultice."
+              "Under fallen pine beams you pry open a dry salt-chest holding hardtack and clean linen wraps."
             ]
           }
         }
@@ -359,28 +376,28 @@
       "npcs": [
         {
           "id": "captain_vane",
-          "name": "Captain Vane",
+          "name": "Halvar Vane",
           "unidentifiedLabel": "Scarred Officer",
-          "shortLabel": "Captain Vane",
+          "shortLabel": "Halvar Vane",
           "visible": {
             "notFlag": "cinderford_fallen"
           },
-          "firstSightProse": "At the far end of the rain-slicked yard stands a broad-shouldered garrison officer leaning over a scarred oak table. Iron-grey hair sits cropped beneath a leather cap, an old sabre slash splits his left eyebrow, and gauntleted fingers drum steadily beside an iron muster roll.",
+          "firstSightProse": "Behind a mud-caked plank table stands a broad-shouldered deserter officer in salt-pitted mail. A pale sabre-scar splits his left eyebrow beneath cropped iron-grey hair, and calloused knuckles drum beside scratched tally-slates.",
           "greetingVariants": [
             {
               "when": {
                 "race": "vaelorian"
               },
-              "text": "Captain Vane eyes the old Vaelorian cut of your brow across the muster table."
+              "text": "Halvar Vane eyes the southern cut of your brow across the plank table."
             },
             {
               "when": {
                 "sex": "female"
               },
-              "text": "Captain Vane glances up from his iron muster-roll, his gaze cold and skeptical."
+              "text": "Halvar Vane looks up from his muster slates, his stare flat and doubtful."
             },
             {
-              "text": "Captain Vane beckons you toward the scarred oak muster table."
+              "text": "Halvar Vane waves you over to the ash-dusted tally board."
             }
           ],
           "anatomy": {
@@ -396,11 +413,11 @@
             "bodyShape": "Broad-Chested",
             "facialScars": "Brow Split",
             "bodyScars": "Old Spear-Mark",
-            "faceDetail": "Deep-set storm-grey eyes sit beneath a jagged scar splitting his left eyebrow and a hard, stubbled jaw.",
-            "chestTorsoDetail": "A heavy barrel chest fills out oiled Iron-Vow plate worn dull by frontier winters.",
-            "armsHandsDetail": "Thick forearms end in scarred knuckles resting permanently near his sword pommel.",
-            "legsStanceDetail": "Planted squarely behind the oak muster board as though holding a breach.",
-            "distinguishingMark": "Wears a notched iron whistle chained across his breastplate.",
+            "faceDetail": "Storm-grey eyes sit deep beneath a jagged sabre-split across his left brow and a hard, stubbled jaw.",
+            "chestTorsoDetail": "A heavy chest fills out oiled ring-mail dulled by salt fog.",
+            "armsHandsDetail": "Thick forearms end in scarred knuckles kept close to his hilt.",
+            "legsStanceDetail": "Boots stay planted wide behind the oak plank as though holding a breach.",
+            "distinguishingMark": "Wears a dented iron whistle chained to his collar.",
             "visibleTags": [
               "humanoid",
               "muscular",
@@ -410,7 +427,7 @@
           "topics": [
             {
               "id": "vane_charter",
-              "label": "Blood Charter",
+              "label": "Road Writ",
               "visible": {
                 "allOf": [
                   {
@@ -432,12 +449,12 @@
                 "giveCrowns": 22,
                 "giveRations": 1,
                 "recordChronicle": {
-                  "title": "Imperial Charter at Cinderford",
-                  "summary": "Captain Vane honored your Vaelorian blood-charter with coin and provisions.",
+                  "title": "Mustered at Timber Post",
+                  "summary": "Halvar Vane recognized your southern military stamp with Onyx coin and hardtack.",
                   "tag": "iron_vow"
                 },
                 "messages": [
-                  "Captain Vane salutes crisply. \"Blood of the Charter. Good to see an Ash-Born {kin} holding the Reach.\" He presses a levy purse and trail bread into your hands."
+                  "Vane taps your old southern seal-mark once. \"At least you marched under iron instead of running barefoot like the rest. Take these black coins and salt-bread.\""
                 ]
               }
             },
@@ -468,12 +485,12 @@
                 "giveCrowns": 16,
                 "giveTorches": 1,
                 "recordChronicle": {
-                  "title": "Mustered with Iron-Vow",
-                  "summary": "Captain Vane enrolled you as an auxiliary and issued coin and a torch.",
+                  "title": "Hired at Timber Post",
+                  "summary": "Halvar Vane signed you on for road scouting with Onyx coin and a pitch torch.",
                   "tag": "iron_vow"
                 },
                 "messages": [
-                  "Captain Vane nods across the scarred oak table. \"Able men are thin on the road, brother. Take a bounty chit and bring word from the Watchtower.\""
+                  "Vane grunts over his slate. \"Warm hands are thin past the black gate, brother. Take this Onyx chit and bring word if anyone still holds the north watch.\""
                 ]
               }
             },
@@ -509,13 +526,13 @@
                     "giveCrowns": 24,
                     "grantMaxHp": 2,
                     "recordChronicle": {
-                      "title": "Outfaced Captain Vane",
-                      "summary": "Refused dismissal at the muster table and won the veterans' respect.",
+                      "title": "Outfaced Halvar Vane",
+                      "summary": "Refused dismissal at the muster table and won over the post watchmen.",
                       "tag": "iron_vow"
                     },
                     "messages": [
-                      "Captain Vane waves a dismissive gauntlet: \"These marches aren't a seamstress hall, lass.\"",
-                      "You drive your weapon flat into the oak plank beside his thumb. The veterans erupt in rough cheers; Vane grunts and slides over an officer purse."
+                      "Vane waves a scarred glove: \"Frost-patrols break harder necks than yours, lass.\"",
+                      "You drive your weapon flat into the plank an inch from his thumb. The watchmen bark rough laughter; Vane exhales and slides a full Onyx purse across."
                     ]
                   },
                   "onFail": {
@@ -524,7 +541,7 @@
                     },
                     "giveCrowns": 10,
                     "messages": [
-                      "Captain Vane scoffs at your stance and tosses a thin messenger fee across the wood."
+                      "Vane snorts at your grip and flicks a thin messenger fee across the timber."
                     ]
                   }
                 }
@@ -532,7 +549,7 @@
             },
             {
               "id": "vane_granary",
-              "label": "Granary",
+              "label": "Grain Shed",
               "effect": {
                 "stayInDialogue": true,
                 "branch": [
@@ -542,14 +559,14 @@
                     },
                     "effect": {
                       "messages": [
-                        "Vane nods toward the well. \"With the granary settled, we might actually outlast winter.\""
+                        "Vane nods toward the shed. \"With the winter grain checked, maybe half these men keep their teeth till thaw.\""
                       ]
                     }
                   },
                   {
                     "effect": {
                       "messages": [
-                        "Vane lowers his voice. \"White mold crept under the granary sills last night. Inspect it before Day 8 or this keep rots from within.\""
+                        "Vane lowers his voice. \"Barley in the cellar went sour overnight, coated in grey chalk-mold. Clear it before Day Eight or half the watch drops sick.\""
                       ]
                     }
                   }
@@ -562,7 +579,7 @@
               "effect": {
                 "stayInDialogue": true,
                 "messages": [
-                  "Vane taps three points on his slate: \"Sir Vorne still holds the Crown-Gate watchtower, the blind Matrons whisper beneath Ash-Fen, and the Weeping Barrow hides pre-Shattering cipher stones.\""
+                  "Vane marks three lines on slate: \"Half-crazed hermits pack salt under an arch to the south, blind weavers hold a flooded stone bathhouse past the bog, and deserters say some iron-clad fool still stands on the far northern watch.\""
                 ]
               }
             }
@@ -570,42 +587,42 @@
         },
         {
           "id": "innkeeper_martha",
-          "name": "Innkeeper Martha",
-          "unidentifiedLabel": "Hearth Keeper",
+          "name": "Martha Brek",
+          "unidentifiedLabel": "Cookhouse Keeper",
           "shortLabel": "Martha",
           "visible": {
             "notFlag": "cinderford_fallen"
           },
-          "firstSightProse": "Beside the smoking peat hearth stands a sturdy, grey-braided woman wiping cracked stoneware with a flour-dusted apron. Soot smudges her forearms, and shrewd amber eyes take in every wet cloak that crosses her threshold.",
+          "firstSightProse": "Under a tarred timber lean-to, a heavy-set cook ladles thin turnip broth from a soot-caked iron kettle. Tallow grease shines on her wool apron, and grey braids stay tucked beneath a scorched kerchief.",
           "greetingVariants": [
             {
               "when": {
                 "hasFlag": "granary_purified"
               },
-              "text": "Martha ladles hot barley broth with a warm smile."
+              "text": "Martha smiles tiredly over the steaming cauldron and reaches for a clean wooden bowl."
             },
             {
-              "text": "Martha wipes cracked stoneware beside the peat hearth."
+              "text": "Martha wipes tallow off her forearms onto a charred apron."
             }
           ],
           "anatomy": {
-            "height": "Average",
-            "weight": "Solid",
+            "height": "Compact",
+            "weight": "Heavy",
             "skinColor": "Warm Olive",
-            "hairLength": "Long",
+            "hairLength": "Shoulder-Length",
             "hairStyle": "Braided",
-            "hairColor": "Iron-Grey",
-            "eyeShape": "Almond",
-            "eyeColor": "Amber",
-            "musculature": "Toned",
+            "hairColor": "Soot-White",
+            "eyeShape": "Deep-Set",
+            "eyeColor": "Hazel",
+            "musculature": "Solid",
             "bodyShape": "Full-Figured",
-            "facialScars": "Unmarked",
+            "facialScars": "Frost-Burn",
             "bodyScars": "Unmarked",
-            "faceDetail": "Laugh-creased amber eyes watch sharply above rosy, hearth-warmed cheeks.",
-            "chestTorsoDetail": "Sturdy shoulders and a full apron bear flour dust and dried rosemary.",
-            "armsHandsDetail": "Strong, burn-speckled forearms lift heavy iron kettles with ease.",
-            "legsStanceDetail": "Unhurried, practical stride behind the timber counter.",
-            "distinguishingMark": "Keeps a heavy brass key-ring looped through her apron sash.",
+            "faceDetail": "Wind-reddened cheeks frame tired hazel eyes and a pale scald scar along her jaw.",
+            "chestTorsoDetail": "A thick woolen apron and heavy shawl guard against sparks.",
+            "armsHandsDetail": "Sturdy forearms bear pale kettle-scars.",
+            "legsStanceDetail": "Settles her weight firmly beside the iron tripod.",
+            "distinguishingMark": "Carries a notched wooden spoon tucked through her belt.",
             "visibleTags": [
               "humanoid"
             ]
@@ -617,24 +634,297 @@
               "effect": {
                 "stayInDialogue": true,
                 "messages": [
-                  "\"A deserter named Kale bolted down the King's Causeway coughing chalk,\" Martha murmurs. \"And if you descend to the Silken Cistern, mind how the Matrons weigh men against sisters.\""
+                  "Martha stirs the pot slowly. \"Nobody walks back south once the black gate shuts behind them. Meat spoils in two days out here, salt costs blood, and even southern deserters trade in those black Onyx pieces now.\""
                 ]
               }
             },
             {
               "id": "martha_soup",
               "label": "Broth",
+              "effect": {
+                "stayInDialogue": true,
+                "branch": [
+                  {
+                    "when": {
+                      "hasFlag": "granary_purified"
+                    },
+                    "effect": {
+                      "healHp": 4,
+                      "messages": [
+                        "Martha ladles hot barley broth into a chipped bowl without asking for coin. Warmth settles deep behind your ribs."
+                      ]
+                    }
+                  },
+                  {
+                    "effect": {
+                      "messages": [
+                        "Martha shakes her head. \"Six Onyx for dry straw and broth, traveler. Fuel and grain come too dear since frost killed the scrub.\""
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "sergeant_kord",
+          "name": "Kord",
+          "unidentifiedLabel": "Gate Warden",
+          "shortLabel": "Kord",
+          "visible": {
+            "notFlag": "cinderford_fallen"
+          },
+          "firstSightProse": "Crouched beside the spiked gate-leaf, a squat, broad-ribbed dwarf scrapes rust off a halberd head with coarse whetstone. Soot fills the creases of his braided beard, and one split knuckle gleams white.",
+          "greetingVariants": [
+            {
+              "when": {
+                "race": "durnfolk"
+              },
+              "text": "Kord spits stone grit into the mud and gives your broad shoulders a short nod."
+            },
+            {
+              "text": "Kord tests his halberd edge with a thick thumb without looking up."
+            }
+          ],
+          "anatomy": {
+            "height": "Stout",
+            "weight": "Burly",
+            "skinColor": "Basalt-Brown",
+            "hairLength": "Long",
+            "hairStyle": "Braided",
+            "hairColor": "Forge-Grey",
+            "eyeShape": "Narrow",
+            "eyeColor": "Flint-Grey",
+            "musculature": "Broad",
+            "bodyShape": "Stocky",
+            "facialScars": "Lip Notch",
+            "bodyScars": "Rib Seam",
+            "faceDetail": "Flint-grey eyes squint over a notched lip and coarse grey beard-braids.",
+            "chestTorsoDetail": "Rusted iron scale sits tight across barrel-set ribs.",
+            "armsHandsDetail": "Short, thick wrists carry stone-hammer calluses.",
+            "legsStanceDetail": "Heavy boots dig square into frozen gravel.",
+            "distinguishingMark": "Iron wire clamps a cracked brass ring into his left braid.",
+            "visibleTags": [
+              "humanoid",
+              "muscular",
+              "small_stature"
+            ]
+          },
+          "topics": [
+            {
+              "id": "kord_watch",
+              "label": "Watch Roster",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Kord grunts: \"Every twelve nights the moon turns full white, and hungry packs sniff closer to the ditch. Keep pitch dry and stay off open paving after dusk.\""
+                ]
+              }
+            },
+            {
+              "id": "kord_plate",
+              "label": "Plate Care",
               "visible": {
-                "notFlag": "martha_broth_today"
+                "notFlag": "kord_tips_given"
               },
               "effect": {
                 "stayInDialogue": true,
                 "setFlags": {
-                  "martha_broth_today": true
+                  "kord_tips_given": true
                 },
-                "healHp": 4,
+                "giveXp": 8,
                 "messages": [
-                  "Martha pushes a steaming wooden bowl across the counter."
+                  "Kord points his whetstone at your harness. \"Grease rivet backs before cold locks them, or one heavy club blow splits your armor clean open.\""
+                ]
+              }
+            },
+            {
+              "id": "kord_quarry",
+              "label": "Quarry Cut",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Kord spits into the frost. \"East past the brick hills lies a stepped black quarry. Builders cut blocks big as cottages down there and left bronze chains worth hauling if frost doesn't take your toes.\""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "scribe_elara",
+          "name": "Elara Vance",
+          "unidentifiedLabel": "Tally Clerk",
+          "shortLabel": "Elara",
+          "visible": {
+            "notFlag": "cinderford_fallen"
+          },
+          "firstSightProse": "Under a waxed canvas awning, a spare woman with ink-blackened fingertips presses charcoal onto damp paper over a cut stone block. Bent wire spectacles perch on a thin nose above rolled rubbings.",
+          "greetingVariants": [
+            {
+              "when": {
+                "background": "root_scholar"
+              },
+              "text": "Elara adjusts her wire frames as she spots old ink-stains on your fingertips."
+            },
+            {
+              "text": "Elara holds down a curling sheet of paper against the bitter draft."
+            }
+          ],
+          "anatomy": {
+            "height": "Average",
+            "weight": "Gaunt",
+            "skinColor": "Pale Ivory",
+            "hairLength": "Shoulder-Length",
+            "hairStyle": "Tied Back",
+            "hairColor": "Chestnut",
+            "eyeShape": "Wide",
+            "eyeColor": "Pale Blue",
+            "musculature": "Frail",
+            "bodyShape": "Spare",
+            "facialScars": "Unmarked",
+            "bodyScars": "Lash Welts",
+            "faceDetail": "Hollow cheeks and pale blue eyes peer sharply behind bent wire spectacles.",
+            "chestTorsoDetail": "Three layers of moth-chewed wool hang loose over narrow shoulders.",
+            "armsHandsDetail": "Ink-stained knuckles tremble slightly in the cold wind.",
+            "legsStanceDetail": "Knees tucked tight beneath a folding camp-stool.",
+            "distinguishingMark": "Carries a cracked slate ruler etched with unfamiliar ticks.",
+            "visibleTags": [
+              "humanoid",
+              "gaunt",
+              "pale_skin"
+            ]
+          },
+          "topics": [
+            {
+              "id": "elara_onyx",
+              "label": "Onyx Coin",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Elara turns a black coin edgewise to the fire. \"Every edge cuts sharp without a burr. Neither file nor chisel scratches them. Whoever ruled these roads stamped these by the wagonload.\""
+                ]
+              }
+            },
+            {
+              "id": "elara_steps",
+              "label": "Tall Steps",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Elara taps her charcoal stick on a rubbing. \"Measure the stair risers outside the post. Even a tall man stretches his knee on every step. The builders here stood higher than southern folk.\""
+                ]
+              }
+            },
+            {
+              "id": "elara_ink",
+              "label": "Road Notes",
+              "visible": {
+                "notFlag": "elara_ink_traded"
+              },
+              "effect": {
+                "stayInDialogue": true,
+                "setFlags": {
+                  "elara_ink_traded": true
+                },
+                "restoreFocus": 2,
+                "messages": [
+                  "Elara shares bitter birch-tea and lets you study three road-mile rubbings until your head clears."
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "tinker_skrit",
+          "name": "Skrit",
+          "unidentifiedLabel": "Scrap Tinker",
+          "shortLabel": "Skrit",
+          "visible": {
+            "notFlag": "cinderford_fallen"
+          },
+          "firstSightProse": "Wedged beside a heap of rusted barrel hoops sits a wiry, sharp-eared goblin hunched over brass tweezers and a tiny oil burner. Yellow eyes dart toward every boot-step while soot-stained fingers twist copper wire.",
+          "greetingVariants": [
+            {
+              "when": {
+                "race": "grixi"
+              },
+              "text": "Skrit clicks his teeth softly in quick kin-cant, beckoning you closer to his scrap heap."
+            },
+            {
+              "when": {
+                "minFaction": {
+                  "faction": "under_warren",
+                  "value": 1
+                }
+              },
+              "text": "Skrit taps a brass loupe against his boot heel and grins crookedly."
+            },
+            {
+              "text": "Skrit keeps one palm over his oil-flasks while eyeing your boots."
+            }
+          ],
+          "anatomy": {
+            "height": "Wiry-Short",
+            "weight": "Lean",
+            "skinColor": "Tarnished Brass",
+            "hairLength": "Shaved",
+            "hairStyle": "Unkempt",
+            "hairColor": "Soot Black",
+            "eyeShape": "Wide",
+            "eyeColor": "Lantern-Yellow",
+            "musculature": "Wiry",
+            "bodyShape": "Spare",
+            "facialScars": "Lip Notch",
+            "bodyScars": "Acid-Stains",
+            "faceDetail": "Notched, pointed ears twitch above wide yellow eyes and a sharp grin.",
+            "chestTorsoDetail": "A greasy leather tool-apron bristles with pliers, files, and glass phials.",
+            "armsHandsDetail": "Thin, acid-spotted fingers move with quick, twitching precision.",
+            "legsStanceDetail": "Perched cross-legged atop an overturned pitch cask.",
+            "distinguishingMark": "Wears a cracked brass monocle strapped tight around his skull.",
+            "visibleTags": [
+              "humanoid",
+              "small_stature",
+              "notched_ears"
+            ]
+          },
+          "topics": [
+            {
+              "id": "skrit_ledger",
+              "label": "Back Ledger",
+              "visible": {
+                "notFlag": "skrit_guild_deal"
+              },
+              "effect": {
+                "stayInDialogue": true,
+                "setFlags": {
+                  "skrit_guild_deal": true
+                },
+                "adjustFactions": {
+                  "under_warren": 2
+                },
+                "messages": [
+                  "Skrit flicks a tiny brass stamp across your wrist. \"Harken hides the good phials under the flour boards. Say brass-tallow and he opens the second chest.\""
+                ]
+              }
+            },
+            {
+              "id": "skrit_wire",
+              "label": "Lock Wire",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Skrit holds up a coiled copper pick. \"Northern locks drop heavy bronze pins instead of southern springs. Carry iron wire kits if you crawl deep cellars.\""
+                ]
+              }
+            },
+            {
+              "id": "skrit_mire",
+              "label": "Bog Vents",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Skrit sniffs loudly. \"South bog vents hiss warm brine and sulfur scum. Skim the vent rims quick before the lung-cough hits.\""
                 ]
               }
             }
@@ -643,466 +933,32 @@
       ]
     },
     {
-      "id": "kings_causeway",
-      "name": "The Old King's Causeway",
-      "regionType": "area",
+      "id": "cistern_cloister",
+      "name": "Old Bathhouse",
+      "regionType": "town",
       "danger": 1,
       "dark": false,
       "neighbors": [
-        "cinderford",
-        "petrified_starwood",
-        "silken_cistern"
+        "brine_marsh",
+        "imperial_viaduct",
+        "foundry_vault",
+        "kiln_terraces"
       ],
       "asciiPos": {
-        "row": 2,
+        "row": 4,
         "col": 1,
-        "code": "KC"
+        "code": "OB"
       },
-      "sensorySummary": "Broad Imperial flagstones buckle upward where pale subterranean roots split ancient mortar. Broken obelisks lean beside rusted deserter cages while cold ash drifts over rutted carriage tracks.",
+      "sensorySummary": "Slick limestone stairs drop into a sunken stone bathhouse where taut linen cords run column-to-column over warm black runoff water. Copper weights clink faintly in rising steam while blind exiles tread the wet marble.",
       "firstSightVariants": [
-        {
-          "text": "The muddy lane widens abruptly onto immense gray flagstones laid for long-dead Imperial legions. Pale roots heave the stone blocks crooked, rusted gibbet cages creak above the ditches, and distant smoke hangs low over the road."
-        }
-      ],
-      "descriptionVariants": [
-        {
-          "text": "Flagstones wide enough for Imperial war-wagons heave upward where white roots split the mortar. Toppled milestone obelisks bear faded Vaelish edicts beside hanged deserter cages."
-        }
-      ],
-      "actions": [
-        {
-          "id": "kc_milestones",
-          "label": "Milestones",
-          "visible": {
-            "notFlag": "kc_milestones_checked"
-          },
-          "effect": {
-            "setFlags": {
-              "kc_milestones_checked": true
-            },
-            "check": {
-              "stat": "wit",
-              "dc": 11,
-              "label": "Milestone Ciphers",
-              "isLoreOrPerception": true,
-              "onSuccess": {
-                "giveRations": 1,
-                "giveTorches": 1,
-                "giveCrowns": 8,
-                "messages": [
-                  "Beneath a loose keystone rests an emergency courier cache with rations, a torch, and silver."
-                ]
-              },
-              "onFail": {
-                "messages": [
-                  "You spot cart tracks leading into a sunken drainage ditch nearby."
-                ]
-              }
-            }
-          }
-        },
-        {
-          "id": "kc_ditch",
-          "label": "Courier Ditch",
-          "visible": {
-            "allOf": [
-              {
-                "hasFlag": "kc_milestones_checked"
-              },
-              {
-                "notFlag": "kc_ditch_cleared"
-              }
-            ]
-          },
-          "effect": {
-            "setFlags": {
-              "kc_ditch_cleared": true
-            },
-            "giveItems": [
-              {
-                "id": "ash_resin",
-                "qty": 1
-              }
-            ],
-            "messages": [
-              "Half-buried in ash mud sits a scorched saddlebag holding resin, though low smoke curls out of the culvert beside it."
-            ],
-            "startCombat": {
-              "enemyId": "ash_hound",
-              "canFlee": true
-            }
-          }
-        }
-      ],
-      "npcs": []
-    },
-    {
-      "id": "weeping_barrow",
-      "name": "The Weeping Barrow",
-      "regionType": "area",
-      "danger": 2,
-      "dark": true,
-      "neighbors": [
-        "cinderford",
-        "petrified_starwood"
-      ],
-      "asciiPos": {
-        "row": 0,
-        "col": 0,
-        "code": "WB"
-      },
-      "sensorySummary": "A grass-bald burial mound older than the Shattering weeps rust-orange groundwater down mossy stone steps. Silver Star-Script glints across the sunken lintel.",
-      "firstSightVariants": [
-        {
-          "text": "A swollen hill of wet slate rises out of the bracken, split by a narrow mouth of dressed granite. Iron-orange water trickles steadily down mossy steps into pitch blackness that smells of wet bronze and cold limestone."
-        }
-      ],
-      "descriptionVariants": [
         {
           "when": {
-            "anyOf": [
-              {
-                "heirloom": "kiln_lantern"
-              },
-              {
-                "minTorches": 1
-              }
-            ]
+            "hasFlag": "stole_cistern_vesper"
           },
-          "text": "An ancient pre-Shattering tumulus weeping iron-stained groundwater down mossy steps. Warm light catches silver Star-Script carved across the weeping lintel."
+          "text": "Dark runoff water laps dead-quiet inside the pillared hall. Every guide-cord hangs severed, copper weights lie drowned in mud, and hooded shadows bolt the gallery doors against you."
         },
         {
-          "text": "An ancient pre-Shattering tumulus weeping iron-stained groundwater down mossy steps. The burial vault yawns in pitch blackness; unlit steps reek of wet bronze."
-        }
-      ],
-      "actions": [
-        {
-          "id": "wb_outer_steps",
-          "label": "Outer Steps",
-          "visible": {
-            "notFlag": "wb_steps_entered"
-          },
-          "effect": {
-            "setFlags": {
-              "wb_steps_entered": true
-            },
-            "consumeTorchIfNotHeirloomOrAbility": {
-              "heirloomId": "kiln_lantern",
-              "abilityId": "kiln_spark",
-              "onHeirloomMsg": "Your Kiln Lantern bathes the drowned stairs in steady amber light.",
-              "onTorchMsg": "You strike a pitch-torch and drive back the wet dark.",
-              "onDarkDamage": 3,
-              "onDarkMsg": "Stone splinters slice your shins in the blind dark before you feel your way down."
-            },
-            "messages": [
-              "Below the threshold wait an inner sarcophagus chamber and a sealed frieze wall."
-            ]
-          }
-        },
-        {
-          "id": "wb_inner_crypt",
-          "label": "Inner Crypt",
-          "visible": {
-            "allOf": [
-              {
-                "hasFlag": "wb_steps_entered"
-              },
-              {
-                "notFlag": "wb_crypt_cleared"
-              }
-            ]
-          },
-          "effect": {
-            "setFlags": {
-              "wb_crypt_cleared": true,
-              "vorne_oath_known": true
-            },
-            "giveItems": [
-              {
-                "id": "echo_shell",
-                "qty": 1
-              }
-            ],
-            "messages": [
-              "Upon the central sarcophagus rests a silver-inlaid tablet naming Sir Vorne's forgotten oath: \"Hold the Crown-Gate until the First Bell answers twice — never yield to the Choir.\" Beside it lies a Resonant Echo-Shell."
-            ]
-          }
-        },
-        {
-          "id": "wb_altar_frieze",
-          "label": "Altar Frieze",
-          "visible": {
-            "allOf": [
-              {
-                "hasFlag": "wb_crypt_cleared"
-              },
-              {
-                "notFlag": "kiln_cipher_learned"
-              }
-            ]
-          },
-          "effect": {
-            "branch": [
-              {
-                "when": {
-                  "anyOf": [
-                    {
-                      "race": "vaelorian"
-                    },
-                    {
-                      "race": "ael_thalor"
-                    },
-                    {
-                      "background": "root_scholar"
-                    }
-                  ]
-                },
-                "effect": {
-                  "setFlags": {
-                    "kiln_cipher_learned": true
-                  },
-                  "recordChronicle": {
-                    "title": "Learned First Kiln Cipher",
-                    "summary": "Translated the pre-Shattering ignition sigils inside the Weeping Barrow.",
-                    "tag": "seal"
-                  },
-                  "messages": [
-                    "Reading the ancient script directly from the scorched marble, you master the First Kiln Cipher."
-                  ]
-                }
-              },
-              {
-                "effect": {
-                  "check": {
-                    "stat": "wit",
-                    "dc": 13,
-                    "label": "Kiln Altar",
-                    "isLoreOrPerception": true,
-                    "onSuccess": {
-                      "setFlags": {
-                        "kiln_cipher_learned": true
-                      },
-                      "recordChronicle": {
-                        "title": "Learned First Kiln Cipher",
-                        "summary": "Pieced together the pre-Shattering Kiln sigils from the tomb lintel.",
-                        "tag": "seal"
-                      },
-                      "messages": [
-                        "You copy the First Kiln Cipher onto your travel-slate."
-                      ]
-                    },
-                    "onFail": {
-                      "messages": [
-                        "The broken glyphs refuse to cohere under your lamp."
-                      ]
-                    }
-                  }
-                }
-              }
-            ]
-          }
-        },
-        {
-          "id": "wb_durnfolk_vault",
-          "label": "Basalt Vault",
-          "visible": {
-            "allOf": [
-              {
-                "race": "durnfolk"
-              },
-              {
-                "hasFlag": "wb_steps_entered"
-              },
-              {
-                "notFlag": "wb_dwarf_vault"
-              }
-            ]
-          },
-          "effect": {
-            "setFlags": {
-              "wb_dwarf_vault": true
-            },
-            "giveItems": [
-              {
-                "id": "runic_warhammer",
-                "qty": 1
-              }
-            ],
-            "giveCrowns": 20,
-            "recordChronicle": {
-              "title": "Opened Barrow Vault",
-              "summary": "Sprang an ancestral Durnfolk counterweight chamber inside the Weeping Barrow.",
-              "tag": "durnfolk"
-            },
-            "messages": [
-              "Tapping the third lintel with your knuckle drops a hidden stone pin. A counterweight chamber swings open, revealing a Runic Warhammer and ancient silver."
-            ]
-          }
-        }
-      ],
-      "npcs": []
-    },
-    {
-      "id": "ash_fen",
-      "name": "The Ash-Fen & Spore-Mire",
-      "regionType": "area",
-      "danger": 2,
-      "dark": false,
-      "neighbors": [
-        "cinderford",
-        "silken_cistern"
-      ],
-      "asciiPos": {
-        "row": 4,
-        "col": 0,
-        "code": "AF"
-      },
-      "sensorySummary": "Knee-deep gray bog dotted with sunken stone lanterns and pale, bell-shaped fungi. Beneath the cattails, an ancient stone culvert descends toward subterranean water.",
-      "firstSightVariants": [
-        {
-          "text": "Solid earth gives way to cold, ash-gray mire smelling of wet peat and sweet mold. Half-drowned stone lanterns mark a crooked causeway of stepping stones, while clusters of pale bell-fungi tremble along the reeds."
-        }
-      ],
-      "descriptionVariants": [
-        {
-          "text": "Knee-deep gray bog dotted with sunken stone lanterns and pale, bell-shaped fungi. Beneath the cattails, an ancient stone culvert descends toward the Silken Cistern."
-        }
-      ],
-      "actions": [
-        {
-          "id": "af_herbs",
-          "label": "Herb Bank",
-          "visible": {
-            "notFlag": "af_herbs_picked"
-          },
-          "effect": {
-            "setFlags": {
-              "af_herbs_picked": true
-            },
-            "giveItems": [
-              {
-                "id": "bog_herb",
-                "qty": 2
-              }
-            ],
-            "messages": [
-              "You cut two bundles of silver-veined bog herb from the reeds."
-            ]
-          }
-        },
-        {
-          "id": "af_stones",
-          "label": "Stepping Stones",
-          "visible": {
-            "notFlag": "af_stones_crossed"
-          },
-          "effect": {
-            "setFlags": {
-              "af_stones_crossed": true
-            },
-            "check": {
-              "stat": "agility",
-              "dc": 12,
-              "label": "Mire Stones",
-              "onSuccess": {
-                "messages": [
-                  "You cross the bone-white stones cleanly to reach a sunken shrine."
-                ]
-              },
-              "onFail": {
-                "damageHp": 4,
-                "messages": [
-                  "A slab tilts into freezing mire and thorn-leeches tear your calf before you reach the shrine."
-                ]
-              }
-            }
-          }
-        },
-        {
-          "id": "af_shrine",
-          "label": "Sunken Shrine",
-          "visible": {
-            "allOf": [
-              {
-                "hasFlag": "af_stones_crossed"
-              },
-              {
-                "notFlag": "af_shrine_done"
-              }
-            ]
-          },
-          "effect": {
-            "setFlags": {
-              "af_shrine_done": true
-            },
-            "giveItems": [
-              {
-                "id": "poultice",
-                "qty": 1
-              }
-            ],
-            "restoreFocus": 3,
-            "messages": [
-              "Beneath the drowned altar you retrieve a dry poultice and steady your mind."
-            ]
-          }
-        },
-        {
-          "id": "af_grixi_salvage",
-          "label": "Mire Vents",
-          "visible": {
-            "allOf": [
-              {
-                "race": "grixi"
-              },
-              {
-                "notFlag": "af_grixi_skimmed"
-              }
-            ]
-          },
-          "effect": {
-            "setFlags": {
-              "af_grixi_skimmed": true
-            },
-            "giveItems": [
-              {
-                "id": "fire_pot",
-                "qty": 1
-              },
-              {
-                "id": "antitoxin",
-                "qty": 1
-              }
-            ],
-            "giveCrowns": 16,
-            "messages": [
-              "Knowing Under-Warren drainage traps by scent alone, you fish out an intact brass canister holding alchemical pots and silver."
-            ]
-          }
-        }
-      ],
-      "npcs": []
-    },
-    {
-      "id": "silken_cistern",
-      "name": "The Silken Cistern",
-      "regionType": "special",
-      "danger": 1,
-      "dark": false,
-      "neighbors": [
-        "ash_fen",
-        "kings_causeway",
-        "drowned_forge"
-      ],
-      "asciiPos": {
-        "row": 4,
-        "col": 1,
-        "code": "SC"
-      },
-      "sensorySummary": "Cathedral-tall subterranean aqueduct arches draped in pale luminous silk above mirror-still black water. Soft shuttle-clicks echo from blind looms hidden behind the curtains.",
-      "firstSightVariants": [
-        {
-          "text": "Descending through the mire culvert opens into an immense vaulted cistern lit by pale, softly glowing curtains of spider-silk hanging from flooded arches. Mirror-still black water carries the rhythmic clack of unseen looms and the hushed whisper of veiled watchers."
+          "text": "Slick limestone stairs drop into a sunken stone bathhouse where taut linen cords run column-to-column over warm black runoff water. Faint copper taps guide blind exiles across damp marble."
         }
       ],
       "descriptionVariants": [
@@ -1110,50 +966,51 @@
           "when": {
             "hasFlag": "stole_cistern_vesper"
           },
-          "text": "The vast underground aqueduct stands dead silent. White silk curtains hang slashed, and the drained Vesper-Font weeps bitter mist."
+          "text": "The Old Bathhouse sits dark and barred. Every oil brazier is drowned; unseen hands keep every door latched."
         },
         {
           "when": {
-            "sex": "female"
+            "minFaction": {
+              "faction": "silken_cistern",
+              "value": 2
+            }
           },
-          "text": "Vast subterranean vaults draped in pale luminous spider-silk above mirror-still black water. The blind Matrons incline their veiled heads toward you in quiet sisterhood."
+          "text": "Linen guide-cords hum gently above warm black water while blindfolded weavers nod toward your footsteps, clearing the dry marble ledge."
         },
         {
-          "text": "Vast subterranean vaults draped in pale luminous spider-silk above mirror-still black water. Blind Matrons stand rigid beside the Loom-Gate, turning sightless faces toward your masculine footstep."
+          "text": "Fluted marble columns rise out of warm steaming runoff beneath a cracked brick dome strung with taut guide-cords."
         }
       ],
       "shop": {
-        "name": "Loom Apothecary",
-        "keeper": "Sister Orla",
+        "name": "Bathhouse Store",
+        "keeper": "Tamsin",
         "greetingVariants": [
           {
             "when": {
               "hasFlag": "stole_cistern_vesper"
             },
-            "text": "The stalls are abandoned and cursed."
+            "text": "The shuttered linen hatch stays bolted from inside."
           },
           {
-            "when": {
-              "sex": "female"
-            },
-            "text": "\"Peace to your step, Sister. Take what helps silence the Choir.\""
-          },
-          {
-            "text": "\"Speak your business briefly, stranger, and touch no loom-thread.\""
+            "text": "Tamsin weighs linen bolts and stoppered phials solely by fingertip."
           }
         ],
         "items": [
           {
             "itemId": "vesper_tonic",
-            "price": 14
+            "price": 15
           },
           {
-            "itemId": "antitoxin",
-            "price": 10
+            "itemId": "amber_tonic",
+            "price": 18
           },
           {
-            "itemId": "star_sap_drop",
-            "price": 34
+            "itemId": "veil_elixir",
+            "price": 20
+          },
+          {
+            "itemId": "cistern_veil",
+            "price": 28
           },
           {
             "itemId": "chitin_mantle",
@@ -1164,27 +1021,35 @@
             "price": 42
           },
           {
-            "itemId": "cistern_veil",
-            "price": 32
-          },
-          {
-            "itemId": "amber_censer",
-            "price": 30
-          },
-          {
-            "itemId": "ash_purge_draught",
-            "price": 24
+            "itemId": "antitoxin",
+            "price": 10
           },
           {
             "itemId": "writ_blight_wave",
-            "price": 34
+            "price": 32
+          },
+          {
+            "itemId": "salt_charm",
+            "price": 24
+          },
+          {
+            "itemId": "venom_grease",
+            "price": 16
+          },
+          {
+            "itemId": "frost_tallow",
+            "price": 16
+          },
+          {
+            "itemId": "acid_flask",
+            "price": 18
           }
         ]
       },
       "actions": [
         {
           "id": "sc_pool_rest",
-          "label": "Quiet Pool",
+          "label": "Warm Basin",
           "visible": {
             "notFlag": "stole_cistern_vesper"
           },
@@ -1192,13 +1057,13 @@
             "healFull": true,
             "advanceDay": 1,
             "messages": [
-              "Cool subterranean water washes away fatigue and lingering root-spores."
+              "You wash trail-salt off beside the warm stone runoff trough and sleep wrapped in dry wool until the frost fades from your joints."
             ]
           }
         },
         {
           "id": "sc_steal_font",
-          "label": "Vesper Font",
+          "label": "Basin Cache",
           "visible": {
             "notFlag": "stole_cistern_vesper"
           },
@@ -1207,18 +1072,17 @@
               "stole_cistern_vesper": true
             },
             "adjustFactions": {
-              "silken_cistern": -5,
-              "husk_choir": 2
+              "silken_cistern": -4
             },
             "grantMaxFocus": 2,
             "giveCrowns": 45,
             "recordChronicle": {
-              "title": "Plundered Vesper-Font",
-              "summary": "Siphoned the sacred cistern amber, turning the blind Matrons into mortal enemies.",
-              "tag": "dark"
+              "title": "Robbed Bathhouse Basin",
+              "summary": "Stripped the mineral salt and Onyx hoard from the blind exiles warm basin.",
+              "tag": "silken_cistern"
             },
             "messages": [
-              "While the watchers chant, you shatter the silver basin and siphon pure soul-amber into your flask. Behind you, the Matrons scream in a single discordant voice."
+              "You rake the sharp black Onyx hoard and mineral crusts from the recessed lip. Instantly every guide-cord across the hall snaps taut in alarm."
             ]
           }
         }
@@ -1226,46 +1090,56 @@
       "npcs": [
         {
           "id": "matron_veyra",
-          "name": "Matron Veyra",
-          "unidentifiedLabel": "Veiled Weaver",
-          "shortLabel": "Matron Veyra",
+          "name": "Old Matron",
+          "unidentifiedLabel": "Blind Weaver",
+          "shortLabel": "Old Veyra",
           "visible": {
             "notFlag": "stole_cistern_vesper"
           },
-          "firstSightProse": "Beside the black water stands a tall, slender woman wrapped from crown to heel in luminous white silk. Her eyes are bound beneath silver-stitched gauze, yet her pale hands trace invisible vibrations hanging in the cavern air.",
+          "firstSightProse": "Beside a sunken marble trough kneels a tall, gaunt woman in damp grey linen. White rag wraps cleanly across her eyes while long, pale fingers test taut cords weighted with copper plumb-bobs.",
           "greetingVariants": [
             {
               "when": {
-                "sex": "female"
+                "hasFlag": "seal_of_silence"
               },
-              "text": "\"Step past the silk, Sister. Let our blind looms weigh your breath.\""
+              "text": "Old Veyra tilts her bandaged brow toward the heavy brass disk hanging quiet at your belt."
             },
             {
-              "text": "\"Halt at the black water, man. Speak why the loom should spare your weight.\""
+              "when": {
+                "minFaction": {
+                  "faction": "silken_cistern",
+                  "value": 2
+                }
+              },
+              "text": "Old Veyra inclines her blindfolded head as your boots touch the dry marble lip."
+            },
+            {
+              "text": "Old Veyra stills her fingers on the guide-cord, listening to the weight of your stride."
             }
           ],
           "anatomy": {
             "height": "Tall",
-            "weight": "Lean",
+            "weight": "Gaunt",
             "skinColor": "Moon-Pale",
             "hairLength": "Waist-Length",
             "hairStyle": "Braided",
-            "hairColor": "Ash-White",
-            "eyeShape": "Almond",
-            "eyeColor": "Blindfolded",
+            "hairColor": "Frost-White",
+            "eyeShape": "Hooded",
+            "eyeColor": "Mist-Grey",
             "musculature": "Wiry",
             "bodyShape": "Slender",
             "facialScars": "Ritual Brand",
             "bodyScars": "Unmarked",
-            "faceDetail": "Silver-stitched gauze wraps the upper face above pale, serene cheekbones and an unmoving mouth.",
-            "chestTorsoDetail": "Layered luminous silk hangs straight across narrow shoulders and a spare, upright torso.",
-            "armsHandsDetail": "Long, pale fingers stain faintly silver at the tips from drawing counter-harmonic thread.",
-            "legsStanceDetail": "Stands motionless upon wet flagstone without shifting weight.",
-            "distinguishingMark": "Fine luminous threads cling to her sleeves and stir whenever a bell rings far away.",
+            "faceDetail": "Clean linen wraps her eyes above pale, tight lips and an old cheek-brand.",
+            "chestTorsoDetail": "Damp grey wool robes cling lightly to hollow ribs.",
+            "armsHandsDetail": "Long, ink-clean fingers hover endlessly along trembling cords.",
+            "legsStanceDetail": "Bare feet grip wet marble tiles without slipping an inch.",
+            "distinguishingMark": "Wears three worn copper thimbles along her left hand.",
             "visibleTags": [
               "humanoid",
+              "gaunt",
               "pale_skin",
-              "occult"
+              "cistern_garb"
             ]
           },
           "topics": [
@@ -1296,185 +1170,433 @@
                 "adjustFactions": {
                   "silken_cistern": 3
                 },
-                "grantMaxFocus": 1,
+                "giveXp": 20,
                 "recordChronicle": {
-                  "title": "Earned Seal of Silence",
-                  "summary": "Returned the Echo-Shell to the blind Matrons and received their counter-harmonic Seal.",
-                  "tag": "seal"
+                  "title": "Traded for Lead Seal",
+                  "summary": "Gave Old Veyra the barrow shell in exchange for a heavy sound-deadening disk.",
+                  "tag": "silken_cistern"
                 },
                 "messages": [
-                  "Matron Veyra gasps as you lay the Echo-Shell on the altar. \"The barrow's lost voice! Keep faith with the deep waters, {formal}.\" She binds the silver Seal of Silence around your wrist."
+                  "Old Veyra turns the cold barrow shell against her veiled cheek. In return she presses a heavy, dead-quiet bronze disk into your palm that muffles steel clink at your hip."
                 ]
               }
             },
             {
               "id": "veyra_sisterhood",
-              "label": "Sisterhood",
-              "visible": {
-                "allOf": [
-                  {
-                    "sex": "female"
-                  },
-                  {
-                    "notFlag": "seal_of_silence"
-                  }
-                ]
-              },
+              "label": "Blind Rule",
               "effect": {
                 "stayInDialogue": true,
-                "adjustFactions": {
-                  "silken_cistern": 1
-                },
-                "check": {
-                  "stat": "wit",
-                  "dc": 11,
-                  "label": "Sisterhood Rite",
-                  "isLoreOrPerception": true,
-                  "onSuccess": {
-                    "setFlags": {
-                      "seal_of_silence": true
-                    },
-                    "recordChronicle": {
-                      "title": "Earned Seal of Silence",
-                      "summary": "Passed the Unveiled Sisterhood rite before the Matrons of the Silken Cistern.",
-                      "tag": "seal"
-                    },
-                    "messages": [
-                      "Veyra welcomes you behind the inner veil. Your quiet pulse stills the silk basin, and she binds the Seal of Silence to your wrist."
-                    ]
-                  },
-                  "onFail": {
-                    "messages": [
-                      "The silk trembles at the edge of the basin. \"Bring us the Echo-Shell from the Weeping Barrow, Sister, or still your breath.\""
-                    ]
-                  }
-                }
+                "messages": [
+                  "Veyra plucks a quiet cord. \"Staring north under bare sky makes men walk till their toes freeze black. Tie cloth over your eyes when the air goes dead still, and listen to stone instead.\""
+                ]
               }
             },
             {
               "id": "veyra_liturgy",
-              "label": "Liturgy",
+              "label": "Quiet Count",
               "visible": {
-                "allOf": [
-                  {
-                    "sex": "male"
-                  },
-                  {
-                    "anyOf": [
-                      {
-                        "race": "ael_thalor"
-                      },
-                      {
-                        "background": "shrine_penitent"
-                      }
-                    ]
-                  },
-                  {
-                    "notFlag": "seal_of_silence"
-                  }
-                ]
+                "notFlag": "veyra_blessed"
               },
               "effect": {
                 "stayInDialogue": true,
-                "check": {
-                  "stat": "grit",
-                  "dc": 13,
-                  "label": "Water Liturgy",
-                  "isLoreOrPerception": true,
-                  "onSuccess": {
-                    "setFlags": {
-                      "seal_of_silence": true
-                    },
-                    "adjustFactions": {
-                      "silken_cistern": 2
-                    },
-                    "recordChronicle": {
-                      "title": "Earned Seal of Silence",
-                      "summary": "Won the Matrons' trust through ancient liturgy.",
-                      "tag": "seal"
-                    },
-                    "messages": [
-                      "Matron Veyra bows slightly as your pre-Shattering water-liturgy echoes across the cistern. \"Take the Seal of Silence.\""
-                    ]
-                  },
-                  "onFail": {
-                    "messages": [
-                      "The blind weavers turn away. \"Bring the Echo-Shell from the Barrow, man, or spill blood upon the threshold.\""
-                    ]
-                  }
-                }
+                "setFlags": {
+                  "veyra_blessed": true
+                },
+                "restoreFocus": 3,
+                "messages": [
+                  "Veyra taps three copper weights in dry rhythm until the ache behind your eyes eases."
+                ]
               }
             },
             {
               "id": "veyra_blood",
-              "label": "Blood Oath",
+              "label": "Kin Draught",
               "visible": {
                 "allOf": [
                   {
-                    "sex": "male"
+                    "race": "ael_thalor"
                   },
                   {
-                    "notFlag": "seal_of_silence"
-                  },
-                  {
-                    "minHp": 7
+                    "notFlag": "veyra_kin_gift"
                   }
                 ]
               },
               "effect": {
                 "stayInDialogue": true,
-                "damageHp": 5,
-                "check": {
-                  "stat": "grit",
-                  "dc": 14,
-                  "label": "Loom Blood-Oath",
-                  "onSuccess": {
-                    "setFlags": {
-                      "seal_of_silence": true
-                    },
-                    "adjustFactions": {
-                      "silken_cistern": 1
-                    },
-                    "recordChronicle": {
-                      "title": "Blood-Oath of Cistern",
-                      "summary": "Spilled your own blood upon the Loom-threshold to earn the Seal of Silence.",
-                      "tag": "seal"
-                    },
-                    "messages": [
-                      "You draw steel across your palm. Your blood sinks cleanly into the black water without waking the Choir-spores, earning the Seal of Silence."
-                    ]
-                  },
-                  "onFail": {
-                    "messages": [
-                      "The dark water ripples angrily against your bleeding palm. \"Not enough. Bring the Echo-Shell.\""
-                    ]
+                "setFlags": {
+                  "veyra_kin_gift": true
+                },
+                "giveItems": [
+                  {
+                    "id": "veil_elixir",
+                    "qty": 1
                   }
-                }
+                ],
+                "messages": [
+                  "Veyra murmurs in highland speech: \"You feel the freezing pull sharper than mortals, kin. Swallow this before bright moonlight catches you outdoors.\""
+                ]
               }
             },
             {
               "id": "veyra_belfry",
-              "label": "Belfry",
+              "label": "White Dome",
               "effect": {
                 "stayInDialogue": true,
+                "messages": [
+                  "Veyra lowers her chin. \"Farthest north stands a white domed hall where dust tastes like wet pennies. Nobody who walked down into its pit came back remembering their mother's name.\""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "brother_malkin",
+          "name": "Malkin",
+          "unidentifiedLabel": "Tallow Monk",
+          "shortLabel": "Malkin",
+          "visible": {
+            "notFlag": "stole_cistern_vesper"
+          },
+          "firstSightProse": "Beside an iron tallow-trough, a stooped apostate with a shaved crown scrubs red salt-sores off his forearms using boiled moss. Stiff wool smells of mutton fat, and a rusted bell-clapper hangs tied quiet at his hip.",
+          "greetingVariants": [
+            {
+              "when": {
+                "minDefilement": 35
+              },
+              "text": "Malkin flinches from the chalky sourness clinging to your breath and steps behind his wax trough."
+            },
+            {
+              "text": "Malkin dips a linen rag into warm tallow and nods toward the dry stairs."
+            }
+          ],
+          "anatomy": {
+            "height": "Average",
+            "weight": "Lean",
+            "skinColor": "Frost-Slate",
+            "hairLength": "Shaved",
+            "hairStyle": "Unkempt",
+            "hairColor": "Iron-Grey",
+            "eyeShape": "Deep-Set",
+            "eyeColor": "Dark Brown",
+            "musculature": "Wiry",
+            "bodyShape": "Spare",
+            "facialScars": "Frost-Burn",
+            "bodyScars": "Lash Welts",
+            "faceDetail": "Soot smears gaunt cheeks beneath heavy-lidded dark eyes.",
+            "chestTorsoDetail": "Rough hemp robes stiff with cold mutton tallow hang loose from stooped shoulders.",
+            "armsHandsDetail": "Blistered forearms wrap tight in vinegar-soaked rags.",
+            "legsStanceDetail": "Kneels often on stone, shifting stiffness from hip to hip.",
+            "distinguishingMark": "Carries a cracked iron clapper lashed quiet with twine.",
+            "visibleTags": [
+              "humanoid",
+              "gaunt",
+              "battle_worn"
+            ]
+          },
+          "topics": [
+            {
+              "id": "malkin_vigil",
+              "label": "Tallow Vigil",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Malkin rubs grease across his knuckles. \"A lamp keeps frost off your thumb, yet bright fire draws hungry packs across a mile of fog. Light tallow only under stone roofs.\""
+                ]
+              }
+            },
+            {
+              "id": "malkin_purge",
+              "label": "Boil Wash",
+              "visible": {
+                "minDefilement": 25
+              },
+              "effect": {
+                "stayInDialogue": true,
+                "consumeItems": [
+                  {
+                    "id": "bog_herb",
+                    "qty": 1
+                  }
+                ],
                 "branch": [
                   {
                     "when": {
-                      "hasFlag": "seal_of_silence"
+                      "hasItem": "bog_herb"
                     },
                     "effect": {
+                      "giveItems": [
+                        {
+                          "id": "ash_purge_draught",
+                          "qty": 1
+                        }
+                      ],
                       "messages": [
-                        "\"With our Seal around your wrist, Malakor's Drowning Toll cannot shatter your mind,\" Veyra whispers."
+                        "Malkin mashes your bog weed with bathhouse salt and hands over a bitter grey draught."
                       ]
                     }
                   },
                   {
                     "effect": {
                       "messages": [
-                        "\"Malakor prepares the Third Toll beneath the Belfry. Without our Seal or severed roots beneath the forge, his bell crushes bone.\""
+                        "Malkin shakes his head. \"Bring one fresh reed-herb from the salt bog and I can boil that rot-taste off your tongue.\""
                       ]
                     }
                   }
+                ]
+              }
+            },
+            {
+              "id": "malkin_salt",
+              "label": "Salt Vow",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Malkin stares into the dark runoff. \"I ran north ahead of a parish gallows. Out here, a hangman's knot almost looks tidy beside freezing slow in wet stone.\""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "sister_tamsin",
+          "name": "Tamsin",
+          "unidentifiedLabel": "Linen Counter",
+          "shortLabel": "Tamsin",
+          "visible": {
+            "notFlag": "stole_cistern_vesper"
+          },
+          "firstSightProse": "At the far end of the tiled gallery, a slight woman in a soot-grey blindfold counts glass phials by touch along a stone shelf. Hard calluses ridge her thumb-pads, and skeins of boiled thread dry above a low oil pan.",
+          "greetingVariants": [
+            {
+              "when": {
+                "sex": "female"
+              },
+              "text": "Tamsin turns an attentive ear toward your steady footsteps along the marble."
+            },
+            {
+              "text": "Tamsin keeps two fingertips resting lightly on a brass balance."
+            }
+          ],
+          "anatomy": {
+            "height": "Short",
+            "weight": "Lean",
+            "skinColor": "Silver-Ivory",
+            "hairLength": "Cropped",
+            "hairStyle": "Tied Back",
+            "hairColor": "Pale Gold",
+            "eyeShape": "Almond",
+            "eyeColor": "Mist-Grey",
+            "musculature": "Wiry",
+            "bodyShape": "Trim",
+            "facialScars": "Unmarked",
+            "bodyScars": "Kiln-Burn",
+            "faceDetail": "A narrow grey blindfold covers her eyes above calm, pale lips.",
+            "chestTorsoDetail": "Layered grey wool belted tight with braided cord.",
+            "armsHandsDetail": "Small, quick hands sort black Onyx coins and stopper phials without sight.",
+            "legsStanceDetail": "Light, measured steps pace smoothly between storage niches.",
+            "distinguishingMark": "Carries three knotted tally-ribbons around her left wrist.",
+            "visibleTags": [
+              "humanoid",
+              "small_stature",
+              "cistern_garb"
+            ]
+          },
+          "topics": [
+            {
+              "id": "tamsin_cords",
+              "label": "Lye Thread",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Tamsin strokes a spun cord. \"Crawler silk boiled in wood-ash lye weaves tighter than boiled hide. Keeps claws off your ribs out in the bog.\""
+                ]
+              }
+            },
+            {
+              "id": "tamsin_rations",
+              "label": "Rations",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Tamsin sighs softly. \"No supply barge comes up from the south. Trade Onyx cleanly at the shelf, or forage roots before your belt runs out of notches.\""
+                ]
+              }
+            },
+            {
+              "id": "tamsin_water",
+              "label": "Warm Pipes",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Tamsin taps a stone conduit pipe. \"Water still runs warm beneath these tiles from deep smelter flues to the east. Keep boots dry if you climb toward the pits.\""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "drifter_ren",
+          "name": "Ren",
+          "unidentifiedLabel": "Lame Courier",
+          "shortLabel": "Ren",
+          "visible": {
+            "notFlag": "stole_cistern_vesper"
+          },
+          "firstSightProse": "Huddled near a warm floor grate sits a lean southern runner rubbing blackened toes with mutton grease. Mud cakes the hem of his split riding cloak, and a dented copper horn hangs cracked across his chest.",
+          "greetingVariants": [
+            {
+              "text": "Ren looks up quickly, clutching his grease-soaked boot rags against the damp."
+            }
+          ],
+          "anatomy": {
+            "height": "Average",
+            "weight": "Gaunt",
+            "skinColor": "Frost-Grey",
+            "hairLength": "Shoulder-Length",
+            "hairStyle": "Unkempt",
+            "hairColor": "Pale Blonde",
+            "eyeShape": "Wide",
+            "eyeColor": "Hazel",
+            "musculature": "Frail",
+            "bodyShape": "Lean",
+            "facialScars": "Cheek Slash",
+            "bodyScars": "Lash Welts",
+            "faceDetail": "Wind-cracked lips and a stiff cheek scar tighten whenever cold air blows in.",
+            "chestTorsoDetail": "Mended leather jerkin stuffed with dried moss for warmth.",
+            "armsHandsDetail": "Chilblained knuckles clench tightly around an empty tin cup.",
+            "legsStanceDetail": "One ankle sits swollen and bound in dirty linen.",
+            "distinguishingMark": "Wears a bent copper post-horn strapped across his ribs.",
+            "visibleTags": [
+              "humanoid",
+              "gaunt",
+              "scarred_face"
+            ]
+          },
+          "topics": [
+            {
+              "id": "ren_gate",
+              "label": "Black Gate",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Ren shudders. \"I rode dispatches till the black doors shut behind me like a cellar trap. Both pack-mules stiffened dead on the gravel before midnight.\""
+                ]
+              }
+            },
+            {
+              "id": "ren_viaduct",
+              "label": "Road Packs",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Ren taps his swollen ankle. \"Mangy hounds leap straight off the broken road piers at dusk. Don't walk under the tall arches without pitch fire.\""
+                ]
+              }
+            },
+            {
+              "id": "ren_pack",
+              "label": "Spare Gear",
+              "visible": {
+                "notFlag": "ren_cache_shared"
+              },
+              "effect": {
+                "stayInDialogue": true,
+                "setFlags": {
+                  "ren_cache_shared": true
+                },
+                "giveCrowns": 9,
+                "giveTorches": 1,
+                "messages": [
+                  "Ren tosses you a stubby pitch torch and a handful of black coins. \"Won't outrun anything on this ankle anyway. Keep them dry.\""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "cutpurse_yora",
+          "name": "Yora",
+          "unidentifiedLabel": "Hooded Thief",
+          "shortLabel": "Yora",
+          "visible": {
+            "notFlag": "stole_cistern_vesper"
+          },
+          "firstSightProse": "Leaning against a shadowed marble pilaster stands a slight, narrow-eyed thief spinning a sharp black coin across nimble knuckles. Wet dark hair clings to a scarred chin above twin bone-handled skinning knives.",
+          "greetingVariants": [
+            {
+              "when": {
+                "background": "barrow_stalker"
+              },
+              "text": "Yora stops spinning her black coin and grins with quick recognition."
+            },
+            {
+              "text": "Yora eyes your belt pouch from the shelter of the stone pillar."
+            }
+          ],
+          "anatomy": {
+            "height": "Short",
+            "weight": "Lean",
+            "skinColor": "Weathered Tan",
+            "hairLength": "Cropped",
+            "hairStyle": "Slicked",
+            "hairColor": "Raven Black",
+            "eyeShape": "Narrow",
+            "eyeColor": "Amber",
+            "musculature": "Wiry",
+            "bodyShape": "Trim",
+            "facialScars": "Cheek Slash",
+            "bodyScars": "Rib Seam",
+            "faceDetail": "Sharp amber eyes flick between stairways over a thin chin-scar.",
+            "chestTorsoDetail": "Soft oiled hide dyed charcoal fits sleek under a ragged scarf.",
+            "armsHandsDetail": "Quick, soot-rubbed fingers flick coins silently back and forth.",
+            "legsStanceDetail": "Balanced light on soft-soled moccasins ready to bolt.",
+            "distinguishingMark": "Three silver rings pierce the cartilage of her left ear.",
+            "visibleTags": [
+              "humanoid",
+              "small_stature",
+              "scarred_face"
+            ]
+          },
+          "topics": [
+            {
+              "id": "yora_onyx",
+              "label": "Black Coin",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Yora snaps her black coin onto her palm. \"Thought I'd live fat in the south smuggling these out of the hills. Turns out southern fences stay behind a cliff wall you can't climb back over.\""
+                ]
+              }
+            },
+            {
+              "id": "yora_locks",
+              "label": "Blind Ears",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Yora jerks her chin toward the blind weavers. \"Careful dipping into their basin. They hear wet soles on marble faster than sighted watchmen ever could.\""
+                ]
+              }
+            },
+            {
+              "id": "yora_blindspot",
+              "label": "Quarry Shaft",
+              "visible": {
+                "notFlag": "yora_tip_sold"
+              },
+              "enabled": {
+                "minCrowns": 8
+              },
+              "disabledReason": "Needs 8 Onyx.",
+              "effect": {
+                "stayInDialogue": true,
+                "giveCrowns": -8,
+                "setFlags": {
+                  "yora_tip_sold": true
+                },
+                "giveXp": 12,
+                "messages": [
+                  "Yora pockets eight Onyx and scratches a crooked hoist-hatch on damp tile. \"Follow the snapped bronze chains east; nobody watches the lower winch pit.\""
                 ]
               }
             }
@@ -1483,42 +1605,1607 @@
       ]
     },
     {
-      "id": "petrified_starwood",
-      "name": "The Petrified Star-Wood",
-      "regionType": "area",
-      "danger": 2,
-      "dark": false,
+      "id": "foundry_vault",
+      "name": "Smelter Pit",
+      "regionType": "special",
+      "danger": 3,
+      "dark": true,
       "neighbors": [
-        "weeping_barrow",
-        "kings_causeway",
-        "crown_watchtower"
+        "cistern_cloister",
+        "kiln_terraces",
+        "basalt_quarry",
+        "silver_rotunda"
       ],
       "asciiPos": {
-        "row": 0,
-        "col": 1,
-        "code": "SW"
+        "row": 4,
+        "col": 2,
+        "code": "SP"
       },
-      "sensorySummary": "Colossal ivory-stone trunks spiral like cathedral ribs into a pale cloudbank. Glassy silver needles chime in the breeze while pale root-veins crawl across the forest floor.",
+      "sensorySummary": "Sunken brick-and-basalt arches span oily sluice ditches smelling of coal smoke, grease, and wet iron. A banked coal-trench glows dull orange below towering bronze valves while trapped smiths hammer salvaged armor.",
       "firstSightVariants": [
         {
-          "text": "The mud turns to crunchy silver dust beneath colossal white trunks turned wholly to stone. Frozen boughs lock high overhead like cathedral ribs, chiming faintly in the cold draft while something heavy scrapes its antlers deeper in the grove."
+          "when": {
+            "hasFlag": "df_warden_slain"
+          },
+          "text": "Sunken brick-and-basalt arches echo cleanly to steady hammer blows. The shattered bronze frame of a fallen clockwork guard lies dragged clear of the coal-trench."
+        },
+        {
+          "text": "Sunken brick-and-basalt arches span oily sluice ditches smelling of coal smoke and wet iron. Near the far bronze sluice stands a motionless metal giant whose furnace chest still clicks with slow gears.{if:stone_skin} Soot and coal dust blend easily across your {skin} skin in the orange glare.{/if}"
         }
       ],
       "descriptionVariants": [
         {
           "when": {
-            "race": "ael_thalor"
+            "hasFlag": "root_conduit_severed"
           },
-          "text": "Colossal ivory-stone trunks spiral toward a pale sky — your exiled kin's ancient home, now strangled by vibrating root-veins."
+          "text": "Black runoff stands still in the sluice ditches now that the giant bronze valve sits cranked shut. Hammer sparks fly cleanly above the coal-trench."
         },
         {
-          "text": "Fossilized white trunks tower like cathedral ribs. Pale blossoms chime faintly when the wind brushes them, and antlers scrape somewhere in the silver brush."
+          "text": "Towering bronze valves loom above wet basalt steps heated by a banked coal-trench. Trapped smiths work grimly in orange glare.{if:stone_skin} Soot and coal dust blend easily across your {skin} skin in the orange glare.{/if}"
+        }
+      ],
+      "shop": {
+        "name": "Pit Anvil-Stall",
+        "keeper": "Borin",
+        "greetingVariants": [
+          {
+            "when": {
+              "race": "durnfolk"
+            },
+            "text": "Borin sets down his fuller hammer and eyes your stonework shoulders with rough respect."
+          },
+          {
+            "text": "Borin spits onto glowing tongs, sending sharp steam across the hearth."
+          }
+        ],
+        "items": [
+          {
+            "itemId": "flanged_mace",
+            "price": 22
+          },
+          {
+            "itemId": "parry_dirk",
+            "price": 20
+          },
+          {
+            "itemId": "chain_hauberk",
+            "price": 24
+          },
+          {
+            "itemId": "kiln_pitch",
+            "price": 15
+          },
+          {
+            "itemId": "silver_ash_oil",
+            "price": 18
+          },
+          {
+            "itemId": "iron_wire_kit",
+            "price": 34
+          },
+          {
+            "itemId": "fire_pot",
+            "price": 15
+          },
+          {
+            "itemId": "iron_sap_draught",
+            "price": 20
+          },
+          {
+            "itemId": "quarry_pickaxe",
+            "price": 36
+          },
+          {
+            "itemId": "frost_halberd",
+            "price": 40
+          },
+          {
+            "itemId": "oak_heater_shield",
+            "price": 30
+          },
+          {
+            "itemId": "steel_halfplate",
+            "price": 62
+          },
+          {
+            "itemId": "bull_strength_brew",
+            "price": 24
+          }
+        ]
+      },
+      "actions": [
+        {
+          "id": "df_warden",
+          "label": "Sluice Hall",
+          "visible": {
+            "notFlag": "df_warden_slain"
+          },
+          "effect": {
+            "branch": [
+              {
+                "when": {
+                  "anyOf": [
+                    {
+                      "hasAbility": "anvil_strike"
+                    },
+                    {
+                      "hasFlag": "barrow_vault_lore"
+                    }
+                  ]
+                },
+                "effect": {
+                  "setFlags": {
+                    "df_warden_slain": true
+                  },
+                  "giveItems": [
+                    {
+                      "id": "basalt_plate",
+                      "qty": 1
+                    }
+                  ],
+                  "giveCrowns": 35,
+                  "recordChronicle": {
+                    "title": "Cleared Smelter Sluice",
+                    "summary": "Jammed the bronze kiln-guard and pulled heavy basalt armor from the tool rack.",
+                    "tag": "foundry_vault"
+                  },
+                  "messages": [
+                    "You drive a cold iron wedge straight into the bronze giant's hip gear. Its furnace chest coughs dead soot, letting you pry fitted plate off the armory pegs."
+                  ]
+                }
+              },
+              {
+                "effect": {
+                  "messages": [
+                    "Iron gears grind shrill as a towering bronze construct lumbers down from the sluice-lip."
+                  ],
+                  "startCombat": {
+                    "enemyId": "forge_automaton",
+                    "canFlee": true,
+                    "onVictoryFlag": "df_warden_slain",
+                    "onVictoryChronicle": {
+                      "title": "Felled Sluice Construct",
+                      "summary": "Shattered the bronze kiln-guard patrolling the Smelter Pit.",
+                      "tag": "foundry_vault"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "df_hone_weapon",
+          "label": "Coal Brazier",
+          "effect": {
+            "honeWeapon": true,
+            "messages": [
+              "You draw your blade across the coal-trench whetstone while orange sparks bite clean edge back into the steel."
+            ]
+          }
+        },
+        {
+          "id": "df_drain_conduit",
+          "label": "Bronze Valve",
+          "visible": {
+            "allOf": [
+              {
+                "hasFlag": "df_warden_slain"
+              },
+              {
+                "notFlag": "root_conduit_severed"
+              }
+            ]
+          },
+          "effect": {
+            "setFlags": {
+              "root_conduit_severed": true
+            },
+            "recordChronicle": {
+              "title": "Shut Smelter Valve",
+              "summary": "Cranked the giant bronze sluice closed, draining the northern drain pipes.",
+              "tag": "foundry_vault"
+            },
+            "messages": [
+              "You brace both boots against basalt and haul the giant bronze wheel until iron pins drop into lock. Deep beneath the floor, rushing water chokes dead quiet."
+            ]
+          }
+        }
+      ],
+      "npcs": [
+        {
+          "id": "smith_borin",
+          "name": "Borin",
+          "unidentifiedLabel": "Coal Smith",
+          "shortLabel": "Borin",
+          "firstSightProse": "Beside the coal-trench stands a broad-shouldered dwarf bare to a scorched leather apron. Coal dust mats his chest hair and braided beard while heavy tongs clamp a red-hot hinge blank over a scarred anvil.",
+          "greetingVariants": [
+            {
+              "when": {
+                "race": "durnfolk"
+              },
+              "text": "Borin lifts his hammer in brief salute, soot flaking off his heavy brows."
+            },
+            {
+              "text": "Borin plunges hot iron into an oil bucket, filling the hall with bitter smoke."
+            }
+          ],
+          "anatomy": {
+            "height": "Compact",
+            "weight": "Burly",
+            "skinColor": "Iron-Tan",
+            "hairLength": "Long",
+            "hairStyle": "Braided",
+            "hairColor": "Coal Black",
+            "eyeShape": "Deep-Set",
+            "eyeColor": "Ember-Amber",
+            "musculature": "Hulking",
+            "bodyShape": "Barrel-Chested",
+            "facialScars": "Frost-Burn",
+            "bodyScars": "Kiln-Burn",
+            "faceDetail": "Ember-amber eyes gleam under bushy soot-coated brows and thick beard-braids.",
+            "chestTorsoDetail": "A thick scarred chest gleams with sweat behind a heavy horsehide apron.",
+            "armsHandsDetail": "Massive forearms knotted like iron cables grip a four-pound hammer.",
+            "legsStanceDetail": "Feet planted wide beside the anvil block on scorched basalt.",
+            "distinguishingMark": "Three iron rivets pierce the rim of his thick left ear.",
+            "visibleTags": [
+              "humanoid",
+              "muscular",
+              "small_stature",
+              "kiln_branded"
+            ]
+          },
+          "topics": [
+            {
+              "id": "borin_sluice",
+              "label": "Sluice Guard",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Borin jerks his tongs toward the wet dark hall. \"That bronze clockwork bastard still stomps the upper valve. Smash its hip-pins before messing with the wheel.\""
+                ]
+              }
+            },
+            {
+              "id": "borin_coal",
+              "label": "Hard Coal",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Borin taps the brick flue. \"Good northern hard-coal burns hot enough to weld steel without bellows, though smoke chokes you if upper vents freeze shut.\""
+                ]
+              }
+            },
+            {
+              "id": "borin_edge",
+              "label": "Oilstone",
+              "visible": {
+                "notFlag": "borin_honed_tip"
+              },
+              "effect": {
+                "stayInDialogue": true,
+                "setFlags": {
+                  "borin_honed_tip": true
+                },
+                "honeWeapon": true,
+                "messages": [
+                  "Borin takes your weapon for three quick strokes across his oilstone and hands it back razor-sharp without charging a coin."
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "apprentice_lira",
+          "name": "Lira",
+          "unidentifiedLabel": "Bellows Hand",
+          "shortLabel": "Lira",
+          "firstSightProse": "Perched on a stone step beside twin bellows, a lean young woman hauls steadily on greased leather ropes. Soot streaks her nose and ragged braids beneath bulky fireproof mittens.",
+          "greetingVariants": [
+            {
+              "text": "Lira pauses between bellows strokes, wiping soot off her chin."
+            }
+          ],
+          "anatomy": {
+            "height": "Short",
+            "weight": "Lean",
+            "skinColor": "Weathered Tan",
+            "hairLength": "Shoulder-Length",
+            "hairStyle": "Braided",
+            "hairColor": "Copper-Red",
+            "eyeShape": "Wide",
+            "eyeColor": "Hazel",
+            "musculature": "Wiry",
+            "bodyShape": "Trim",
+            "facialScars": "Unmarked",
+            "bodyScars": "Kiln-Burn",
+            "faceDetail": "Soot smudges copper freckles beneath alert hazel eyes.",
+            "chestTorsoDetail": "A patched wool tunic hangs loose beneath leather shoulder straps.",
+            "armsHandsDetail": "Lean forearms flex steadily inside bulky fireproof mittens.",
+            "legsStanceDetail": "Braces one boot against the stone hearth-curb for leverage.",
+            "distinguishingMark": "Carries a brass whistle strung on twine to signal slag pours.",
+            "visibleTags": [
+              "humanoid",
+              "small_stature"
+            ]
+          },
+          "topics": [
+            {
+              "id": "lira_bellows",
+              "label": "Chimney Draft",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Lira points at the soot-black flue arch. \"When gale winds drop off the white hills, coal smoke backs straight down the chimney and makes everyone cough black phlegm.\""
+                ]
+              }
+            },
+            {
+              "id": "lira_flues",
+              "label": "Brick Hills",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Lira lowers her voice. \"Up the scree sit cracked brick kilns still leaking dry warmth. Pitch crusts thick along the flue collars if you scrape before frost cracks it.\""
+                ]
+              }
+            },
+            {
+              "id": "lira_oil",
+              "label": "Pitch Pot",
+              "visible": {
+                "notFlag": "lira_oil_gift"
+              },
+              "effect": {
+                "stayInDialogue": true,
+                "setFlags": {
+                  "lira_oil_gift": true
+                },
+                "giveItems": [
+                  {
+                    "id": "kiln_pitch",
+                    "qty": 1
+                  }
+                ],
+                "messages": [
+                  "Lira sneaks a stoppered pot of thick pitch oil from under the bellows frame. \"Borin won't miss one jar. Keep it off your wool.\""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "mercenary_dax",
+          "name": "Dax",
+          "unidentifiedLabel": "One-Eyed Pikeman",
+          "shortLabel": "Dax",
+          "firstSightProse": "Along the upper stone catwalk leans a tall, scarred fighter in mismatched brigandine. A coarse black patch straps over his ruined left eye while scarred knuckles rest lazily on a long-handled boar-spear.",
+          "greetingVariants": [
+            {
+              "when": {
+                "hasTag": "iron_vow_garb"
+              },
+              "text": "Dax spits over the rail as he spots Iron-Vow mail plates strapped across your shoulders."
+            },
+            {
+              "text": "Dax shifts his spear shaft across his knee and eyes your belt."
+            }
+          ],
+          "anatomy": {
+            "height": "Tall",
+            "weight": "Solid",
+            "skinColor": "Bronze",
+            "hairLength": "Cropped",
+            "hairStyle": "Unkempt",
+            "hairColor": "Raven Black",
+            "eyeShape": "Narrow",
+            "eyeColor": "Dark Brown",
+            "musculature": "Corded",
+            "bodyShape": "Broad-Shouldered",
+            "facialScars": "Brow Split",
+            "bodyScars": "Old Spear-Mark",
+            "faceDetail": "One sharp dark eye watches steadily beside a stitched leather eye-patch.",
+            "chestTorsoDetail": "Mismatched iron plates lash over stained leather brigandine.",
+            "armsHandsDetail": "Long, rope-veined forearms stay poised along seasoned oak.",
+            "legsStanceDetail": "Loafing stance against the parapet, weight coiled on the back heel.",
+            "distinguishingMark": "Carries notched bronze links welded around his spear butt.",
+            "visibleTags": [
+              "humanoid",
+              "towering",
+              "muscular",
+              "scarred_face",
+              "battle_worn"
+            ]
+          },
+          "topics": [
+            {
+              "id": "dax_watch",
+              "label": "Catwalk Pay",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Dax taps his spear butt on basalt. \"Borin pays two Onyx a day to keep quarry scavengers off his coal pile. Easy coin, long as nothing climbs up the drain pipes.\""
+                ]
+              }
+            },
+            {
+              "id": "dax_beasts",
+              "label": "Quarry Crawlers",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Dax grimaces. \"North of here the quarry benches drop forty feet down. Wire-legged crawlers nest under broken stone blocks and spit acid sharp enough to pit iron mail.\""
+                ]
+              }
+            },
+            {
+              "id": "dax_pike",
+              "label": "Spear Drill",
+              "visible": {
+                "notFlag": "dax_drilled"
+              },
+              "effect": {
+                "stayInDialogue": true,
+                "setFlags": {
+                  "dax_drilled": true
+                },
+                "restoreStamina": 2,
+                "giveXp": 10,
+                "messages": [
+                  "Dax runs you through three tight step-and-brace drills along the stone gallery until your breathing steadies."
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "delver_orik",
+          "name": "Orik",
+          "unidentifiedLabel": "Salt Miner",
+          "shortLabel": "Orik",
+          "firstSightProse": "Sitting on an overturned ore skip, a squat miner scrapes white salt-crust off leather knee-pads with a blunt pick-spike. Thick stone dust fills every crease of his brow below a tallow hood.",
+          "greetingVariants": [
+            {
+              "text": "Orik knocks salt grit off his pick-head and squints through the orange glare."
+            }
+          ],
+          "anatomy": {
+            "height": "Squat",
+            "weight": "Heavy",
+            "skinColor": "Slate-Grey",
+            "hairLength": "Cropped",
+            "hairStyle": "Unkempt",
+            "hairColor": "Soot-White",
+            "eyeShape": "Deep-Set",
+            "eyeColor": "Smoky Quartz",
+            "musculature": "Broad",
+            "bodyShape": "Stocky",
+            "facialScars": "Frost-Burn",
+            "bodyScars": "Rib Seam",
+            "faceDetail": "White salt-crust flakes in the lines around small smoky-quartz eyes.",
+            "chestTorsoDetail": "Thick boiled-hide mining vest stiff with tallow and quarry grit.",
+            "armsHandsDetail": "Short, stubby fingers scarred flat by falling stone.",
+            "legsStanceDetail": "Heavy nailed boots braced apart on wet basalt.",
+            "distinguishingMark": "Carries a cracked copper plumb-bob hanging from his collar.",
+            "visibleTags": [
+              "humanoid",
+              "small_stature",
+              "battle_worn"
+            ]
+          },
+          "topics": [
+            {
+              "id": "orik_chutes",
+              "label": "Salt Shafts",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Orik spits black grit. \"Whoever carved these halls drove vertical shafts straight into salt beds deeper than any dwarf mine. Keep rope handy near the bone cellars.\""
+                ]
+              }
+            },
+            {
+              "id": "orik_seam",
+              "label": "Tight Joints",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Orik taps a wall ashlar. \"Not a chisel mark on the joints. Ground flush as glass, and cut heavy enough no siege ram could budge a course.\""
+                ]
+              }
+            },
+            {
+              "id": "orik_vault",
+              "label": "Steps Lock",
+              "visible": {
+                "notFlag": "barrow_vault_lore"
+              },
+              "effect": {
+                "stayInDialogue": true,
+                "setFlags": {
+                  "barrow_vault_lore": true
+                },
+                "messages": [
+                  "Orik lowers his voice. \"Found an old Durnfolk counterweight seal down the northwest Long Steps once. Remember how those bronze pins drop if you tackle the sluice lock here.\""
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "salt_hermitage",
+      "name": "Dry Arch",
+      "regionType": "special",
+      "danger": 2,
+      "dark": false,
+      "neighbors": [
+        "frostwall_redoubt",
+        "brine_marsh",
+        "stepped_barrow",
+        "kiln_terraces"
+      ],
+      "asciiPos": {
+        "row": 3,
+        "col": 0,
+        "code": "DA"
+      },
+      "sensorySummary": "Tilted marble porticoes shelter a wind-cut hollow thick with coarse grey salt and dried bitter-root bundles. Four ragged exiles crouch around a smokeless dung-fire, notching moon counts into bleached sheep-ribs.",
+      "firstSightVariants": [
+        {
+          "text": "Tilted marble porticoes shelter a wind-cut hollow thick with coarse grey salt and dried bitter-root bundles. Smokeless blue flame licks a shallow stone hearth while ragged hermits watch the ridge in silence.{if:ritual_branded} Hermits crouch closer to the dung-fire, eyeing the old brand on your skin.{/if}"
+        }
+      ],
+      "descriptionVariants": [
+        {
+          "when": {
+            "minDefilement": 50
+          },
+          "text": "Salt grit stings your cracked knuckles beneath the tilted roof. The pale exile beside the hearth tracks your boots without blinking."
+        },
+        {
+          "text": "Collapsed marble columns break the northern gale above a salt-dusted hollow where bitter-root bundles hang dry on twine.{if:ritual_branded} Hermits crouch closer to the dung-fire, eyeing the old brand on your skin.{/if}"
+        }
+      ],
+      "actions": [
+        {
+          "id": "sh_hearth",
+          "label": "Salt Hearth",
+          "visible": {
+            "notFlag": "sh_hearth_used"
+          },
+          "effect": {
+            "setFlags": {
+              "sh_hearth_used": true
+            },
+            "restoreFocus": 2,
+            "restoreStamina": 2,
+            "messages": [
+              "You warm stiff fingers over the smokeless dung-fire and chew bitter salt-bark until the tremor leaves your jaw."
+            ]
+          }
+        },
+        {
+          "id": "sh_tally",
+          "label": "Rib Tally",
+          "visible": {
+            "notFlag": "hermit_tallies_read"
+          },
+          "effect": {
+            "setFlags": {
+              "hermit_tallies_read": true
+            },
+            "giveItems": [
+              {
+                "id": "ash_resin",
+                "qty": 1
+              },
+              {
+                "id": "bog_herb",
+                "qty": 1
+              }
+            ],
+            "messages": [
+              "Beneath dried root bundles you recover amber resin lumps, bog stems, and notched sheep-ribs tracking twelve-day moon counts."
+            ]
+          }
+        }
+      ],
+      "npcs": [
+        {
+          "id": "hermit_soren",
+          "name": "Old Soren",
+          "unidentifiedLabel": "Salt Hermit",
+          "shortLabel": "Old Soren",
+          "firstSightProse": "Sitting cross-legged inside a hollowed column drum, a sunken-eyed exile packs coarse grey salt into split boots. Long white beard-strands hang stiff with brine beside a notched oak staff.",
+          "greetingVariants": [
+            {
+              "when": {
+                "race": "ael_thalor"
+              },
+              "text": "Old Soren narrows milky eyes toward your silver stare and mutters of thin air."
+            },
+            {
+              "text": "Old Soren taps his oak staff once against the salt-caked slab."
+            }
+          ],
+          "anatomy": {
+            "height": "Average",
+            "weight": "Gaunt",
+            "skinColor": "Frost-Grey",
+            "hairLength": "Long",
+            "hairStyle": "Wild",
+            "hairColor": "Soot-White",
+            "eyeShape": "Deep-Set",
+            "eyeColor": "Mist-Grey",
+            "musculature": "Frail",
+            "bodyShape": "Spare",
+            "facialScars": "Frost-Burn",
+            "bodyScars": "Pale Seam-Veins",
+            "faceDetail": "Milky mist-grey eyes blink slowly behind salt-matted white brows.",
+            "chestTorsoDetail": "Tattered sheepskin vests layered three deep over protruding collarbones.",
+            "armsHandsDetail": "Gnarled, salt-reddened knuckles knot tightly around seasoned oak.",
+            "legsStanceDetail": "Cross-legged posture planted immovable inside a broken column drum.",
+            "distinguishingMark": "Wears twelve notched sheep-ribs strung on leather cord around his neck.",
+            "visibleTags": [
+              "humanoid",
+              "gaunt",
+              "root_veined"
+            ]
+          },
+          "topics": [
+            {
+              "id": "soren_salt",
+              "label": "Boot Salt",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Soren rubs salt grit between thumb and forefinger. \"Pack salt inside your socks and chew bitter bark. Keeps the damp numbness out when fog rolls off the northern hills.\""
+                ]
+              }
+            },
+            {
+              "id": "soren_pull",
+              "label": "North Pull",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Soren stares north past the tilted arch. \"Every soul past the black gate feels it—that quiet itch behind the ribs telling you to keep walking north till your boots rot off.\""
+                ]
+              }
+            },
+            {
+              "id": "soren_barrow",
+              "label": "Long Steps",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Soren points his staff northwest. \"Up the ridge sit broad basalt stairs cut for taller strides. Carry bright tallow if you climb down beneath the lintel.\""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "witch_mora",
+          "name": "Mora",
+          "unidentifiedLabel": "Pin-Stitched Herbalist",
+          "shortLabel": "Mora",
+          "firstSightProse": "Crouched beside hanging bundles of dried bog-weed, a wiry woman stitches thin bronze pins directly under the skin of her left collarbone. Chalk-white hair hangs wild above sharp cheeks smelling of vinegar and boiled bark.",
+          "greetingVariants": [
+            {
+              "when": {
+                "minDefilement": 30
+              },
+              "text": "Mora sniffs the air around your collar and smiles with sudden, sharp interest."
+            },
+            {
+              "text": "Mora pulls another sinew strand tight through her bone needle without flinching."
+            }
+          ],
+          "anatomy": {
+            "height": "Average",
+            "weight": "Lean",
+            "skinColor": "Pale Ivory",
+            "hairLength": "Long",
+            "hairStyle": "Wild",
+            "hairColor": "Frost-White",
+            "eyeShape": "Almond",
+            "eyeColor": "Bog-Green",
+            "musculature": "Wiry",
+            "bodyShape": "Spare",
+            "facialScars": "Ritual Brand",
+            "bodyScars": "Rib Seam",
+            "faceDetail": "Sharp bog-green eyes watch fiercely over a blackened brand on her chin.",
+            "chestTorsoDetail": "Open-collared cured hide shows thin bronze pins sewn flat into pale skin.",
+            "armsHandsDetail": "Vinegar-stained fingers move swiftly with curved bone needles.",
+            "legsStanceDetail": "Perches lightly on her heels beside boiling clay pots.",
+            "distinguishingMark": "Carries three carved finger-bones braided behind her left ear.",
+            "visibleTags": [
+              "humanoid",
+              "pale_skin",
+              "implanted",
+              "kiln_branded"
+            ]
+          },
+          "topics": [
+            {
+              "id": "mora_graft",
+              "label": "Bronze Pins",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Mora taps a pin beneath her collarbone. \"Soft flesh fails out here. Only salt, hot wire, or tight grafts keep your nerves answering when the frost bites deep.\""
+                ]
+              }
+            },
+            {
+              "id": "mora_brew",
+              "label": "Bitter Brew",
+              "visible": {
+                "allOf": [
+                  {
+                    "hasItem": "bog_herb"
+                  },
+                  {
+                    "notFlag": "mora_brewed"
+                  }
+                ]
+              },
+              "effect": {
+                "stayInDialogue": true,
+                "consumeItems": [
+                  {
+                    "id": "bog_herb",
+                    "qty": 1
+                  }
+                ],
+                "setFlags": {
+                  "mora_brewed": true
+                },
+                "giveItems": [
+                  {
+                    "id": "antitoxin",
+                    "qty": 1
+                  }
+                ],
+                "messages": [
+                  "Mora drops your bog herb into boiling vinegar-brine and corks a stinging antitoxin flask for your pack."
+                ]
+              }
+            },
+            {
+              "id": "mora_spores",
+              "label": "Bog Mist",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Mora spits into the ashes. \"Stay out of deep hollows south of here when fog sits dead-still. White mold fills lungs faster than knife-work.\""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "penitent_cass",
+          "name": "Cass",
+          "unidentifiedLabel": "Chained Penitent",
+          "shortLabel": "Cass",
+          "firstSightProse": "Kneeling atop crushed gravel beside a fallen column drum, a raw-knuckled penitent scrubs grey marble clean with coarse salt and snow-melt. Ragged sackcloth hangs stiff over scarred shoulders and rusted wrist-cuffs.",
+          "greetingVariants": [
+            {
+              "when": {
+                "background": "shrine_penitent"
+              },
+              "text": "Cass bows his forehead to the cold marble in silent recognition of your wrist-scars."
+            },
+            {
+              "text": "Cass pauses his scrubbing stone, breathing white vapor into the wind."
+            }
+          ],
+          "anatomy": {
+            "height": "Tall",
+            "weight": "Lean",
+            "skinColor": "Frost-Slate",
+            "hairLength": "Shaved",
+            "hairStyle": "Unkempt",
+            "hairColor": "Raven Black",
+            "eyeShape": "Deep-Set",
+            "eyeColor": "Dark Brown",
+            "musculature": "Toned",
+            "bodyShape": "Lean",
+            "facialScars": "Ritual Brand",
+            "bodyScars": "Lash Welts",
+            "faceDetail": "Sunken dark eyes stare steadily past a cinder-rubbed forehead.",
+            "chestTorsoDetail": "Coarse sackcloth torn open at the back reveals old cross-hatched lash welts.",
+            "armsHandsDetail": "Broken iron manacles cling rusted to raw, salt-stung wrists.",
+            "legsStanceDetail": "Calloused knees press immovable into sharp crushed limestone.",
+            "distinguishingMark": "Carries an iron penitent ring riveted through his lower collar.",
+            "visibleTags": [
+              "humanoid",
+              "battle_worn"
+            ]
+          },
+          "topics": [
+            {
+              "id": "cass_penance",
+              "label": "Iron Cuffs",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Cass lifts his chained wrists. \"Southern elders drove me north to freeze in sackcloth. Yet stripped of parish bread, a man still owes clean stone and steady breath.\""
+                ]
+              }
+            },
+            {
+              "id": "cass_ashlar",
+              "label": "Tight Stone",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Cass touches the carved marble beneath his palms. \"No southern mason laid blocks this tight. Even fifty winters of frost cannot wedge ice between the seams.\""
+                ]
+              }
+            },
+            {
+              "id": "cass_vigil",
+              "label": "Silent Hour",
+              "visible": {
+                "notFlag": "cass_blessing_taken"
+              },
+              "effect": {
+                "stayInDialogue": true,
+                "setFlags": {
+                  "cass_blessing_taken": true
+                },
+                "giveXp": 10,
+                "messages": [
+                  "You kneel beside Cass through one quiet hour of salt-wind until cold resolve settles hard behind your ribs."
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "remnant_vel",
+          "name": "Vel",
+          "unidentifiedLabel": "Blank-Eyed Walker",
+          "shortLabel": "Vel",
+          "firstSightProse": "Seated stiffly against a cracked stone wall, a chalk-pale exile stares straight ahead without shivering in the wind. Tarnished grey metallic dust clings inside the creases of his torn coat, and his eyelids scarcely blink.",
+          "greetingVariants": [
+            {
+              "when": {
+                "minDefilement": 40
+              },
+              "text": "Vel turns his pale head smoothly toward you, his voice flat and unhurried."
+            },
+            {
+              "text": "Vel watches you approach with quiet, unblinking stillness."
+            }
+          ],
+          "anatomy": {
+            "height": "Average",
+            "weight": "Gaunt",
+            "skinColor": "Starlit Alabaster",
+            "hairLength": "Cropped",
+            "hairStyle": "Unkempt",
+            "hairColor": "Frost-White",
+            "eyeShape": "Wide",
+            "eyeColor": "Mist-Grey",
+            "musculature": "Frail",
+            "bodyShape": "Spare",
+            "facialScars": "Unmarked",
+            "bodyScars": "Pale Seam-Veins",
+            "faceDetail": "Smooth, bloodless features hold an unnatural stillness with unblinking grey eyes.",
+            "chestTorsoDetail": "A moth-eaten riding coat dusted thick with pale metallic grit.",
+            "armsHandsDetail": "Cold, dry fingers lie perfectly still atop his knees.",
+            "legsStanceDetail": "Sits rigid as carved stone without shifting weight.",
+            "distinguishingMark": "Pale grey veins trace faintly beneath his thin temple skin.",
+            "visibleTags": [
+              "humanoid",
+              "gaunt",
+              "pale_skin",
+              "root_veined"
+            ]
+          },
+          "topics": [
+            {
+              "id": "vel_plazas",
+              "label": "White Streets",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Vel speaks slowly, pausing between words. \"Wide white streets up north. No crows. No snow melts on the pale paving. Only doors cut tall enough for giants.\""
+                ]
+              }
+            },
+            {
+              "id": "vel_name",
+              "label": "Lost Name",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Vel touches his own chest gently. \"They call me Vel here. Once I had another word before it, and a mill town in the south. Now there is only salt and stone.\""
+                ]
+              }
+            },
+            {
+              "id": "vel_steps",
+              "label": "Numbness",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Vel lifts one pale hand north. \"Walk far enough past the north watchtower and your boots ring loud on white stone. Do not sit down once your tongue goes numb.\""
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "imperial_viaduct",
+      "name": "High Road",
+      "regionType": "area",
+      "danger": 1,
+      "dark": false,
+      "neighbors": [
+        "frostwall_redoubt",
+        "frost_orchard",
+        "cistern_cloister",
+        "petrified_grove"
+      ],
+      "asciiPos": {
+        "row": 2,
+        "col": 1,
+        "code": "HR"
+      },
+      "sensorySummary": "Towering stone arches lift a four-wagon flagstone road high above frozen shale. Rusted iron lamp-poles stand twice a man's height beside wrecked southern supply carts picked bare by crows.",
+      "firstSightVariants": [
+        {
+          "text": "Towering stone arches lift a four-wagon flagstone road high above frozen shale. Half-buried milestones bear sharp, undeciphered letters while wind whistles through snapped parapet gaps.{if:greenskin} Even here, old charcoal scorings on a milestone warn against goblin raiders.{/if}{if:female} Wind whips {hair} hair across your {eyes} eyes as you scan the piers.{/if}"
+        }
+      ],
+      "descriptionVariants": [
+        {
+          "text": "Wide cracked flagstones carry the raised road north over wind-scoured scree beside tall iron lamp-poles.{if:greenskin} Even here, old charcoal scorings on a milestone warn against goblin raiders.{/if}{if:female} Wind whips {hair} hair across your {eyes} eyes as you scan the piers.{/if}"
+        }
+      ],
+      "actions": [
+        {
+          "id": "kc_milestones",
+          "label": "Milestones",
+          "visible": {
+            "notFlag": "kc_milestones_checked"
+          },
+          "effect": {
+            "setFlags": {
+              "kc_milestones_checked": true
+            },
+            "check": {
+              "stat": "wit",
+              "dc": 12,
+              "label": "Milestone Rubbing",
+              "isLoreOrPerception": true,
+              "onSuccess": {
+                "setFlags": {
+                  "kiln_cipher_clue": true
+                },
+                "giveCrowns": 12,
+                "messages": [
+                  "Behind a toppled mile-stone you pry loose a wedged Onyx purse and copy repeating tally-notches into your notebook."
+                ]
+              },
+              "onFail": {
+                "giveCrowns": 5,
+                "messages": [
+                  "Frost-split stone defies reading, though you recover a few sharp Onyx coins wedged under the plinth."
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "kc_ditch",
+          "label": "Wrecked Wain",
+          "visible": {
+            "notFlag": "kc_ditch_cleared"
+          },
+          "effect": {
+            "setFlags": {
+              "kc_ditch_cleared": true
+            },
+            "giveItems": [
+              {
+                "id": "ash_resin",
+                "qty": 1
+              }
+            ],
+            "messages": [
+              "A starving hound with split, black-crusted jaws lunges out from beneath a wrecked supply cart."
+            ],
+            "startCombat": {
+              "enemyId": "ash_hound",
+              "canFlee": true
+            }
+          }
+        }
+      ],
+      "npcs": [
+        {
+          "id": "scout_fenna",
+          "name": "Fenna",
+          "unidentifiedLabel": "Crouched Bowwoman",
+          "shortLabel": "Fenna",
+          "firstSightProse": "Wedged behind a splintered axle-tree, a lean elf in mud-caked wool keeps a horn bow half-strung across her lap. Tapered ears flick toward every loose pebble while silver eyes watch the dark piers below.",
+          "greetingVariants": [
+            {
+              "when": {
+                "race": "ael_thalor"
+              },
+              "text": "Fenna dips two fingers from her bowstring in quiet highland salute."
+            },
+            {
+              "text": "Fenna stays low behind the shattered wain wheel, motioning you to keep down."
+            }
+          ],
+          "anatomy": {
+            "height": "Lithesome Tall",
+            "weight": "Lean",
+            "skinColor": "Frost-Grey",
+            "hairLength": "Shoulder-Length",
+            "hairStyle": "Tied Back",
+            "hairColor": "Midnight Blue",
+            "eyeShape": "Almond",
+            "eyeColor": "Liquid Silver",
+            "musculature": "Wiry",
+            "bodyShape": "Trim",
+            "facialScars": "Unmarked",
+            "bodyScars": "Old Spear-Mark",
+            "faceDetail": "Tapered ears angle back beside sharp, liquid-silver eyes watching the piers.",
+            "chestTorsoDetail": "Soot-mottled wool wraps snugly over a bow-quiver strap.",
+            "armsHandsDetail": "Calloused archery fingers keep tension steady on horn limbs.",
+            "legsStanceDetail": "Crouched coiled on soft-wrapped boots ready to clear the rail.",
+            "distinguishingMark": "Carries three black-fletched arrows bound with copper wire.",
+            "visibleTags": [
+              "humanoid",
+              "towering",
+              "pale_skin"
+            ]
+          },
+          "topics": [
+            {
+              "id": "fenna_arches",
+              "label": "Broken Spans",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Fenna keeps her gaze down the road. \"Deserters drop stones off the third span whenever fog sits thick. Walk the windward curb where you can hear boots on grit.\""
+                ]
+              }
+            },
+            {
+              "id": "fenna_hounds",
+              "label": "Wild Packs",
+              "effect": {
+                "stayInDialogue": true,
+                "messages": [
+                  "Fenna taps a black-fletched shaft. \"Stray hounds out here chew kiln-slag and bitter bone till their teeth crack. Keep a buckler or pitch pot ready.\""
+                ]
+              }
+            },
+            {
+              "id": "fenna_orchard",
+              "label": "Orchard Steps",
+              "visible": {
+                "notFlag": "fenna_orchard_tip"
+              },
+              "effect": {
+                "stayInDialogue": true,
+                "setFlags": {
+                  "fenna_orchard_tip": true
+                },
+                "giveXp": 8,
+                "messages": [
+                  "Fenna points north off the causeway. \"Stone stairs drop down through broken vine-walls into a dead orchard. Quiet water still pools in marble troughs there.\""
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "frost_orchard",
+      "name": "Dead Orchard",
+      "regionType": "area",
+      "danger": 1,
+      "dark": false,
+      "neighbors": [
+        "imperial_viaduct",
+        "stepped_barrow",
+        "petrified_grove"
+      ],
+      "asciiPos": {
+        "row": 1,
+        "col": 1,
+        "code": "DO"
+      },
+      "sensorySummary": "Low marble terrace walls enclose rows of stunted, rime-crusted trees whose split bark oozes frozen gum. Dry irrigation troughs wind beneath dead limbs smelling sharply of frostbitten rind and wet moss.",
+      "firstSightVariants": [
+        {
+          "text": "Low marble terrace walls enclose rows of stunted, rime-crusted trees whose split bark oozes frozen gum. Ice-choked stone channels slice clean across frozen turf toward a fallen trough.{if:ael_thalor} Dead apple bark reminds you bitterly of burned highland groves.{/if}{if:small_stature} Low terrace walls give you clean cover from the north wind.{/if}"
+        }
+      ],
+      "descriptionVariants": [
+        {
+          "text": "Twisted orchard limbs clack brittle in the north wind above marble watering troughs choked with grey moss.{if:ael_thalor} Dead apple bark reminds you bitterly of burned highland groves.{/if}{if:small_stature} Low terrace walls give you clean cover from the north wind.{/if}"
+        }
+      ],
+      "actions": [
+        {
+          "id": "so_harvest",
+          "label": "Gather Moss",
+          "effect": {
+            "advanceHours": 2,
+            "giveItems": [
+              {
+                "id": "bog_herb",
+                "qty": 1
+              }
+            ],
+            "messages": [
+              "You scrape pale frost-moss and bitter green stems off the marble irrigation sluice."
+            ]
+          }
+        },
+        {
+          "id": "fo_channel",
+          "label": "Stone Sluice",
+          "visible": {
+            "notFlag": "frost_orchard_cache"
+          },
+          "effect": {
+            "setFlags": {
+              "frost_orchard_cache": true
+            },
+            "check": {
+              "stat": "agility",
+              "dc": 11,
+              "label": "Frozen Sluice",
+              "isCraftOrStealth": true,
+              "onSuccess": {
+                "giveCrowns": 14,
+                "giveItems": [
+                  {
+                    "id": "poultice",
+                    "qty": 1
+                  }
+                ],
+                "messages": [
+                  "You reach beneath an iced marble sluice-gate and pull free a waxed pouch holding Onyx coins and clean linen wraps."
+                ]
+              },
+              "onFail": {
+                "damageHp": 3,
+                "messages": [
+                  "Brittle ice snaps across your wrist, leaving a jagged cut as the sluice-grate slams shut."
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "npcs": []
+    },
+    {
+      "id": "stepped_barrow",
+      "name": "Long Steps",
+      "regionType": "area",
+      "danger": 2,
+      "dark": true,
+      "neighbors": [
+        "frostwall_redoubt",
+        "salt_hermitage",
+        "frost_orchard",
+        "petrified_grove",
+        "salt_ossuary"
+      ],
+      "asciiPos": {
+        "row": 0,
+        "col": 0,
+        "code": "LS"
+      },
+      "sensorySummary": "Broad basalt stair-treads cut for longer strides sink beneath a grassless stone mound smelling of wet lime and tallow. Tall lintels frame black darkness where frost rimes iron hinge-pins.",
+      "firstSightVariants": [
+        {
+          "text": "Broad basalt stair-treads cut for longer strides sink beneath a grassless stone mound smelling of wet lime and tallow. Above the dark lintel, weathered chisel-lines show tall robed figures holding quiet bowls.{if:towering} Even your {height} frame looks short beside stair treads cut for longer strides.{/if}{if:small_stature} Each oversized basalt riser forces you to scramble knee-high.{/if}"
+        }
+      ],
+      "descriptionVariants": [
+        {
+          "when": {
+            "hasFlag": "wb_crypt_cleared"
+          },
+          "text": "Cold air wafts up from the unbarred tomb steps. Rusted sconces flank a dark threshold bearing fresh boot-prints."
+        },
+        {
+          "text": "Oversized basalt steps descend into frost-rimed darkness beneath a silent stone mound.{if:towering} Even your {height} frame looks short beside stair treads cut for longer strides.{/if}{if:small_stature} Each oversized basalt riser forces you to scramble knee-high.{/if}"
+        }
+      ],
+      "actions": [
+        {
+          "id": "wb_outer_steps",
+          "label": "Outer Steps",
+          "visible": {
+            "notFlag": "wb_steps_entered"
+          },
+          "effect": {
+            "setFlags": {
+              "wb_steps_entered": true
+            },
+            "consumeTorchIfNotHeirloomOrAbility": {
+              "heirloomId": "kiln_lantern",
+              "abilityId": "kiln_spark",
+              "onHeirloomMsg": "Warm orange flame steadies your footing down the oversized basalt treads.",
+              "onTorchMsg": "You strike a pitch torch, driving wet shadows back from the stair wall.",
+              "onDarkDamage": 4,
+              "onDarkMsg": "Without light, your boot slips across frost-slick risers and slams hard against stone."
+            }
+          }
+        },
+        {
+          "id": "wb_inner_crypt",
+          "label": "Inner Crypt",
+          "visible": {
+            "allOf": [
+              {
+                "hasFlag": "wb_steps_entered"
+              },
+              {
+                "notFlag": "wb_crypt_cleared"
+              }
+            ]
+          },
+          "effect": {
+            "setFlags": {
+              "wb_crypt_cleared": true,
+              "vorne_oath_known": true
+            },
+            "giveItems": [
+              {
+                "id": "echo_shell",
+                "qty": 1
+              }
+            ],
+            "messages": [
+              "Inside a dry wall-alcove lies a hollow spiral shell beside a bronze watch-tablet etched in southern script: Hold the northern arch till relief arrives. Never break the bronze line."
+            ]
+          }
+        },
+        {
+          "id": "wb_altar_frieze",
+          "label": "Wall Frieze",
+          "visible": {
+            "allOf": [
+              {
+                "hasFlag": "wb_steps_entered"
+              },
+              {
+                "notFlag": "kiln_cipher_learned"
+              }
+            ]
+          },
+          "effect": {
+            "branch": [
+              {
+                "when": {
+                  "anyOf": [
+                    {
+                      "background": "root_scholar"
+                    },
+                    {
+                      "race": "ael_thalor"
+                    }
+                  ]
+                },
+                "effect": {
+                  "setFlags": {
+                    "kiln_cipher_learned": true
+                  },
+                  "giveXp": 25,
+                  "recordChronicle": {
+                    "title": "Copied Steps Frieze",
+                    "summary": "Matched the repeating furnace notches carved along the Long Steps crypt wall.",
+                    "tag": "stepped_barrow"
+                  },
+                  "messages": [
+                    "Tracing the geometric notches with charcoal, you match three repeating furnace-signs and commit the ignition sequence to memory."
+                  ]
+                }
+              },
+              {
+                "effect": {
+                  "check": {
+                    "stat": "wit",
+                    "dc": 15,
+                    "label": "Frieze Study",
+                    "isLoreOrPerception": true,
+                    "onSuccess": {
+                      "setFlags": {
+                        "kiln_cipher_learned": true
+                      },
+                      "giveXp": 25,
+                      "recordChronicle": {
+                        "title": "Copied Steps Frieze",
+                        "summary": "Matched the repeating furnace notches carved along the Long Steps crypt wall.",
+                        "tag": "stepped_barrow"
+                      },
+                      "messages": [
+                        "Working slowly by tally count, you align the notched bronze rings and unlock the buried furnace sequence."
+                      ]
+                    },
+                    "onFail": {
+                      "damageHp": 3,
+                      "messages": [
+                        "Sharp stone edges slice your palm as a counter-weighted frieze plate snaps shut."
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "wb_durnfolk_vault",
+          "label": "Stone Vault",
+          "visible": {
+            "allOf": [
+              {
+                "notFlag": "wb_dwarf_vault"
+              },
+              {
+                "anyOf": [
+                  {
+                    "race": "durnfolk"
+                  },
+                  {
+                    "hasFlag": "wb_crypt_cleared"
+                  }
+                ]
+              }
+            ]
+          },
+          "effect": {
+            "setFlags": {
+              "wb_dwarf_vault": true
+            },
+            "giveItems": [
+              {
+                "id": "runic_warhammer",
+                "qty": 1
+              }
+            ],
+            "giveCrowns": 18,
+            "recordChronicle": {
+              "title": "Opened Steps Vault",
+              "summary": "Dropped the counterweight lock inside Long Steps and recovered a heavy warhammer.",
+              "tag": "stepped_barrow"
+            },
+            "messages": [
+              "You shift two hidden basalt counterweights in sequence. Stone pins drop smoothly, revealing a heavy runic warhammer and stacked Onyx coins."
+            ]
+          }
+        }
+      ],
+      "npcs": []
+    },
+    {
+      "id": "brine_marsh",
+      "name": "Salt Bog",
+      "regionType": "area",
+      "danger": 2,
+      "dark": false,
+      "neighbors": [
+        "frostwall_redoubt",
+        "salt_hermitage",
+        "cistern_cloister"
+      ],
+      "asciiPos": {
+        "row": 4,
+        "col": 0,
+        "code": "SB"
+      },
+      "sensorySummary": "Black sulfurous puddles steam sluggishly around sunken marble blocks and salt-rimed reeds. Thin grey ice crackles underfoot while pale bubbles burst with a sharp, rotten-egg stench.",
+      "firstSightVariants": [
+        {
+          "text": "Black sulfurous puddles steam sluggishly around sunken marble blocks and salt-rimed reeds. Every cracked step leaks brackish brine that stains boot-leather stiff and white.{if:pale_skin} Sulfur steam stings red across {skin} skin.{/if}{if:greenskin} Cold brine smells almost like southern tunnel-sumps beneath your boots.{/if}"
+        }
+      ],
+      "descriptionVariants": [
+        {
+          "text": "Steaming black mire laps broken column drums while sulfur vents hiss softly beneath salt-crusted reeds.{if:pale_skin} Sulfur steam stings red across {skin} skin.{/if}{if:greenskin} Cold brine smells almost like southern tunnel-sumps beneath your boots.{/if}"
+        }
+      ],
+      "actions": [
+        {
+          "id": "af_herbs",
+          "label": "Herb Bank",
+          "visible": {
+            "notFlag": "af_herbs_picked"
+          },
+          "effect": {
+            "setFlags": {
+              "af_herbs_picked": true
+            },
+            "giveItems": [
+              {
+                "id": "bog_herb",
+                "qty": 2
+              }
+            ],
+            "messages": [
+              "Along a dry tussock you cut two thick bundles of bitter marsh-weed clear of the brine."
+            ]
+          }
+        },
+        {
+          "id": "af_stones",
+          "label": "Stepping Stones",
+          "visible": {
+            "notFlag": "af_stones_crossed"
+          },
+          "effect": {
+            "setFlags": {
+              "af_stones_crossed": true
+            },
+            "check": {
+              "stat": "agility",
+              "dc": 13,
+              "label": "Sunken Blocks",
+              "isCraftOrStealth": true,
+              "onSuccess": {
+                "giveCrowns": 16,
+                "messages": [
+                  "You leap cleanly across slick marble blocks and pry an Onyx-filled belt pouch off a drowned corpse."
+                ]
+              },
+              "onFail": {
+                "damageHp": 4,
+                "addStatuses": [
+                  {
+                    "type": "poisoned",
+                    "turns": 2,
+                    "power": 2
+                  }
+                ],
+                "messages": [
+                  "Your heel skids off wet marble; foul sulfur brine fills your boot-top and blisters your calf."
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "af_shrine",
+          "label": "Sunken Niche",
+          "visible": {
+            "allOf": [
+              {
+                "anyOf": [
+                  {
+                    "background": "shrine_penitent"
+                  },
+                  {
+                    "background": "root_scholar"
+                  }
+                ]
+              },
+              {
+                "notFlag": "af_shrine_done"
+              }
+            ]
+          },
+          "effect": {
+            "setFlags": {
+              "af_shrine_done": true
+            },
+            "giveItems": [
+              {
+                "id": "poultice",
+                "qty": 1
+              }
+            ],
+            "restoreFocus": 2,
+            "messages": [
+              "Inside a half-submerged niche you recover sealed linen wraps and steady your breathing against the sulfur haze."
+            ]
+          }
+        },
+        {
+          "id": "af_grixi_salvage",
+          "label": "Bog Vents",
+          "visible": {
+            "allOf": [
+              {
+                "anyOf": [
+                  {
+                    "race": "grixi"
+                  },
+                  {
+                    "background": "barrow_stalker"
+                  }
+                ]
+              },
+              {
+                "notFlag": "af_grixi_skimmed"
+              }
+            ]
+          },
+          "effect": {
+            "setFlags": {
+              "af_grixi_skimmed": true
+            },
+            "giveItems": [
+              {
+                "id": "fire_pot",
+                "qty": 1
+              },
+              {
+                "id": "antitoxin",
+                "qty": 1
+              }
+            ],
+            "giveCrowns": 10,
+            "messages": [
+              "Working deftly above the hissing brine vents, you skim volatile sulfur-pitch into a clay pot and pocket spare Onyx."
+            ]
+          }
+        }
+      ],
+      "npcs": []
+    },
+    {
+      "id": "petrified_grove",
+      "name": "White Timber",
+      "regionType": "area",
+      "danger": 3,
+      "dark": false,
+      "neighbors": [
+        "stepped_barrow",
+        "frost_orchard",
+        "imperial_viaduct",
+        "kiln_terraces",
+        "gate_watchtower"
+      ],
+      "asciiPos": {
+        "row": 0,
+        "col": 1,
+        "code": "WT"
+      },
+      "sensorySummary": "Brittle pale trunks stand clustered between ruined stone colonnades, their glass-hard twigs clicking whenever wind sweeps ash across frozen moss. Sap hardened into cold amber drips from split bark.",
+      "firstSightVariants": [
+        {
+          "text": "Brittle pale trunks stand clustered between ruined stone colonnades, their stiff boughs clicking like bone in the frost. Between white roots, half-buried marble paving still gleams beneath drifted ash.{if:silver_eyes} Brittle white twigs catch sharp glare in your {eyes} eyes.{/if}{if:heavy_build} Cracked moss crunches loud under your {build} weight.{/if}"
+        }
+      ],
+      "descriptionVariants": [
+        {
+          "when": {
+            "hasFlag": "sw_stag_slain"
+          },
+          "text": "The brittle grove stands quiet; snapped pale branches litter frozen moss around a dry stone channel."
+        },
+        {
+          "text": "Clicking white trees crowd cracked colonnades while cold resin drips from split bark.{if:silver_eyes} Brittle white twigs catch sharp glare in your {eyes} eyes.{/if}{if:heavy_build} Cracked moss crunches loud under your {build} weight.{/if}"
         }
       ],
       "actions": [
         {
           "id": "sw_resin_grove",
-          "label": "Resin Grove",
+          "label": "Resin Bark",
           "visible": {
             "notFlag": "sw_grove_searched"
           },
@@ -1533,63 +3220,51 @@
               }
             ],
             "messages": [
-              "You scrape volatile amber resin from petrified boughs and clear a deer trail into the Heart-Glade."
+              "You pry hard, bitter-smelling resin lumps out from scarred tree-forks with your knife point."
             ]
           }
         },
         {
           "id": "sw_star_stag",
-          "label": "Heart Glade",
+          "label": "Deep Glade",
           "visible": {
-            "allOf": [
-              {
-                "hasFlag": "sw_grove_searched"
-              },
-              {
-                "notFlag": "star_stag_resolved"
-              }
-            ]
+            "notFlag": "sw_stag_slain"
           },
           "effect": {
             "branch": [
               {
                 "when": {
-                  "race": "ael_thalor"
+                  "hasFlag": "hermit_tallies_read"
                 },
                 "effect": {
-                  "setFlags": {
-                    "star_stag_resolved": true
-                  },
-                  "giveItems": [
-                    {
-                      "id": "star_glaive",
-                      "qty": 1
-                    }
-                  ],
-                  "grantMaxFocus": 1,
-                  "recordChronicle": {
-                    "title": "Calmed the Star-Stag",
-                    "summary": "Sang the Ael-Thalor Memory-Canticle to free the Star-Stag without bloodshed.",
-                    "tag": "ael_thalor"
-                  },
                   "messages": [
-                    "You kneel and sing the elder Memory-Canticle. The immense silver stag halts, shakes pale vines from its chiming rack, and leaves a Star-Glaive gleaming in the mossy plinth."
-                  ]
+                    "Between tall white trunks, a massive antlered beast drops its frost-rimmed rack toward you, dry vines clicking along its ribs."
+                  ],
+                  "startCombat": {
+                    "enemyId": "star_stag",
+                    "canFlee": true,
+                    "onVictoryFlag": "sw_stag_slain",
+                    "onVictoryChronicle": {
+                      "title": "Felled the Grove Stag",
+                      "summary": "Brought down the vine-bound beast inside White Timber.",
+                      "tag": "petrified_grove"
+                    }
+                  }
                 }
               },
               {
                 "effect": {
                   "messages": [
-                    "Silver ferns split apart as heavy hooves thunder into the glade."
+                    "Bone-hard antlers crash through brittle branches as a towering pale beast lunges out of the grove."
                   ],
                   "startCombat": {
                     "enemyId": "star_stag",
                     "canFlee": true,
-                    "onVictoryFlag": "star_stag_resolved",
+                    "onVictoryFlag": "sw_stag_slain",
                     "onVictoryChronicle": {
-                      "title": "Felled the Star-Stag",
-                      "summary": "Slew the corrupted guardian of the Petrified Star-Wood.",
-                      "tag": "combat"
+                      "title": "Felled the Grove Stag",
+                      "summary": "Brought down the vine-bound beast inside White Timber.",
+                      "tag": "petrified_grove"
                     }
                   }
                 }
@@ -1599,239 +3274,11 @@
         },
         {
           "id": "sw_sever_conduit",
-          "label": "Root Conduit",
+          "label": "Drain Trench",
           "visible": {
             "allOf": [
               {
-                "hasFlag": "star_stag_resolved"
-              },
-              {
-                "notFlag": "root_conduit_severed"
-              }
-            ]
-          },
-          "effect": {
-            "branch": [
-              {
-                "when": {
-                  "hasAnyAbility": [
-                    "kiln_spark",
-                    "cinder_brand"
-                  ]
-                },
-                "effect": {
-                  "setFlags": {
-                    "root_conduit_severed": true
-                  },
-                  "recordChronicle": {
-                    "title": "Severed Root Conduit",
-                    "summary": "Burned out the pulsing Pale-Root taproot beneath the Petrified Star-Wood.",
-                    "tag": "seal"
-                  },
-                  "messages": [
-                    "Flame tears into the throbbing pale taproot. The forest shudders as the Belfry's outer armor-conduit snaps."
-                  ]
-                }
-              },
-              {
-                "when": {
-                  "hasItem": "fire_pot"
-                },
-                "effect": {
-                  "consumeItems": [
-                    {
-                      "id": "fire_pot",
-                      "qty": 1
-                    }
-                  ],
-                  "setFlags": {
-                    "root_conduit_severed": true
-                  },
-                  "recordChronicle": {
-                    "title": "Severed Root Conduit",
-                    "summary": "Burned out the pulsing Pale-Root taproot beneath the Petrified Star-Wood.",
-                    "tag": "seal"
-                  },
-                  "messages": [
-                    "Flame tears into the throbbing pale taproot. The forest shudders as the Belfry's outer armor-conduit snaps."
-                  ]
-                }
-              },
-              {
-                "effect": {
-                  "check": {
-                    "stat": "might",
-                    "dc": 14,
-                    "label": "Root-Core",
-                    "onSuccess": {
-                      "setFlags": {
-                        "root_conduit_severed": true
-                      },
-                      "recordChronicle": {
-                        "title": "Severed Root Conduit",
-                        "summary": "Hacked apart the Pale-Root conduit beneath the Star-Wood.",
-                        "tag": "seal"
-                      },
-                      "messages": [
-                        "With brutal strokes you sever the pulsing conduit, starving Malakor's bark-aegis."
-                      ]
-                    },
-                    "onFail": {
-                      "damageHp": 5,
-                      "messages": [
-                        "The iron-hard root lashes back across your shoulder."
-                      ]
-                    }
-                  }
-                }
-              }
-            ]
-          }
-        }
-      ],
-      "npcs": []
-    },
-    {
-      "id": "drowned_forge",
-      "name": "The Drowned Forge-Vault",
-      "regionType": "special",
-      "danger": 3,
-      "dark": true,
-      "neighbors": [
-        "silken_cistern",
-        "sunken_belfry"
-      ],
-      "asciiPos": {
-        "row": 4,
-        "col": 2,
-        "code": "DF"
-      },
-      "sensorySummary": "Flooded basalt furnace halls built by the Durnfolk before the Shattering. Warm brine laps against submerged anvils while steam hisses from copper sluice-pipes.",
-      "firstSightVariants": [
-        {
-          "text": "Warm, sulfur-thick steam rolls out of a low square gate cut into black basalt. Knee-deep brine floods vast recessed forge floors where old anvils glow dull ember beneath the water and a massive sluice-wheel hums beyond the mist."
-        }
-      ],
-      "descriptionVariants": [
-        {
-          "text": "Flooded basalt halls built by the Durnfolk before the Kiln shattered. Half-submerged anvils glow faintly under sluggish steam while an iron sluice-wheel hums behind a watchful bronze sentinel."
-        }
-      ],
-      "actions": [
-        {
-          "id": "df_warden",
-          "label": "Sluice Hall",
-          "visible": {
-            "notFlag": "forge_cleared"
-          },
-          "effect": {
-            "branch": [
-              {
-                "when": {
-                  "race": "durnfolk"
-                },
-                "effect": {
-                  "setFlags": {
-                    "forge_cleared": true
-                  },
-                  "giveItems": [
-                    {
-                      "id": "basalt_plate",
-                      "qty": 1
-                    }
-                  ],
-                  "recordChronicle": {
-                    "title": "Commanded Forge-Warden",
-                    "summary": "Used ancestral Durnfolk master-signs to stand down the Basalt Kiln-Warden.",
-                    "tag": "durnfolk"
-                  },
-                  "messages": [
-                    "You rap the ancient guild-cadence twice upon your helm. The towering Basalt Kiln-Warden kneels in grinding stone deference, opening the armory locker."
-                  ]
-                }
-              },
-              {
-                "when": {
-                  "race": "grixi"
-                },
-                "effect": {
-                  "check": {
-                    "stat": "agility",
-                    "dc": 12,
-                    "label": "Flue Bypass",
-                    "isCraftOrStealth": true,
-                    "onSuccess": {
-                      "setFlags": {
-                        "forge_cleared": true
-                      },
-                      "giveItems": [
-                        {
-                          "id": "basalt_plate",
-                          "qty": 1
-                        }
-                      ],
-                      "messages": [
-                        "You wriggle through the ash-exhaust duct behind the golem, pull its pressure pin, and claim the Basalt Cuirass."
-                      ]
-                    },
-                    "onFail": {
-                      "messages": [
-                        "Boiling water surges sideways as heavy basalt joints grind awake in the steam."
-                      ],
-                      "startCombat": {
-                        "enemyId": "forge_automaton",
-                        "canFlee": true,
-                        "onVictoryFlag": "forge_cleared",
-                        "onVictoryChronicle": {
-                          "title": "Shattered Kiln-Warden",
-                          "summary": "Defeated the ancient Durnfolk automaton inside the Drowned Forge-Vault.",
-                          "tag": "combat"
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                "effect": {
-                  "messages": [
-                    "Boiling water surges sideways as heavy basalt joints grind awake in the steam."
-                  ],
-                  "startCombat": {
-                    "enemyId": "forge_automaton",
-                    "canFlee": true,
-                    "onVictoryFlag": "forge_cleared",
-                    "onVictoryChronicle": {
-                      "title": "Shattered Kiln-Warden",
-                      "summary": "Defeated the ancient Durnfolk automaton inside the Drowned Forge-Vault.",
-                      "tag": "combat"
-                    }
-                  }
-                }
-              }
-            ]
-          }
-        },
-        {
-          "id": "df_hone_weapon",
-          "label": "Runic Brazier",
-          "visible": {
-            "hasFlag": "forge_cleared"
-          },
-          "effect": {
-            "honeWeapon": true,
-            "messages": [
-              "You draw your weapon across the warm basalt whetstone. Sparks of old Kiln-steel kiss the edge."
-            ]
-          }
-        },
-        {
-          "id": "df_drain_conduit",
-          "label": "Abyssal Valve",
-          "visible": {
-            "allOf": [
-              {
-                "hasFlag": "forge_cleared"
+                "hasFlag": "sw_stag_slain"
               },
               {
                 "notFlag": "root_conduit_severed"
@@ -1842,13 +3289,19 @@
             "setFlags": {
               "root_conduit_severed": true
             },
+            "giveItems": [
+              {
+                "id": "star_glaive",
+                "qty": 1
+              }
+            ],
             "recordChronicle": {
-              "title": "Choked Deep Conduit",
-              "summary": "Closed the flooded Durnfolk sluice-valves, starving Malakor's root-shield.",
-              "tag": "seal"
+              "title": "Cleared Timber Trench",
+              "summary": "Split the choked stone channel inside White Timber and claimed a silver-socketed glaive.",
+              "tag": "petrified_grove"
             },
             "messages": [
-              "You haul the heavy bronze wheel shut. Superheated brine floods the lower root-shaft, crippling Malakor's Belfry Aegis."
+              "You wedge iron cold-chisels into the root-choked stone channel beneath the fallen stag and pry free a tall silver-socketed glaive."
             ]
           }
         }
@@ -1856,35 +3309,264 @@
       "npcs": []
     },
     {
-      "id": "crown_watchtower",
-      "name": "Crown-Gate Watchtower",
+      "id": "kiln_terraces",
+      "name": "Brick Hills",
       "regionType": "area",
       "danger": 3,
       "dark": false,
       "neighbors": [
-        "petrified_starwood",
-        "sunken_belfry"
+        "salt_hermitage",
+        "cistern_cloister",
+        "petrified_grove",
+        "foundry_vault",
+        "basalt_quarry"
+      ],
+      "asciiPos": {
+        "row": 3,
+        "col": 2,
+        "code": "BH"
+      },
+      "sensorySummary": "Stepped vitrified brick domes cling to a black basalt slope, venting dry, soot-thick warmth through cracked iron chimneys. Glazed slag crunches underfoot like broken crockery.",
+      "firstSightVariants": [
+        {
+          "text": "Stepped vitrified brick domes cling to a black basalt slope, venting dry, soot-thick warmth through cracked iron chimneys. Heat shimmers faintly off black glass slag beside rusted iron rakes.{if:burn_scarred} Dry flue heat pulls tightly at old burn-scars along your skin.{/if}{if:durnfolk} Even dead brick domes stir an old smith-habit of checking mortar seams.{/if}"
+        }
+      ],
+      "descriptionVariants": [
+        {
+          "text": "Dry heat leaks out of cracked kiln domes across black slag terraces slick with grease and soot.{if:burn_scarred} Dry flue heat pulls tightly at old burn-scars along your skin.{/if}{if:durnfolk} Even dead brick domes stir an old smith-habit of checking mortar seams.{/if}"
+        }
+      ],
+      "actions": [
+        {
+          "id": "ks_scrape",
+          "label": "Scrape Pitch",
+          "effect": {
+            "advanceHours": 2,
+            "giveItems": [
+              {
+                "id": "ash_resin",
+                "qty": 1
+              }
+            ],
+            "messages": [
+              "You chip brittle amber pitch off a warm flue collar before soot coats your sleeves."
+            ]
+          }
+        },
+        {
+          "id": "kt_flue",
+          "label": "Slag Drawer",
+          "visible": {
+            "notFlag": "kt_flue_looted"
+          },
+          "effect": {
+            "setFlags": {
+              "kt_flue_looted": true
+            },
+            "giveItems": [
+              {
+                "id": "kiln_pitch",
+                "qty": 1
+              }
+            ],
+            "giveCrowns": 14,
+            "messages": [
+              "Inside a cooled ash-drawer you uncover a stoppered pot of furnace pitch and Onyx coins fused lightly to brick."
+            ]
+          }
+        }
+      ],
+      "npcs": []
+    },
+    {
+      "id": "basalt_quarry",
+      "name": "Black Quarry",
+      "regionType": "area",
+      "danger": 4,
+      "dark": false,
+      "neighbors": [
+        "foundry_vault",
+        "kiln_terraces",
+        "silver_rotunda"
+      ],
+      "asciiPos": {
+        "row": 3,
+        "col": 3,
+        "code": "BQ"
+      },
+      "sensorySummary": "Forty-foot stone benches step down into black quarry cuts littered with snapped bronze chains and dressed stone blocks larger than wagons. Meltwater pools black against sheer walls.",
+      "firstSightVariants": [
+        {
+          "text": "Forty-foot stone benches step down into black quarry cuts littered with snapped bronze chains and dressed stone blocks larger than wagons. Cold drafts whine off crane-beams twice the span of southern timber rigs.{if:durnfolk} Your stone-hold eye spots clean quarry cleavage lines immediately.{/if}{if:frail} Forty-foot benches drop dizzying and steep beneath your thin boots.{/if}"
+        }
+      ],
+      "descriptionVariants": [
+        {
+          "text": "Sheer basalt cuts descend in giant steps past rusted iron carts and snapped bronze hoist chains.{if:durnfolk} Your stone-hold eye spots clean quarry cleavage lines immediately.{/if}{if:frail} Forty-foot benches drop dizzying and steep beneath your thin boots.{/if}"
+        }
+      ],
+      "actions": [
+        {
+          "id": "iq_winch",
+          "label": "Search Carts",
+          "effect": {
+            "advanceHours": 2,
+            "giveItems": [
+              {
+                "id": "kiln_pitch",
+                "qty": 1
+              }
+            ],
+            "messages": [
+              "Beneath a collapsed hoist axle you recover grease-sealed furnace pitch."
+            ]
+          }
+        },
+        {
+          "id": "bq_hoist",
+          "label": "Chain Winch",
+          "visible": {
+            "notFlag": "basalt_quarry_hoard"
+          },
+          "effect": {
+            "setFlags": {
+              "basalt_quarry_hoard": true
+            },
+            "check": {
+              "stat": "might",
+              "dc": 14,
+              "label": "Quarry Hoist",
+              "onSuccess": {
+                "giveItems": [
+                  {
+                    "id": "iron_wire_kit",
+                    "qty": 1
+                  }
+                ],
+                "giveCrowns": 24,
+                "messages": [
+                  "You heave a jammed bronze pawl clear, dropping a rusted tool-chest holding lock-wire and heavy Onyx."
+                ]
+              },
+              "onFail": {
+                "damageHp": 5,
+                "messages": [
+                  "A rusted chain link parts under load, whipping sharp bronze across your ribs."
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "npcs": []
+    },
+    {
+      "id": "salt_ossuary",
+      "name": "Bone Cellars",
+      "regionType": "area",
+      "danger": 4,
+      "dark": true,
+      "neighbors": [
+        "stepped_barrow",
+        "gate_watchtower"
       ],
       "asciiPos": {
         "row": 0,
         "col": 2,
-        "code": "CW"
+        "code": "BC"
       },
-      "sensorySummary": "A wind-scoured parapet jutting over the sunken amphitheater of the Belfry. Shattered arches frame the abyss below, where an old bronze plinth holds vigil.",
+      "sensorySummary": "Tiered limestone cellars hold thousands of salt-dried bones stacked neatly behind iron grilles. Dry air carries the rasp of shifting grit and smells sharply of lime and old tallow.",
       "firstSightVariants": [
         {
-          "text": "Steep stone stairs break out onto a wind-scoured cliff parapet hanging above a vast drowned crater. Below lies a sunken amphitheater crowned by a colossal inverted bell; on the broken flagstones before you sits a motionless, towering figure in green-tarnished bronze."
+          "text": "Tiered limestone cellars hold thousands of salt-dried bones stacked neatly behind iron grilles. Tall arched doorways force your eyes upward into black vaulting where dry salt drifts over stone thresholds.{if:lantern_eyes} Your bright {eyes} eyes pick out bone-stacks deep behind the iron grilles.{/if}{if:white_hair} Dry salt dust settles unseen into your {hair} hair.{/if}"
+        }
+      ],
+      "descriptionVariants": [
+        {
+          "text": "Dry limestone tunnels line endlessly with iron-barred bone niches and crisp white salt drifts.{if:lantern_eyes} Your bright {eyes} eyes pick out bone-stacks deep behind the iron grilles.{/if}{if:white_hair} Dry salt dust settles unseen into your {hair} hair.{/if}"
+        }
+      ],
+      "actions": [
+        {
+          "id": "sc_niche",
+          "label": "Search Niches",
+          "effect": {
+            "advanceHours": 2,
+            "giveCrowns": 8,
+            "messages": [
+              "Between dry femur-stacks you sift out cold black Onyx coins left inside rotted linen."
+            ]
+          }
+        },
+        {
+          "id": "so_grille",
+          "label": "Bone Grille",
+          "visible": {
+            "notFlag": "ossuary_seal_marked"
+          },
+          "effect": {
+            "setFlags": {
+              "ossuary_seal_marked": true
+            },
+            "consumeTorchIfNotHeirloomOrAbility": {
+              "heirloomId": "kiln_lantern",
+              "abilityId": "kiln_spark",
+              "onHeirloomMsg": "Warm lantern glow catches a sealed oil flask tucked behind rusted grille bars.",
+              "onTorchMsg": "Torchlight glints off glass behind the bone grille, letting you hook out a sealed oil flask.",
+              "onDarkDamage": 5,
+              "onDarkMsg": "Reaching blindly past jagged iron bars tears your sleeve and slices your wrist."
+            },
+            "giveItems": [
+              {
+                "id": "silver_ash_oil",
+                "qty": 1
+              }
+            ],
+            "giveCrowns": 14
+          }
+        }
+      ],
+      "npcs": []
+    },
+    {
+      "id": "gate_watchtower",
+      "name": "North Gate",
+      "regionType": "area",
+      "danger": 5,
+      "dark": false,
+      "neighbors": [
+        "petrified_grove",
+        "salt_ossuary",
+        "silver_rotunda"
+      ],
+      "asciiPos": {
+        "row": 0,
+        "col": 3,
+        "code": "NG"
+      },
+      "sensorySummary": "A frost-crusted stone bastion straddles a monumental arch overlooking pale marble avenues far below. Frozen iron bell-chains clank slowly in the bitter northern gale.",
+      "firstSightVariants": [
+        {
+          "text": "A frost-crusted stone bastion straddles a monumental arch overlooking silent marble boulevards dusted in pale grey ash. High on the cracked parapet, tarnished bronze plate catches cold glare without shifting an inch.{if:female} Frost-rimed archers' slits stare down coldly as you climb the icy steps.{/if}{if:scarred_face} Freezing gale needles raw along your facial scar.{/if}"
         }
       ],
       "descriptionVariants": [
         {
           "when": {
-            "hasFlag": "vorne_resolved"
+            "anyOf": [
+              {
+                "hasFlag": "vorne_redeemed"
+              },
+              {
+                "hasFlag": "vorne_slain"
+              }
+            ]
           },
-          "text": "Wind howls through the ruined gate-arch overlooking the Sunken Belfry below. An empty bronze chair faces the chasm."
+          "text": "Wind howls unimpeded through the gate arch above silent white streets. Only frost-rimmed stone steps remain."
         },
         {
-          "text": "A shattered parapet overlooking the abyssal crater of the Sunken Belfry. On a bronze plinth sits a motionless bell-helmed sentinel whose visor hums in the wind."
+          "text": "A towering bronze sentinel keeps unmoving watch beside a frozen bell-frame overlooking the northern avenues.{if:female} Frost-rimed archers' slits stare down coldly as you climb the icy steps.{/if}{if:scarred_face} Freezing gale needles raw along your facial scar.{/if}"
         }
       ],
       "actions": [
@@ -1905,7 +3587,43 @@
               }
             ],
             "messages": [
-              "Tucked behind a fallen battlement you uncover a dry watchman satchel and a clear vantage over the Sunken Belfry below."
+              "Wedged beneath a frozen brazier rim you salvage dry linen field-wraps."
+            ]
+          }
+        },
+        {
+          "id": "gw_plinth",
+          "label": "Watch Plinth",
+          "visible": {
+            "allOf": [
+              {
+                "anyOf": [
+                  {
+                    "hasFlag": "vorne_redeemed"
+                  },
+                  {
+                    "hasFlag": "vorne_slain"
+                  }
+                ]
+              },
+              {
+                "notFlag": "gw_plinth_looted"
+              }
+            ]
+          },
+          "effect": {
+            "setFlags": {
+              "gw_plinth_looted": true
+            },
+            "giveItems": [
+              {
+                "id": "writ_bone_shatter",
+                "qty": 1
+              }
+            ],
+            "giveCrowns": 25,
+            "messages": [
+              "Behind the silent watch-plinth you pry open an iron scroll-tube holding a scorched vellum writ and heavy Onyx."
             ]
           }
         }
@@ -1913,40 +3631,54 @@
       "npcs": [
         {
           "id": "sir_vorne_npc",
-          "name": "Sir Vorne",
-          "unidentifiedLabel": "Bronze Sentinel",
-          "shortLabel": "Sir Vorne",
+          "name": "Bronze Gate-Warden",
+          "unidentifiedLabel": "Bronze Watcher",
+          "shortLabel": "Vorne",
           "visible": {
-            "notFlag": "vorne_resolved"
+            "allOf": [
+              {
+                "notFlag": "vorne_redeemed"
+              },
+              {
+                "notFlag": "vorne_slain"
+              }
+            ]
           },
-          "firstSightProse": "Seated upon a bronze plinth rests a towering knight whose gorget has fused seamlessly into a cast bronze bell-helm. Mountain wind draws a low, grieving ring from his visor while gauntleted fingers rest across a notched greatblade.",
+          "firstSightProse": "At the center of the wind-scoured plinth stands a towering figure sealed head-to-heel in tarnished bronze plate. Rime crusts every joint, and both gloved fists rest upright over the pommel of a broad, pitted greatblade.",
           "greetingVariants": [
             {
-              "text": "Beneath a great bronze bell-helm, Sir Vorne grips his massive cleaver without rising."
+              "when": {
+                "hasFlag": "vorne_oath_known"
+              },
+              "text": "Behind the slotted bronze visor, pale eyes track your belt as though waiting for a spoken pass-phrase."
+            },
+            {
+              "text": "The bronze watcher lifts his visor a fraction, frost scraping softly against his gorget."
             }
           ],
           "anatomy": {
             "height": "Towering",
-            "weight": "Heavy",
-            "skinColor": "Hidden Under Plate",
-            "hairLength": "None",
-            "hairStyle": "None",
-            "hairColor": "None",
-            "eyeShape": "Narrow",
-            "eyeColor": "Shadowed",
+            "weight": "Burly",
+            "skinColor": "Frost-Grey",
+            "hairLength": "Cropped",
+            "hairStyle": "Unkempt",
+            "hairColor": "Iron-Grey",
+            "eyeShape": "Deep-Set",
+            "eyeColor": "Mist-Grey",
             "musculature": "Hulking",
-            "bodyShape": "Broad-Chested",
-            "facialScars": "Unmarked",
+            "bodyShape": "Barrel-Chested",
+            "facialScars": "Brow Split",
             "bodyScars": "Old Spear-Mark",
-            "faceDetail": "Only cold shadow answers behind the slit of his fused bronze bell-helm.",
-            "chestTorsoDetail": "Massive green-tarnished pauldrons and breastplate stand weathered by mountain wind.",
-            "armsHandsDetail": "Gauntleted hands rest lightly across the pommel of a bronze greatblade.",
-            "legsStanceDetail": "Greaved legs sit straight and motionless upon the stone plinth.",
-            "distinguishingMark": "The mountain gale rings faintly off his cast bronze helm.",
+            "faceDetail": "Hollow, frost-chapped cheeks sit dimly visible behind slotted bronze cheek-guards.",
+            "chestTorsoDetail": "Heavy bell-cast bronze cuirass scored by countless winter hailstones.",
+            "armsHandsDetail": "Riveted bronze gauntlets lock firm around a broad steel-and-bronze grip.",
+            "legsStanceDetail": "Greaved boots stand planted wide atop frost-slick marble.",
+            "distinguishingMark": "Carries an engraved copper watch-seal chained to his left pauldron.",
             "visibleTags": [
               "humanoid",
               "towering",
-              "armored"
+              "muscular",
+              "iron_vow_garb"
             ]
           },
           "topics": [
@@ -1958,8 +3690,10 @@
               },
               "effect": {
                 "setFlags": {
-                  "vorne_resolved": true,
                   "vorne_redeemed": true
+                },
+                "adjustFactions": {
+                  "iron_vow": 2
                 },
                 "giveItems": [
                   {
@@ -1967,70 +3701,26 @@
                     "qty": 1
                   }
                 ],
+                "giveXp": 35,
                 "recordChronicle": {
-                  "title": "Redeemed Sir Vorne",
-                  "summary": "Spoke the forgotten Weeping Barrow oath, freeing Sir Vorne to strike at the Belfry steps.",
-                  "tag": "vorne"
+                  "title": "Relieved Gate-Warden",
+                  "summary": "Spoke the forgotten watch-oath at North Gate, freeing Vorne from his post.",
+                  "tag": "gate_watchtower"
                 },
                 "messages": [
-                  "You recite the exact oath engraved in the Weeping Barrow. Sir Vorne freezes, sighs deeply through his visor, presses his Bell-Cleaver into your hands, and marches down to break Malakor's choir."
+                  "You speak the barrow words cleanly into the wind: \"Hold the northern arch till relief arrives. Never break the bronze line.\"",
+                  "Iron gauntlets unclench with a slow screech of frost. The watcher lowers his greatblade across your arms and steps aside down the watch-stairs."
                 ]
               }
             },
             {
               "id": "vorne_challenge",
               "label": "Challenge",
-              "visible": {
-                "anyOf": [
-                  {
-                    "race": "vaelorian"
-                  },
-                  {
-                    "background": "ashen_blade"
-                  }
-                ]
-              },
               "effect": {
-                "check": {
-                  "stat": "grit",
-                  "dc": 14,
-                  "label": "Knightly Oath",
-                  "onSuccess": {
-                    "setFlags": {
-                      "vorne_resolved": true,
-                      "vorne_redeemed": true
-                    },
-                    "giveItems": [
-                      {
-                        "id": "bell_cleaver",
-                        "qty": 1
-                      }
-                    ],
-                    "recordChronicle": {
-                      "title": "Redeemed Sir Vorne",
-                      "summary": "Recalled Sir Vorne to knightly honor at the Crown-Gate Watchtower.",
-                      "tag": "vorne"
-                    },
-                    "messages": [
-                      "You utter the old Vaelish knight dismissal. Sir Vorne lowers his blade, yields his Bell-Cleaver, and pledges his final charge to break Malakor's choir."
-                    ]
-                  },
-                  "onFail": {
-                    "messages": [
-                      "Sir Vorne rises slowly, bell-helm tolling once as he draws his cleaver."
-                    ],
-                    "startCombat": {
-                      "enemyId": "sir_vorne",
-                      "canFlee": true,
-                      "onVictoryFlag": "vorne_resolved",
-                      "onVictoryChronicle": {
-                        "title": "Slain Sir Vorne",
-                        "summary": "Defeated Sir Vorne in single combat at the Crown-Gate.",
-                        "tag": "vorne"
-                      }
-                    }
-                  }
-                }
+                "stayInDialogue": true,
+                "messages": [
+                  "Bronze grates flatly from inside the helm: \"No relief. None walk onto the white avenues without the watch-word.\""
+                ]
               }
             },
             {
@@ -2038,16 +3728,16 @@
               "label": "Draw Steel",
               "effect": {
                 "messages": [
-                  "\"None pass the Crown-Gate unweighed,\" Sir Vorne rumbles, hoisting his massive Bell-Cleaver."
+                  "Bronze plates screech apart as the towering watcher hefts his heavy bell-blade."
                 ],
                 "startCombat": {
                   "enemyId": "sir_vorne",
                   "canFlee": true,
-                  "onVictoryFlag": "vorne_resolved",
+                  "onVictoryFlag": "vorne_slain",
                   "onVictoryChronicle": {
-                    "title": "Slain Sir Vorne",
-                    "summary": "Defeated Sir Vorne in single combat at the Crown-Gate.",
-                    "tag": "vorne"
+                    "title": "Felled Gate-Warden",
+                    "summary": "Cut down the bronze watcher holding North Gate.",
+                    "tag": "gate_watchtower"
                   }
                 }
               }
@@ -2057,29 +3747,36 @@
       ]
     },
     {
-      "id": "sunken_belfry",
-      "name": "The Sunken Belfry",
+      "id": "silver_rotunda",
+      "name": "The White Dome",
       "regionType": "area",
-      "danger": 4,
+      "danger": 5,
       "dark": true,
       "neighbors": [
-        "crown_watchtower",
-        "drowned_forge"
+        "gate_watchtower",
+        "foundry_vault",
+        "basalt_quarry"
       ],
       "asciiPos": {
         "row": 2,
-        "col": 2,
-        "code": "SB"
+        "col": 3,
+        "code": "WD"
       },
-      "sensorySummary": "A drowned stone amphitheater cradling an immense upside-down bronze bell. Living white roots braid a high throne directly beneath its trembling rim.",
+      "sensorySummary": "Sweeping white colonnades ring a collapsed dome inlaid with tarnished silver ribs. Ash lies ankle-deep over pale marble tiles while a slow, freezing draft rises from a sunken bronze pit at the center.",
       "firstSightVariants": [
         {
-          "text": "The tunnel opens onto the rim of a colossal sunken amphitheater flooded with shallow, mirror-black ash-water. Suspended upside-down across the pit hangs a bronze bell vast as a keep, humming softly over a living throne of braided white roots."
+          "text": "Sweeping white colonnades ring a collapsed dome inlaid with tarnished silver ribs. Doorways stand twice a man's height around silent paved courts, while a slow cold draft carries metallic chill up from the drowned pit below.{if:ael_thalor} High ringing stillness tightens behind your temples the instant your boot touches pale marble.{/if}{if:vaelorian} Your mortal breath clouds thick over dust-caked white stone.{/if}"
         }
       ],
       "descriptionVariants": [
         {
-          "text": "At the bottom of a drowned stone amphitheater hangs an upside-down bronze bell as large as a keep. Pale roots weave a living throne beneath it where Malakor awaits the Third Drowning Toll."
+          "when": {
+            "hasFlag": "malakor_slain"
+          },
+          "text": "Silence fills the fractured white dome. Broken bronze shards litter the sunken dais while cold wind drifts cleanly across pale stone."
+        },
+        {
+          "text": "Ash swirls quietly between tarnished silver pillars around a sunken bronze dais trembling with cold air.{if:ael_thalor} High ringing stillness tightens behind your temples the instant your boot touches pale marble.{/if}{if:vaelorian} Your mortal breath clouds thick over dust-caked white stone.{/if}"
         }
       ],
       "actions": [
@@ -2101,12 +3798,12 @@
           },
           "effect": {
             "messages": [
-              "You raise your weapon against the cracked heart of the great bronze bell."
+              "You drive your weapon down into the fractured bronze bell-heart with every ounce of weight left in your ribs."
             ],
             "triggerEnding": {
               "endingId": "shatter_belfry",
-              "title": "Silence Over the Reach",
-              "openingText": "The great bell fractures into harmless bronze rain."
+              "title": "Silence Over the Frost",
+              "openingText": "The great bronze bell fractures into quiet rain over cold marble."
             }
           }
         },
@@ -2119,28 +3816,18 @@
                 "hasFlag": "malakor_slain"
               },
               {
-                "anyOf": [
-                  {
-                    "hasFlag": "kiln_cipher_learned"
-                  },
-                  {
-                    "race": "vaelorian"
-                  },
-                  {
-                    "race": "durnfolk"
-                  }
-                ]
+                "hasFlag": "kiln_cipher_learned"
               }
             ]
           },
           "effect": {
             "messages": [
-              "You turn from the dead bell toward the dormant furnace beneath the altar."
+              "You trace the barrow furnace-cipher across the sunken dais and strike flame down into the deep stone flues."
             ],
             "triggerEnding": {
               "endingId": "rekindle_kiln",
-              "title": "Heir of the First Kiln",
-              "openingText": "Pale ember flares back into the ancient conduits of stone."
+              "title": "Keeper of the Silver Dome",
+              "openingText": "Pale orange heat surges back up through the buried northern conduits."
             }
           }
         },
@@ -2153,214 +3840,19 @@
                 "hasFlag": "malakor_slain"
               },
               {
-                "anyOf": [
-                  {
-                    "minFaction": {
-                      "faction": "husk_choir",
-                      "value": 2
-                    }
-                  },
-                  {
-                    "hasFlag": "stole_cistern_vesper"
-                  },
-                  {
-                    "race": "ael_thalor"
-                  },
-                  {
-                    "background": "root_scholar"
-                  }
-                ]
+                "minDefilement": 50
               }
             ]
           },
           "effect": {
             "messages": [
-              "You reach down through settling spore-dust for Malakor's bell-crown."
+              "You lift the cracked bronze circlet from the ash and press its freezing rim onto your own brow."
             ],
             "triggerEnding": {
               "endingId": "ascend_warden",
               "title": "The Quiet Crown",
-              "openingText": "The Pale Root bows in sudden, uncanny obedience."
+              "openingText": "Cold silence settles obediently around the white colonnades."
             }
-          }
-        }
-      ],
-      "npcs": []
-    },
-    {
-      "id": "sunken_orchard",
-      "name": "Sunken Orchard",
-      "regionType": "area",
-      "danger": 2,
-      "dark": false,
-      "neighbors": [
-        "ash_fen",
-        "petrified_starwood"
-      ],
-      "asciiPos": {
-        "row": 1,
-        "col": 1,
-        "code": "SO"
-      },
-      "sensorySummary": "Blackened fruit trees stand knee-deep in stagnant ash-water, their bare branches hung with dry bone-lanterns.",
-      "firstSightVariants": [
-        {
-          "text": "Crooked, dead apple trees rise from ankle-deep grey water. Dry seed-pods rattle in the breeze like hollow teeth, and pale moss clings to the sunken orchard wall."
-        }
-      ],
-      "descriptionVariants": [
-        {
-          "text": "Flooded rows of dead orchard trees lean over dark mirror-water where pale roots coil beneath the mud."
-        }
-      ],
-      "actions": [
-        {
-          "id": "so_harvest",
-          "label": "Gather Moss",
-          "effect": {
-            "advanceHours": 1,
-            "giveItems": [
-              {
-                "id": "bog_herb",
-                "qty": 1
-              }
-            ],
-            "messages": [
-              "You peel pale medicinal moss from the drowned orchard bark."
-            ]
-          }
-        }
-      ],
-      "npcs": []
-    },
-    {
-      "id": "kiln_scars",
-      "name": "Kiln Scars",
-      "regionType": "area",
-      "danger": 3,
-      "dark": false,
-      "neighbors": [
-        "petrified_starwood",
-        "drowned_forge"
-      ],
-      "asciiPos": {
-        "row": 3,
-        "col": 2,
-        "code": "KS"
-      },
-      "sensorySummary": "Split basalt ridges vent warm, sulfur-sweet steam from cracks in the earth.",
-      "firstSightVariants": [
-        {
-          "text": "The ground here splits into jagged black glass trenches. Warm amber-scented steam hisses from deep vents where old furnace masonry still glows faintly red in the dark."
-        }
-      ],
-      "descriptionVariants": [
-        {
-          "text": "Cracked obsidian ground vents warm ash-steam above the buried furnace galleries."
-        }
-      ],
-      "actions": [
-        {
-          "id": "ks_scrape",
-          "label": "Scrape Resin",
-          "effect": {
-            "advanceHours": 1,
-            "giveItems": [
-              {
-                "id": "ash_resin",
-                "qty": 1
-              }
-            ],
-            "messages": [
-              "You pry hardened amber resin from a warm basalt fissure."
-            ]
-          }
-        }
-      ],
-      "npcs": []
-    },
-    {
-      "id": "salt_catacombs",
-      "name": "Salt Catacombs",
-      "regionType": "area",
-      "danger": 4,
-      "dark": true,
-      "neighbors": [
-        "weeping_barrow",
-        "crown_watchtower"
-      ],
-      "asciiPos": {
-        "row": 0,
-        "col": 2,
-        "code": "SC"
-      },
-      "sensorySummary": "Dry white salt-crust coats low bone-lined arches where cold drafts carry faint bronze humming.",
-      "firstSightVariants": [
-        {
-          "text": "A collapsed hillside opens into bone-white galleries crusted with dry salt. Every footstep crunches loudly, and old iron lantern-hooks sway from the low stone ceiling."
-        }
-      ],
-      "descriptionVariants": [
-        {
-          "text": "Salt-crusted burial galleries wind beneath the northern ridge, cold and dry as old bone."
-        }
-      ],
-      "actions": [
-        {
-          "id": "sc_niche",
-          "label": "Search Niches",
-          "effect": {
-            "advanceHours": 1,
-            "giveCrowns": 12,
-            "messages": [
-              "You pry a handful of tarnished silver coins from behind a salt-crusted skull."
-            ]
-          }
-        }
-      ],
-      "npcs": []
-    },
-    {
-      "id": "iron_quarry",
-      "name": "Iron Quarry",
-      "regionType": "area",
-      "danger": 4,
-      "dark": false,
-      "neighbors": [
-        "drowned_forge",
-        "crown_watchtower"
-      ],
-      "asciiPos": {
-        "row": 4,
-        "col": 2,
-        "code": "IQ"
-      },
-      "sensorySummary": "Stepped slate terraces descend into a flooded pit ringed by rusted cranes and broken ore-carts.",
-      "firstSightVariants": [
-        {
-          "text": "Giant stepped walls of wet black slate drop into a mist-filled quarry pit. Rusted winch-chains hang motionless over dark water, and heavy iron ore-carts sit derailed along the rim."
-        }
-      ],
-      "descriptionVariants": [
-        {
-          "text": "Stepped slate ledges and rusted iron winches overlook the flooded quarry floor."
-        }
-      ],
-      "actions": [
-        {
-          "id": "iq_winch",
-          "label": "Search Carts",
-          "effect": {
-            "advanceHours": 1,
-            "giveItems": [
-              {
-                "id": "kiln_pitch",
-                "qty": 1
-              }
-            ],
-            "messages": [
-              "You salvage a sealed tin of grease-pitch from a rusted ore-cart."
-            ]
           }
         }
       ],

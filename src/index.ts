@@ -5,12 +5,12 @@ import type {
   AppearanceSelections,
   BackgroundId,
   GameState,
-  HeirloomId,
   RaceId,
   SexId,
+  SouthernPastId,
   SurvivalMode,
 } from './types.ts';
-import { BACKGROUNDS, HEIRLOOMS, RACES } from './content/characters.ts';
+import { BACKGROUNDS, RACES, SOUTHERN_PASTS } from './content/characters.ts';
 import { createNewGame, processInput, renderCurrentScreen } from './engine.ts';
 import { loadGame, loadMetaProfile, recordRunCompletion, saveGame } from './save.ts';
 import { paint } from './ui.ts';
@@ -150,7 +150,7 @@ async function runCharacterCreation(
 ): Promise<GameState> {
   const meta = loadMetaProfile();
   console.log('');
-  console.log(paint('TRAVELER - THE GLOAMING REACH', 'cyan', stealth));
+  console.log(paint('TRAVELER - THE NORTHERN EXPANSE', 'cyan', stealth));
   if (meta.runsPlayed > 0) {
     console.log(
       `Runs ${meta.runsPlayed} | Victories ${meta.victories} | Best Day ${meta.bestDayReached}`,
@@ -192,14 +192,15 @@ async function runCharacterCreation(
   const bgRaw = await reader.ask('> ');
   const background = pickFromList(bgRaw, bgIds, 0);
 
-  const unlocked = meta.unlockedHeirlooms;
-  console.log('\nHeirloom:');
-  unlocked.forEach((hid, idx) => {
-    const h = HEIRLOOMS[hid];
-    console.log(`  ${idx + 1}. ${h.name}`);
+  const pastIds = Object.keys(SOUTHERN_PASTS) as SouthernPastId[];
+  console.log('\nSouthern Past:');
+  pastIds.forEach((pid, idx) => {
+    const sp = SOUTHERN_PASTS[pid];
+    console.log(`  ${idx + 1}. ${sp.name} - ${sp.subtitle}`);
   });
-  const heirloomRaw = await reader.ask('> ');
-  const heirloom = pickFromList(heirloomRaw, unlocked, 0);
+  const pastRaw = await reader.ask('> ');
+  const southernPast = pickFromList(pastRaw, pastIds, 0);
+
 
   const anatomy = await runAppearanceCustomizer(reader, sex, race, background);
 
@@ -212,7 +213,7 @@ async function runCharacterCreation(
     sex,
     race,
     background,
-    heirloom,
+    southernPast,
     survivalMode,
     anatomy,
     stealthMode: stealth,
@@ -256,22 +257,12 @@ async function main(): Promise<void> {
       if (state.scene === 'dead') {
         const result = recordRunCompletion(state, 'death');
         console.log('\nExpedition ended. Save erased.');
-        if (result.newlyUnlocked.length > 0) {
-          console.log(
-            `Unlocked: ${result.newlyUnlocked.map((id) => HEIRLOOMS[id].name).join(', ')}`,
-          );
-        }
         break;
       }
 
       if (state.scene === 'ending') {
         const result = recordRunCompletion(state, 'victory', state.endingSummary ?? 'Victory');
         console.log('\nVictory recorded.');
-        if (result.newlyUnlocked.length > 0) {
-          console.log(
-            `Unlocked: ${result.newlyUnlocked.map((id) => HEIRLOOMS[id].name).join(', ')}`,
-          );
-        }
         break;
       }
 

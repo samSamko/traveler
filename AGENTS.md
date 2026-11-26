@@ -15,11 +15,11 @@ node --test test/engine.test.ts
 ```
 And verify CLI startup in stealth mode:
 ```powershell
-"1`n1`n2`n2`n1`n1`nAelindra`n1`n2`nJournal`nSelf`nBack`nArts`nBack`nBack`nquit`n" | node src/index.ts --stealth
+"1`n1`n2`n2`n1`n1`n1`nAelindra`n1`n2`nJournal`nSelf`nBack`nArts`nBack`nBack`nquit`n" | node src/index.ts --stealth
 ```
 
 ## Writing Framework & Writer Agent
-Read `docs/WRITER_AGENT.md` and `docs/lore/` before authoring new prose, creatures, NPCs, or locations. Every entity must supply `firstSightProse`, `unidentifiedName` / `unidentifiedLabel`, mirrored `AnatomyProfile`, and `entityLinks` entries in `data/links.json`.
+Read `docs/WRITER_AGENT.md` and `docs/lore/` before authoring new prose, creatures, NPCs, or locations. **Realistic-grimdark** (bleak survival realism, visceral body-horror/gore, moral cynicism, and 3-tier escalation from mundane surface to late-game dread) is the mandatory theme for all prose and world content. Every entity must supply `firstSightProse`, `unidentifiedName` / `unidentifiedLabel`, mirrored `AnatomyProfile`, and `entityLinks` entries in `data/links.json`.
 
 ## World Database Architecture (`data/*.json` -> `node:sqlite`)
 - All narrative prose, dialogue, places, NPCs, events, enemies, items, recipes, abilities, races, backgrounds, heirlooms, perks, body mods, injuries, NPC appearance reactions, and entity links live in human-readable `data/*.json` files (`characters.json`, `items.json`, `bodymods.json`, `enemies.json`, `places.json`, `events.json`, `links.json`), NOT hardcoded in `.ts` files.

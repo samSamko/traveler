@@ -1,5 +1,5 @@
 import type { GameState } from './types.ts';
-import { RACES, BACKGROUNDS, HEIRLOOMS, ABILITIES, PERKS } from './content/characters.ts';
+import { RACES, BACKGROUNDS, ABILITIES, PERKS, SOUTHERN_PASTS } from './content/characters.ts';
 import { ITEMS } from './content/items.ts';
 import { LOCATIONS } from './content/locations.ts';
 import { getEffectiveStat } from './dice.ts';
@@ -143,21 +143,27 @@ export function renderAsciiMap(state: GameState): string {
   };
 
   const lines = [
-    'FRONTIER MAP - THE GLOAMING REACH',
+    'FRONTIER MAP - THE NORTHERN EXPANSE',
     '* current   ? unvisited',
     '',
-    `  ${mark('weeping_barrow', 'WB')} ------ ${mark('petrified_starwood', 'SW')} ------ ${mark('crown_watchtower', 'CW')}`,
-    '   |          |          |',
-    `  ${mark('cinderford', 'CF')} ------ ${mark('kings_causeway', 'KC')}        ${mark('sunken_belfry', 'SB')}`,
-    '   |          |          |',
-    `  ${mark('ash_fen', 'AF')} ------ ${mark('silken_cistern', 'SC')} ------ ${mark('drowned_forge', 'DF')}`,
+    `  ${mark('stepped_barrow', 'LS')} ------ ${mark('petrified_grove', 'WT')} ------ ${mark('salt_ossuary', 'BC')} ------ ${mark('gate_watchtower', 'NG')}`,
+    '   |          |                      |',
+    `   |         ${mark('frost_orchard', 'DO')}                     ${mark('silver_rotunda', 'WD')}`,
+    '   |          |                      |',
+    `  ${mark('frostwall_redoubt', 'TP')} ------ ${mark('imperial_viaduct', 'HR')}         ${mark('kiln_terraces', 'BH')} --- ${mark('basalt_quarry', 'BQ')}`,
+    '   |          |          |           |',
+    `  ${mark('salt_hermitage', 'DA')}          |          |           |`,
+    '   |          |          |           |',
+    `  ${mark('brine_marsh', 'SB')} ------ ${mark('cistern_cloister', 'OB')} ------ ${mark('foundry_vault', 'SP')} ------+`,
     '',
     'Legend:',
-    "  CF Cinderford Keep         KC Old King's Causeway",
-    '  WB Weeping Barrow          SW Petrified Star-Wood',
-    '  AF Ash-Fen & Spore-Mire    SC Silken Cistern',
-    '  DF Drowned Forge-Vault     CW Crown-Gate Watchtower',
-    '  SB The Sunken Belfry',
+    '  TP Timber Post            OB Old Bathhouse',
+    '  SP Smelter Pit            DA Dry Arch',
+    '  HR High Road              DO Dead Orchard',
+    '  LS Long Steps             SB Salt Bog',
+    '  WT White Timber           BH Brick Hills',
+    '  BQ Black Quarry           BC Bone Cellars',
+    '  NG North Gate             WD The White Dome',
   ];
 
   return s ? lines.join('\n') : paint(lines.join('\n'), 'white', false);
@@ -167,7 +173,7 @@ export function renderCharacterSheet(state: GameState): string {
   const p = state.player;
   const race = RACES[p.race];
   const bg = BACKGROUNDS[p.background];
-  const heirloom = HEIRLOOMS[p.heirloom];
+  const past = p.southernPast ? SOUTHERN_PASTS[p.southernPast] : undefined;
   const mainHand = p.equipment.mainHand ? ITEMS[p.equipment.mainHand] : null;
   const offHand = p.equipment.offHand ? ITEMS[p.equipment.offHand] : null;
   const armor = p.equipment.armor ? ITEMS[p.equipment.armor] : null;
@@ -176,12 +182,11 @@ export function renderCharacterSheet(state: GameState): string {
 
   const lines: string[] = [
     `CHARACTER SHEET - ${p.name}`,
-    `Identity: ${p.sex === 'female' ? 'Female' : 'Male'} ${race.name} ${bg.name}`,
+    `Identity: ${p.sex === 'female' ? 'Female' : 'Male'} ${race.name} ${bg.name}${past ? ` - ${past.name}` : ''}`,
     `Level ${p.level} | XP ${p.xp}/${p.xpToNext} | HP ${p.hp}/${p.maxHp} | Stamina ${p.stamina}/${p.maxStamina} | Focus ${p.focus}/${p.maxFocus}`,
     `Reserves ${p.reserves}/${p.maxReserves} | Grace ${p.grace}/${p.maxGrace}`,
     `Stats: Might ${getEffectiveStat(state, 'might')} | Agility ${getEffectiveStat(state, 'agility')} | Wit ${getEffectiveStat(state, 'wit')} | Grit ${getEffectiveStat(state, 'grit')}`,
     `Passives: ${race.passive.name} - ${race.passive.description} | ${bg.passive.name} - ${bg.passive.description}`,
-    `Heirloom: ${heirloom.name} - ${heirloom.combatDescription}`,
     'Equipment:',
     `  Main-Hand: ${mainHand ? mainHand.name : 'None'}${p.weaponHoned ? ' Honed' : ''}${p.weaponCoating ? ` - ${p.weaponCoating.name} ${p.weaponCoating.charges}x` : ''}`,
     `  Off-Hand : ${offHand ? offHand.name : mainHand?.twoHanded ? 'Two-Handed Locked' : 'None'}`,
@@ -250,21 +255,21 @@ export function renderMemoryChronicle(state: GameState): string {
   });
 
   lines.push('');
-  lines.push('Counter-Seals:');
+  lines.push('Deep Marks:');
   lines.push(
-    `  - Seal of Silence: ${state.memory.flags['seal_of_silence'] ? 'Acquired' : 'Unfound'}`,
+    `  - Silent Cistern Seal: ${state.memory.flags['seal_of_silence'] ? 'Acquired' : 'Unfound'}`,
   );
   lines.push(
-    `  - Root Conduit: ${state.memory.flags['root_conduit_severed'] ? 'Severed' : 'Intact'}`,
+    `  - Deep Conduit: ${state.memory.flags['root_conduit_severed'] ? 'Severed' : 'Intact'}`,
   );
   lines.push(
-    `  - First Kiln Cipher: ${state.memory.flags['kiln_cipher_learned'] ? 'Learned' : 'Unfound'}`,
+    `  - Northern Cipher: ${state.memory.flags['kiln_cipher_learned'] ? 'Learned' : 'Unfound'}`,
   );
 
   lines.push('');
   lines.push('Chronicle:');
   if (state.memory.chronicle.length === 0) {
-    lines.push('  Your deeds are not yet written in the Reach.');
+    lines.push('  Your deeds are not yet written in the North.');
   } else {
     for (const c of state.memory.chronicle) {
       lines.push(`  Day ${c.day} - ${c.title}: ${c.summary}`);

@@ -1,11 +1,1862 @@
 {
   "enemies": {
-    "root_husk": {
-      "id": "root_husk",
-      "name": "Root-Husk Vagrant",
-      "unidentifiedName": "Chalk-Ribbed Walker",
-      "category": "husk",
+    "gaunt_wolf": {
+      "armor": 0,
+      "stats": {
+        "might": 2,
+        "agility": 4,
+        "wit": 1,
+        "grit": 1
+      },
+      "resistances": {
+        "cold": "resistant",
+        "fire": "vulnerable"
+      },
+      "crownReward": [
+        0,
+        3
+      ],
+      "lootTable": [
+        {
+          "itemId": "poultice",
+          "chance": 0.15
+        }
+      ],
+      "id": "gaunt_wolf",
+      "name": "Gaunt Timber-Wolf",
+      "unidentifiedName": "Starving Grey Wolf",
+      "category": "animal",
+      "maxHp": 15,
+      "visibleGear": {
+        "weapon": "Cracked yellow fangs slick with frozen saliva",
+        "armor": "Matted, mangy winter pelt over bare ribs",
+        "hiddenDetail": "Porcupine quills and rusted trap-wire scar its left foreleg."
+      },
+      "anatomy": {
+        "height": "Low",
+        "weight": "Gaunt",
+        "skinColor": "Sallow Grey",
+        "hairLength": "Matted",
+        "hairStyle": "Shaggy",
+        "hairColor": "Slate-Grey",
+        "eyeShape": "Slit",
+        "eyeColor": "Pale Yellow",
+        "musculature": "Wiry",
+        "bodyShape": "Skeletal",
+        "facialScars": "Snout Notch",
+        "bodyScars": "Trap-Wire Scar",
+        "faceDetail": "Hollow cheeks draw back over chipped fangs and frost-rimmed whiskers.",
+        "chestTorsoDetail": "Every rib shows sharply under patchy winter fur.",
+        "armsHandsDetail": "Split paw pads leave dark blood-specks on frozen mud.",
+        "legsStanceDetail": "Tucked hindquarters coil low, tail clamped tight between hocks.",
+        "distinguishingMark": "Half an ear torn clean off by rival pack-jaws.",
+        "visibleTags": [
+          "animal",
+          "gaunt"
+        ]
+      },
+      "firstSightProse": "Dry brush snaps behind a fallen milestone as a starved, mangy canine pads into the sleet. Its ribs show like barrel staves through patchy grey fur, and frozen blood crusts around its parted jaws.",
+      "returnSightProse": "A Gaunt Timber-Wolf circles low through the slush, fangs bared.",
+      "xpReward": 13,
+      "description": "Driven onto the High Road by winter famine, snapping at anything warm that limps.",
+      "intents": [
+        {
+          "kind": "attack",
+          "label": "Hamstring Bite",
+          "damage": 5,
+          "damageType": "piercing",
+          "status": {
+            "type": "bleeding",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "lunges low for the calf."
+        },
+        {
+          "kind": "attack",
+          "label": "Throat Snap",
+          "damage": 6,
+          "damageType": "slashing",
+          "description": "snaps wildly at your collar."
+        }
+      ]
+    },
+    "frost_boar": {
+      "armor": 1,
+      "stats": {
+        "might": 4,
+        "agility": 2,
+        "wit": 1,
+        "grit": 3
+      },
+      "resistances": {
+        "cold": "resistant",
+        "bludgeoning": "resistant",
+        "fire": "vulnerable"
+      },
+      "crownReward": [
+        0,
+        4
+      ],
+      "lootTable": [
+        {
+          "itemId": "bog_herb",
+          "chance": 0.3
+        }
+      ],
+      "id": "frost_boar",
+      "name": "Frost-Tusked Boar",
+      "unidentifiedName": "Bristle-Backed Hog",
+      "category": "animal",
+      "maxHp": 21,
+      "visibleGear": {
+        "weapon": "Jagged lower tusks stained with frozen clay and bark",
+        "armor": "Inch-thick mud-caked hide along the shoulders",
+        "hiddenDetail": "A snapped southern spear-tip sits rusted deep behind its left ear."
+      },
+      "anatomy": {
+        "height": "Low",
+        "weight": "Heavy",
+        "skinColor": "Soot-Brown",
+        "hairLength": "Coarse",
+        "hairStyle": "Bristled",
+        "hairColor": "Coal Black",
+        "eyeShape": "Small",
+        "eyeColor": "Bloodshot Brown",
+        "musculature": "Broad",
+        "bodyShape": "Barrel-Chested",
+        "facialScars": "Split Snout",
+        "bodyScars": "Spear-Tip Scar",
+        "faceDetail": "Tiny bloodshot eyes glare above curved, dirt-packed tusks.",
+        "chestTorsoDetail": "Thick cartilage shield-plates armor both hunched shoulders.",
+        "armsHandsDetail": "Cloven forehooves tear deep ruts into frozen turf.",
+        "legsStanceDetail": "Short, muscular legs brace hard to charge straight ahead.",
+        "distinguishingMark": "Rusted iron spear-barb jutting crookedly from its neck hump.",
+        "visibleTags": [
+          "animal",
+          "muscular"
+        ]
+      },
+      "firstSightProse": "Frozen moss flies upward in clumps as a thick-shouldered hog roots furiously under dead orchard trees. Frost coats its coarse black bristles, and curved yellow tusks click together as small red eyes lock onto your boots.",
+      "returnSightProse": "A Frost-Tusked Boar paws frozen dirt, lowering its scarred snout.",
+      "xpReward": 16,
+      "description": "A scarred northern boar rooting Dead Orchard tubers, maddened by cold and rusted iron in its hide.",
+      "intents": [
+        {
+          "kind": "heavy",
+          "label": "Tusk Charge",
+          "damage": 8,
+          "damageType": "piercing",
+          "status": {
+            "type": "bleeding",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "lowers its bristled skull to charge."
+        },
+        {
+          "kind": "guard",
+          "label": "Hide Brace",
+          "damage": 0,
+          "damageType": "bludgeoning",
+          "armorGain": 3,
+          "description": "turns its thick shoulder-plate toward you."
+        }
+      ]
+    },
+    "carrion_crow_flock": {
+      "armor": 0,
+      "stats": {
+        "might": 1,
+        "agility": 5,
+        "wit": 2,
+        "grit": 1
+      },
+      "resistances": {
+        "bludgeoning": "resistant",
+        "fire": "vulnerable",
+        "slashing": "vulnerable"
+      },
+      "crownReward": [
+        2,
+        6
+      ],
+      "lootTable": [
+        {
+          "itemId": "poultice",
+          "chance": 0.2
+        }
+      ],
+      "id": "carrion_crow_flock",
+      "name": "Carrion Rookery",
+      "unidentifiedName": "Screaming Black Flock",
+      "category": "animal",
+      "maxHp": 14,
+      "visibleGear": {
+        "weapon": "Dozens of hooked beaks and frost-wet talons",
+        "armor": "Swarming scatter of wet black feathers",
+        "hiddenDetail": "Several birds carry shredded wool and dried flesh clamped in their claws."
+      },
+      "anatomy": {
+        "height": "Small",
+        "weight": "Light",
+        "skinColor": "Scaled Black",
+        "hairLength": "Feathered",
+        "hairStyle": "Ruffled",
+        "hairColor": "Oil Black",
+        "eyeShape": "Beady",
+        "eyeColor": "Jet Black",
+        "musculature": "Wiry",
+        "bodyShape": "Lean",
+        "facialScars": "Unmarked",
+        "bodyScars": "Plucked Patches",
+        "faceDetail": "Wet black eyes gleam beside heavy beaks crusted in frozen gore.",
+        "chestTorsoDetail": "Swollen crops bulge beneath sleet-soaked plumage.",
+        "armsHandsDetail": "Pinion feathers snap loud like wet leather in the wind.",
+        "legsStanceDetail": "Hops sideways across frozen corpses with crooked black talons.",
+        "distinguishingMark": "Smells sharply of sour carrion and wet feathers.",
+        "visibleTags": [
+          "animal",
+          "small_stature"
+        ]
+      },
+      "firstSightProse": "A dozen bloated black birds burst off a half-eaten pack-mule with deafening croaks, wheeling low around your head. Wet wingtips slap your hood while hooked beaks snap straight toward your eyes.",
+      "returnSightProse": "The Carrion Rookery descends in a screaming black cloud.",
+      "xpReward": 12,
+      "description": "Bold, corpse-fed crows that flock wherever travelers freeze or limp along the northern road.",
+      "intents": [
+        {
+          "kind": "attack",
+          "label": "Eye Peck",
+          "damage": 4,
+          "damageType": "piercing",
+          "resolveDamage": 2,
+          "status": {
+            "type": "dazed",
+            "turns": 1,
+            "power": 2
+          },
+          "description": "dives straight at your face."
+        },
+        {
+          "kind": "attack",
+          "label": "Talon Rake",
+          "damage": 5,
+          "damageType": "slashing",
+          "description": "slashes wildly across exposed knuckles."
+        }
+      ]
+    },
+    "mire_rat_pack": {
+      "armor": 0,
+      "stats": {
+        "might": 1,
+        "agility": 4,
+        "wit": 1,
+        "grit": 1
+      },
+      "resistances": {
+        "poison": "resistant",
+        "fire": "vulnerable"
+      },
+      "crownReward": [
+        1,
+        4
+      ],
+      "lootTable": [
+        {
+          "itemId": "antitoxin",
+          "chance": 0.15
+        }
+      ],
+      "id": "mire_rat_pack",
+      "name": "Cellar Rat-Pack",
+      "unidentifiedName": "Squealing Sewer Pack",
+      "category": "animal",
+      "maxHp": 13,
+      "visibleGear": {
+        "weapon": "Chisel-sharp yellow incisors smeared with grain-rot",
+        "armor": "Matted, scabby pelts crusted in wet cellar filth",
+        "hiddenDetail": "Chalk-white mold spots the hairless tails of the largest breeders."
+      },
+      "anatomy": {
+        "height": "Tiny",
+        "weight": "Lean",
+        "skinColor": "Raw Pink",
+        "hairLength": "Short",
+        "hairStyle": "Matted",
+        "hairColor": "Dirty Brown",
+        "eyeShape": "Beady",
+        "eyeColor": "Red-Black",
+        "musculature": "Wiry",
+        "bodyShape": "Hunched",
+        "facialScars": "Split Ear",
+        "bodyScars": "Mange Scabs",
+        "faceDetail": "Twitching whiskers frame stained yellow teeth and wet red eyes.",
+        "chestTorsoDetail": "Bloated bellies drag low over damp flagstones.",
+        "armsHandsDetail": "Pink, needle-clawed forepaws scrabble across boot-leather.",
+        "legsStanceDetail": "Skittering pack darts in and out of wall cracks.",
+        "distinguishingMark": "Hairless tails whip behind them like wet twine.",
+        "visibleTags": [
+          "animal",
+          "small_stature"
+        ]
+      },
+      "firstSightProse": "High-pitched squeaks echo off damp stone as a swarming knot of bloated, mange-spotted rodents pours out from a split drain-grate. Raw pink tails whip through grey slush as yellow teeth snap at your boot-tops.",
+      "returnSightProse": "A Cellar Rat-Pack swarms out from cracked stone drains.",
+      "xpReward": 11,
+      "description": "Filth-bloated rats driven out of Timber Post granaries and Old Bathhouse drains.",
+      "intents": [
+        {
+          "kind": "attack",
+          "label": "Ankle Swarm",
+          "damage": 4,
+          "damageType": "piercing",
+          "status": {
+            "type": "poisoned",
+            "turns": 2,
+            "power": 1
+          },
+          "description": "swarms up your boot-laces."
+        },
+        {
+          "kind": "attack",
+          "label": "Gnaw",
+          "damage": 5,
+          "damageType": "slashing",
+          "description": "sinks chisel teeth into cloth and skin."
+        }
+      ]
+    },
+    "snow_lynx": {
+      "armor": 0,
+      "stats": {
+        "might": 3,
+        "agility": 5,
+        "wit": 2,
+        "grit": 1
+      },
+      "resistances": {
+        "cold": "resistant",
+        "fire": "vulnerable"
+      },
+      "crownReward": [
+        1,
+        5
+      ],
+      "lootTable": [
+        {
+          "itemId": "poultice",
+          "chance": 0.25
+        }
+      ],
+      "id": "snow_lynx",
+      "name": "Pale Ridge-Lynx",
+      "unidentifiedName": "Tufted Snow-Cat",
+      "category": "animal",
+      "maxHp": 18,
+      "visibleGear": {
+        "weapon": "Curved ice-white claws and needle canines",
+        "armor": "Thick frost-grey fur blending against stone",
+        "hiddenDetail": "Dry pine needles and frozen blood cake its tufted belly."
+      },
+      "anatomy": {
+        "height": "Low",
+        "weight": "Lean",
+        "skinColor": "Pale Pink",
+        "hairLength": "Thick",
+        "hairStyle": "Sleek",
+        "hairColor": "Frost-White",
+        "eyeShape": "Slit",
+        "eyeColor": "Ice-Green",
+        "musculature": "Corded",
+        "bodyShape": "Lean",
+        "facialScars": "Cheek Nick",
+        "bodyScars": "Unmarked",
+        "faceDetail": "Tufted ears flatten sharply beside cold ice-green eyes.",
+        "chestTorsoDetail": "Deep winter ruff hides coiled shoulder muscle.",
+        "armsHandsDetail": "Wide, furred paws spread broad over crusted snow without sound.",
+        "legsStanceDetail": "Coiled hind legs spring silently off broken steps.",
+        "distinguishingMark": "Bobbed tail twitches once before every pounce.",
+        "visibleTags": [
+          "animal"
+        ]
+      },
+      "firstSightProse": "Not a pebble shifts before a pale, thick-furred wildcat drops silently off a broken lintel onto the snow. Tufted ears flatten flat to its skull as wide paws sink noiselessly toward your flank.",
+      "returnSightProse": "A Pale Ridge-Lynx crouches motionless against frost-white stone.",
+      "xpReward": 16,
+      "description": "Silent highland predator stalking lone scavengers along Long Steps and High Road ridges.",
+      "intents": [
+        {
+          "kind": "attack",
+          "label": "Silent Pounce",
+          "damage": 7,
+          "damageType": "slashing",
+          "status": {
+            "type": "bleeding",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "coils low to spring."
+        },
+        {
+          "kind": "attack",
+          "label": "Rake Claws",
+          "damage": 5,
+          "damageType": "slashing",
+          "description": "whips barbed forepaws across your guard."
+        }
+      ]
+    },
+    "ash_hound": {
+      "armor": 0,
+      "stats": {
+        "might": 2,
+        "agility": 4,
+        "wit": 1,
+        "grit": 1
+      },
+      "resistances": {
+        "fire": "resistant",
+        "cold": "vulnerable"
+      },
+      "crownReward": [
+        4,
+        9
+      ],
+      "lootTable": [
+        {
+          "itemId": "ash_resin",
+          "chance": 0.55
+        }
+      ],
+      "id": "ash_hound",
+      "name": "Slag-Chewing Hound",
+      "unidentifiedName": "Ember-Jawed Hound",
+      "category": "beast",
+      "maxHp": 17,
+      "harvestItemId": "ash_resin",
+      "visibleGear": {
+        "weapon": "Blistered jaws weeping black slag-tar",
+        "armor": "Singed charcoal hide flaking soot",
+        "hiddenDetail": "A swallowed furnace clinker glows dull orange inside its split throat."
+      },
+      "anatomy": {
+        "height": "Low",
+        "weight": "Gaunt",
+        "skinColor": "Charred Black",
+        "hairLength": "Singed",
+        "hairStyle": "Patchy",
+        "hairColor": "Soot-Black",
+        "eyeShape": "Wide",
+        "eyeColor": "Ember-Red",
+        "musculature": "Wiry",
+        "bodyShape": "Skeletal",
+        "facialScars": "Scorched Muzzle",
+        "bodyScars": "Cinder Burns",
+        "faceDetail": "Cracked gums drip black grease around scorched yellow teeth.",
+        "chestTorsoDetail": "Sunken flanks heave roughly, smelling of sulfur and burnt hair.",
+        "armsHandsDetail": "Charred paws scrape sparks off dry stone.",
+        "legsStanceDetail": "Crouches trembling on brittle, soot-caked hocks.",
+        "distinguishingMark": "Faint orange heat leaks between its parted ribs.",
+        "visibleTags": [
+          "beast",
+          "gaunt"
+        ]
+      },
+      "firstSightProse": "Bitter coal-smoke curls out of a wrecked ditch before a starved, hair-singed mastiff crawls into view. Blisters bubble black along its split muzzle, and dull orange heat glimmers between its jagged teeth.",
+      "returnSightProse": "A Slag-Chewing Hound slinks out of the mist, black grease dripping from its jaws.",
+      "xpReward": 15,
+      "description": "Feral hound maddened by chewing hot furnace cinders along Brick Hills and High Road.",
+      "intents": [
+        {
+          "kind": "attack",
+          "label": "Lunging Bite",
+          "damage": 6,
+          "damageType": "piercing",
+          "status": {
+            "type": "bleeding",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "crouches low for the throat."
+        },
+        {
+          "kind": "attack",
+          "label": "Cinder Snap",
+          "damage": 5,
+          "damageType": "fire",
+          "status": {
+            "type": "burned",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "coughs hot sparks across its fangs."
+        }
+      ]
+    },
+    "chitin_weaver": {
+      "armor": 2,
+      "stats": {
+        "might": 2,
+        "agility": 4,
+        "wit": 2,
+        "grit": 2
+      },
+      "resistances": {
+        "acid": "immune",
+        "poison": "resistant",
+        "bludgeoning": "vulnerable"
+      },
+      "crownReward": [
+        6,
+        12
+      ],
+      "lootTable": [
+        {
+          "itemId": "antitoxin",
+          "chance": 0.35
+        },
+        {
+          "itemId": "chitin_serum",
+          "chance": 0.2
+        }
+      ],
+      "id": "chitin_weaver",
+      "name": "Brine-Spinner",
+      "unidentifiedName": "Blind Pale Arachnid",
+      "category": "beast",
+      "maxHp": 24,
+      "harvestItemId": "chitin_serum",
+      "harvestModId": "chitin_skin",
+      "visibleGear": {
+        "weapon": "Acid-dripping chelicerae and six hooked legs",
+        "armor": "Segmented bone-white carapace",
+        "hiddenDetail": "Acid glands swell translucent green behind its mandibles."
+      },
+      "anatomy": {
+        "height": "Low",
+        "weight": "Lean",
+        "skinColor": "Bone-White",
+        "hairLength": "Bristled",
+        "hairStyle": "Spiny",
+        "hairColor": "Pale Grey",
+        "eyeShape": "Eyeless",
+        "eyeColor": "None",
+        "musculature": "Wiry",
+        "bodyShape": "Segmented",
+        "facialScars": "Unmarked",
+        "bodyScars": "Cracked Plates",
+        "faceDetail": "Smooth eyeless shell splits open over glistening green mandibles.",
+        "chestTorsoDetail": "Overlapping lime-white plates rattle softly as it breathes.",
+        "armsHandsDetail": "Six jointed legs end in needle-sharp spurs.",
+        "legsStanceDetail": "Skates sideways across wet reeds and sulfur crust.",
+        "distinguishingMark": "Trailing acid silk drips off its swollen abdomen.",
+        "visibleTags": [
+          "beast",
+          "chitin_plated"
+        ]
+      },
+      "firstSightProse": "Wet reeds hiss softly as a six-legged, bone-white crawler drops from a sulfur vent. Smooth and eyeless across the crown, it taps frozen mud with jointed forelimbs while green acid beads along its mandibles.",
+      "returnSightProse": "A Brine-Spinner clicks out of the sulfur steam, legs poised wide.",
+      "xpReward": 22,
+      "description": "Blind sulfur-vent arachnid nesting across Salt Bog drains, spitting lye-sharp bile.",
+      "intents": [
+        {
+          "kind": "attack",
+          "label": "Acid Spit",
+          "damage": 5,
+          "damageType": "acid",
+          "status": {
+            "type": "corroded",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "tilts its swollen mandibles."
+        },
+        {
+          "kind": "attack",
+          "label": "Spur Lunge",
+          "damage": 7,
+          "damageType": "piercing",
+          "status": {
+            "type": "poisoned",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "rears back on four hind legs."
+        },
+        {
+          "kind": "guard",
+          "label": "Shell Tuck",
+          "damage": 0,
+          "damageType": "bludgeoning",
+          "armorGain": 4,
+          "description": "locks its pale carapace plates tight."
+        }
+      ]
+    },
+    "star_stag": {
+      "armor": 2,
+      "stats": {
+        "might": 4,
+        "agility": 3,
+        "wit": 2,
+        "grit": 4
+      },
+      "resistances": {
+        "cold": "resistant",
+        "blight": "resistant",
+        "fire": "vulnerable",
+        "slashing": "vulnerable"
+      },
+      "crownReward": [
+        16,
+        28
+      ],
+      "lootTable": [
+        {
+          "itemId": "ash_resin",
+          "chance": 0.9
+        },
+        {
+          "itemId": "star_sap_drop",
+          "chance": 0.45
+        }
+      ],
+      "id": "star_stag",
+      "name": "Vine-Strangled Stag",
+      "unidentifiedName": "Antlered Timber Beast",
+      "category": "beast",
+      "maxHp": 44,
+      "harvestItemId": "star_sap_drop",
+      "isElite": true,
+      "visibleGear": {
+        "weapon": "Twelve-point antlers wrapped in glassy pale vines",
+        "armor": "Bark-hard hide knotted with dry root-cord",
+        "hiddenDetail": "Frozen sap bleeds steadily where tight tendrils saw into its neck."
+      },
+      "anatomy": {
+        "height": "Towering",
+        "weight": "Heavy",
+        "skinColor": "Frost-Brown",
+        "hairLength": "Coarse",
+        "hairStyle": "Matted",
+        "hairColor": "Frost-Grey",
+        "eyeShape": "Wide",
+        "eyeColor": "Milky Blind",
+        "musculature": "Broad",
+        "bodyShape": "Muscular",
+        "facialScars": "Vine-Grooves",
+        "bodyScars": "Split Ribs",
+        "faceDetail": "Milky blind eyes bulge above nostrils crusted in frozen amber sap.",
+        "chestTorsoDetail": "Tight pale vines dig deep furrows across heaving ribs.",
+        "armsHandsDetail": "Split forehooves slam down hard enough to crack frozen stone.",
+        "legsStanceDetail": "Tall, trembling legs paw brittle moss between white trunks.",
+        "distinguishingMark": "Brittle glass-like twigs rattle along its wide rack.",
+        "visibleTags": [
+          "beast",
+          "towering",
+          "root_veined"
+        ]
+      },
+      "firstSightProse": "Brittle white branches snap like glass as a towering, rib-scarred hart crashes through the frost-locked trees. Tight grey vines saw deep into its hide around the neck, and blind milky eyes roll wildly as it lowers a twelve-point rack.",
+      "returnSightProse": "The Vine-Strangled Stag stamps frozen moss, antlers clicking like bone.",
+      "xpReward": 45,
+      "description": "Maddened giant stag strangled by brittle White Timber vines, thrashing blindly at any sound.",
+      "intents": [
+        {
+          "kind": "heavy",
+          "label": "Antler Gore",
+          "damage": 11,
+          "damageType": "piercing",
+          "status": {
+            "type": "bleeding",
+            "turns": 2,
+            "power": 3
+          },
+          "description": "drops its knotted rack to gore."
+        },
+        {
+          "kind": "attack",
+          "label": "Hoof Trample",
+          "damage": 8,
+          "damageType": "bludgeoning",
+          "status": {
+            "type": "staggered",
+            "turns": 1,
+            "power": 2
+          },
+          "description": "rears high above frozen stone."
+        },
+        {
+          "kind": "blight",
+          "label": "Sap Lash",
+          "damage": 6,
+          "damageType": "blight",
+          "resolveDamage": 3,
+          "description": "shakes brittle sap-shards from its hide."
+        }
+      ]
+    },
+    "quarry_centipede": {
+      "armor": 3,
+      "stats": {
+        "might": 3,
+        "agility": 3,
+        "wit": 1,
+        "grit": 3
+      },
+      "resistances": {
+        "acid": "immune",
+        "slashing": "resistant",
+        "bludgeoning": "vulnerable"
+      },
+      "crownReward": [
+        8,
+        16
+      ],
+      "lootTable": [
+        {
+          "itemId": "antitoxin",
+          "chance": 0.4
+        },
+        {
+          "itemId": "kiln_pitch",
+          "chance": 0.25
+        }
+      ],
+      "id": "quarry_centipede",
+      "name": "Quarry Wire-Crawler",
+      "unidentifiedName": "Armored Stone Crawler",
+      "category": "beast",
+      "maxHp": 30,
+      "harvestItemId": "chitin_serum",
+      "visibleGear": {
+        "weapon": "Saw-edged pincers dripping black quarry acid",
+        "armor": "Slate-hard segmented shell plates",
+        "hiddenDetail": "Broken bronze chain-links hang wedged between its rear segments."
+      },
+      "anatomy": {
+        "height": "Low",
+        "weight": "Heavy",
+        "skinColor": "Slate-Black",
+        "hairLength": "None",
+        "hairStyle": "Segmented",
+        "hairColor": "None",
+        "eyeShape": "Beady",
+        "eyeColor": "Dull Amber",
+        "musculature": "Corded",
+        "bodyShape": "Elongated",
+        "facialScars": "Chipped Pincer",
+        "bodyScars": "Stone-Scraped",
+        "faceDetail": "Broad, flat head sports twin serrated jaws smeared in black slime.",
+        "chestTorsoDetail": "Twenty overlapping slate-black plates click over thirty-inch girth.",
+        "armsHandsDetail": "Dozens of hooked iron-hard legs grip sheer rock faces.",
+        "legsStanceDetail": "Coils smoothly around fallen quarry blocks before striking.",
+        "distinguishingMark": "Snapped hoist-chain rings drag loudly behind its tail.",
+        "visibleTags": [
+          "beast",
+          "chitin_plated"
+        ]
+      },
+      "firstSightProse": "Loose scree rattles down a forty-foot quarry bench as an arm-thick, multi-legged crawler ripples over a dressed stone block. Slate-black plates click loud in the cold air while dark acid drips steadily from its serrated pincers.",
+      "returnSightProse": "A Quarry Wire-Crawler uncoils across the black stone cuts.",
+      "xpReward": 29,
+      "description": "Armored segmented predator nesting under Black Quarry blocks, spitting acid strong enough to pit iron.",
+      "intents": [
+        {
+          "kind": "attack",
+          "label": "Pincer Shear",
+          "damage": 8,
+          "damageType": "slashing",
+          "status": {
+            "type": "corroded",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "snaps wide serrated jaws."
+        },
+        {
+          "kind": "heavy",
+          "label": "Coil Crush",
+          "damage": 9,
+          "damageType": "bludgeoning",
+          "status": {
+            "type": "staggered",
+            "turns": 1,
+            "power": 2
+          },
+          "description": "rears its plated torso high."
+        }
+      ]
+    },
+    "ossuary_bat": {
+      "armor": 1,
+      "stats": {
+        "might": 2,
+        "agility": 5,
+        "wit": 2,
+        "grit": 1
+      },
+      "resistances": {
+        "resonant": "resistant",
+        "cold": "resistant",
+        "fire": "vulnerable"
+      },
+      "crownReward": [
+        3,
+        8
+      ],
+      "lootTable": [
+        {
+          "itemId": "poultice",
+          "chance": 0.25
+        }
+      ],
+      "id": "ossuary_bat",
+      "name": "Salt-Blind Flitter",
+      "unidentifiedName": "Shrieking Vault Bat",
+      "category": "beast",
+      "maxHp": 22,
+      "visibleGear": {
+        "weapon": "Needle-fanged snout and thumb-hooks",
+        "armor": "Leathery grey wing-membranes dusted in salt",
+        "hiddenDetail": "Crusted salt-scabs coat its oversized, fluted ears."
+      },
+      "anatomy": {
+        "height": "Small",
+        "weight": "Lean",
+        "skinColor": "Salt-Grey",
+        "hairLength": "Short",
+        "hairStyle": "Velvety",
+        "hairColor": "Slate-Grey",
+        "eyeShape": "Pinprick",
+        "eyeColor": "Milky White",
+        "musculature": "Wiry",
+        "bodyShape": "Winged",
+        "facialScars": "Torn Ear",
+        "bodyScars": "Salt Sores",
+        "faceDetail": "Huge pleated ears twitch around a snarling, needle-toothed muzzle.",
+        "chestTorsoDetail": "Narrow ribcage pumps hard beneath a five-foot wingspan.",
+        "armsHandsDetail": "Hooked wing-thumbs tear sharply at hood and cheek.",
+        "legsStanceDetail": "Drops headfirst from iron ceiling grilles without warning.",
+        "distinguishingMark": "White salt crystals crust its dark wingtips.",
+        "visibleTags": [
+          "beast"
+        ]
+      },
+      "firstSightProse": "A piercing shriek rattles dry bones behind the iron grilles as a dog-sized winged shape drops straight from the dark vaulting. Huge pleated ears twitch in the draft while needle teeth snap inches from your throat.",
+      "returnSightProse": "A Salt-Blind Flitter swoops out from the bone-cellar rafters.",
+      "xpReward": 21,
+      "description": "Oversized, blind cave-bat roosting in Bone Cellars vaulting, hunting by ear-splitting shriek.",
+      "intents": [
+        {
+          "kind": "blight",
+          "label": "Vault Shriek",
+          "damage": 5,
+          "damageType": "resonant",
+          "resolveDamage": 4,
+          "status": {
+            "type": "dazed",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "draws air into a swollen chest."
+        },
+        {
+          "kind": "attack",
+          "label": "Hooked Swoop",
+          "damage": 7,
+          "damageType": "piercing",
+          "status": {
+            "type": "bleeding",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "tucks its salt-rimed wings to dive."
+        }
+      ]
+    },
+    "iron_deserter": {
+      "armor": 2,
+      "stats": {
+        "might": 3,
+        "agility": 2,
+        "wit": 2,
+        "grit": 2
+      },
+      "resistances": {
+        "slashing": "resistant",
+        "poison": "vulnerable"
+      },
+      "crownReward": [
+        9,
+        17
+      ],
+      "lootTable": [
+        {
+          "itemId": "poultice",
+          "chance": 0.35
+        },
+        {
+          "itemId": "kiln_pitch",
+          "chance": 0.2
+        }
+      ],
+      "id": "iron_deserter",
+      "name": "Toll-Road Deserter",
+      "unidentifiedName": "Hooded Pikeman",
+      "category": "humanoid",
+      "maxHp": 23,
+      "visibleGear": {
+        "weapon": "Notched levy-pike wrapped in dirty rag",
+        "armor": "Rust-pitted brigandine over tattered wool",
+        "hiddenDetail": "Keeps a small brass whistle and half a moldy oatcake hidden in his boot."
+      },
+      "anatomy": {
+        "height": "Average",
+        "weight": "Lean",
+        "skinColor": "Frost-Red",
+        "hairLength": "Cropped",
+        "hairStyle": "Unkempt",
+        "hairColor": "Dirty Blonde",
+        "eyeShape": "Narrow",
+        "eyeColor": "Watery Blue",
+        "musculature": "Toned",
+        "bodyShape": "Lean",
+        "facialScars": "Cheek Slash",
+        "bodyScars": "Old Spear-Mark",
+        "faceDetail": "Frost-split lips snarl over missing molars and a red cheek scar.",
+        "chestTorsoDetail": "Soot-stained brigandine hangs loose on starved ribs.",
+        "armsHandsDetail": "Chapped knuckles choke tightly around seasoned oak.",
+        "legsStanceDetail": "Shifts shivering weight inside split leather boots.",
+        "distinguishingMark": "Tattered garrison strip knotted tight around his left knee.",
+        "visibleTags": [
+          "humanoid",
+          "scarred_face",
+          "iron_vow_garb"
+        ]
+      },
+      "firstSightProse": "Steel scrapes stone behind an overturned supply cart as a gaunt, frostbitten man steps across the road, leveling a notched pike. His wool cloak smells of wet dog and stale sweat, and hollow eyes fix straight on your belt pouch.",
+      "returnSightProse": "A Toll-Road Deserter bars the flagstones with leveled iron.",
+      "xpReward": 19,
+      "description": "Stranded southern soldier robbing High Road travelers for dry bread and black Onyx.",
+      "interrogateHint": "Timber Post stores are spoiling from within, and half the garrison fights over firewood.",
+      "intents": [
+        {
+          "kind": "attack",
+          "label": "Pike Thrust",
+          "damage": 7,
+          "damageType": "piercing",
+          "description": "levels his rusted spearhead."
+        },
+        {
+          "kind": "guard",
+          "label": "Brace Shaft",
+          "damage": 0,
+          "damageType": "bludgeoning",
+          "armorGain": 4,
+          "description": "sets his butt-spike into cracked stone."
+        }
+      ]
+    },
+    "silk_assassin": {
+      "armor": 1,
+      "stats": {
+        "might": 3,
+        "agility": 5,
+        "wit": 3,
+        "grit": 2
+      },
+      "resistances": {
+        "resonant": "resistant",
+        "poison": "resistant",
+        "bludgeoning": "vulnerable"
+      },
+      "crownReward": [
+        18,
+        30
+      ],
+      "lootTable": [
+        {
+          "itemId": "vesper_tonic",
+          "chance": 0.6
+        },
+        {
+          "itemId": "silken_veil",
+          "chance": 0.25
+        }
+      ],
+      "id": "silk_assassin",
+      "name": "Bathhouse Strangler",
+      "unidentifiedName": "Blindfolded Knife-Killer",
+      "category": "humanoid",
+      "maxHp": 40,
+      "isElite": true,
+      "visibleGear": {
+        "weapon": "Twin thin-bladed dirks and greased garrote wire",
+        "armor": "Charcoal-dyed bathhouse wool",
+        "hiddenDetail": "Carries three weighted copper plumb-bobs sewn into her hem for silent balance."
+      },
+      "anatomy": {
+        "height": "Short",
+        "weight": "Lean",
+        "skinColor": "Moon-Pale",
+        "hairLength": "Cropped",
+        "hairStyle": "Tied Back",
+        "hairColor": "Frost-White",
+        "eyeShape": "Covered",
+        "eyeColor": "Hidden",
+        "musculature": "Wiry",
+        "bodyShape": "Trim",
+        "facialScars": "Ritual Brand",
+        "bodyScars": "Unmarked",
+        "faceDetail": "Wet grey linen wraps tight across her eyes above a calm, bloodless jaw.",
+        "chestTorsoDetail": "Silent charcoal wool clings close without a single metal buckle.",
+        "armsHandsDetail": "Long, pale fingers twist greased copper wire taut between knuckles.",
+        "legsStanceDetail": "Barely makes a sound on frost-grit in soft felt soles.",
+        "distinguishingMark": "Three pale brand-ticks etched below her left ear.",
+        "visibleTags": [
+          "humanoid",
+          "small_stature",
+          "cistern_garb"
+        ]
+      },
+      "firstSightProse": "Not a boot scrapes before a slight, blindfolded figure slips out from behind a pillar, damp grey wool silent in the wind. Greased wire gleams taut between pale knuckles as her head cocks cleanly toward your breathing.",
+      "returnSightProse": "A Bathhouse Strangler glides forward, blindfolded head tilted to your steps.",
+      "xpReward": 42,
+      "description": "Blindfolded assassin dispatched from Old Bathhouse when their warm basin is plundered.",
+      "interrogateHint": "The bathhouse matron sends killers after anyone who steals salt and Onyx.",
+      "intents": [
+        {
+          "kind": "attack",
+          "label": "Wire Garrote",
+          "damage": 10,
+          "damageType": "slashing",
+          "status": {
+            "type": "bleeding",
+            "turns": 2,
+            "power": 3
+          },
+          "description": "whips greased wire toward your neck."
+        },
+        {
+          "kind": "attack",
+          "label": "Gut Dirks",
+          "damage": 8,
+          "damageType": "piercing",
+          "status": {
+            "type": "poisoned",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "slides twin needles beneath your ribs."
+        }
+      ]
+    },
+    "sir_vorne": {
+      "armor": 3,
+      "stats": {
+        "might": 5,
+        "agility": 2,
+        "wit": 2,
+        "grit": 4
+      },
+      "resistances": {
+        "slashing": "resistant",
+        "piercing": "resistant",
+        "lightning": "vulnerable"
+      },
+      "crownReward": [
+        24,
+        38
+      ],
+      "lootTable": [
+        {
+          "itemId": "bell_cleaver",
+          "chance": 1
+        },
+        {
+          "itemId": "amber_tonic",
+          "chance": 0.5
+        }
+      ],
+      "id": "sir_vorne",
+      "name": "Bronze Gate-Warden",
+      "unidentifiedName": "Bronze Gate-Watcher",
+      "category": "humanoid",
+      "maxHp": 52,
+      "isElite": true,
+      "visibleGear": {
+        "weapon": "Heavy bell-bronze greatblade notched from frost",
+        "armor": "Full frost-locked bronze plate",
+        "hiddenDetail": "An engraved southern watch-seal hangs frozen inside his left pauldron."
+      },
+      "anatomy": {
+        "height": "Towering",
+        "weight": "Burly",
+        "skinColor": "Frost-Grey",
+        "hairLength": "Cropped",
+        "hairStyle": "Unkempt",
+        "hairColor": "Iron-Grey",
+        "eyeShape": "Deep-Set",
+        "eyeColor": "Mist-Grey",
+        "musculature": "Hulking",
+        "bodyShape": "Barrel-Chested",
+        "facialScars": "Brow Split",
+        "bodyScars": "Old Spear-Mark",
+        "faceDetail": "Frostbitten grey skin shows dimly behind slotted bronze cheek-guards.",
+        "chestTorsoDetail": "Heavy bell-cast bronze cuirass dented by years of sleet and stone.",
+        "armsHandsDetail": "Riveted gauntlets lock rigid around a two-handed hilt.",
+        "legsStanceDetail": "Greaved boots stand planted immovable across the arch.",
+        "distinguishingMark": "Ice fuses his visor hinges half-shut.",
+        "visibleTags": [
+          "humanoid",
+          "towering",
+          "muscular",
+          "iron_vow_garb"
+        ]
+      },
+      "firstSightProse": "Frost cracks off riveted bronze joints as a towering, plate-clad figure hefts a broad, pitted greatblade off the flagstones. Behind his slotted helm, pale eyes stare straight through you without a flicker of warmth.",
+      "returnSightProse": "The Bronze Gate-Warden raises his frost-rimmed bronze blade.",
+      "xpReward": 55,
+      "description": "Mad southern knight holding North Gate long after his relief froze or turned back.",
+      "interrogateHint": "Only the watch-word carved inside Long Steps can release him from his post.",
+      "intents": [
+        {
+          "kind": "heavy",
+          "label": "Gate Cleave",
+          "damage": 13,
+          "damageType": "slashing",
+          "status": {
+            "type": "staggered",
+            "turns": 1,
+            "power": 2
+          },
+          "description": "draws his heavy greatblade overhead."
+        },
+        {
+          "kind": "blight",
+          "label": "Iron Ring",
+          "damage": 8,
+          "damageType": "resonant",
+          "resolveDamage": 4,
+          "description": "slams his pommel against bronze plate."
+        },
+        {
+          "kind": "guard",
+          "label": "Watch Stance",
+          "damage": 0,
+          "damageType": "bludgeoning",
+          "armorGain": 5,
+          "description": "locks broad greaves into the stone."
+        }
+      ]
+    },
+    "salt_poacher": {
+      "armor": 1,
+      "stats": {
+        "might": 2,
+        "agility": 3,
+        "wit": 2,
+        "grit": 2
+      },
+      "resistances": {
+        "poison": "resistant",
+        "cold": "vulnerable"
+      },
+      "crownReward": [
+        7,
+        14
+      ],
+      "lootTable": [
+        {
+          "itemId": "bog_herb",
+          "chance": 0.45
+        },
+        {
+          "itemId": "antitoxin",
+          "chance": 0.25
+        }
+      ],
+      "id": "salt_poacher",
+      "name": "Bog-Salt Poacher",
+      "unidentifiedName": "Brine-Stained Scavenger",
+      "category": "humanoid",
       "maxHp": 20,
+      "visibleGear": {
+        "weapon": "Hooked flensing knife and sulfur-soaked sling",
+        "armor": "Salt-stiffened oilskin coat",
+        "hiddenDetail": "Keeps a small leather sack of dried marsh-weed tucked under his belt."
+      },
+      "anatomy": {
+        "height": "Average",
+        "weight": "Lean",
+        "skinColor": "Salt-Chapped",
+        "hairLength": "Shoulder-Length",
+        "hairStyle": "Greasy",
+        "hairColor": "Chestnut",
+        "eyeShape": "Squinting",
+        "eyeColor": "Hazel",
+        "musculature": "Wiry",
+        "bodyShape": "Lean",
+        "facialScars": "Blister Scars",
+        "bodyScars": "Brine Sores",
+        "faceDetail": "White salt crusts around red, peeling nostrils and cracked lips.",
+        "chestTorsoDetail": "Stiff oilskin smells sharply of sulfur steam and boiled fat.",
+        "armsHandsDetail": "Salt-raw fingers grip a hooked skinning blade.",
+        "legsStanceDetail": "Skirts steaming mud-holes on wide bog-patters.",
+        "distinguishingMark": "Carries a cracked copper kettle slung across his pack.",
+        "visibleTags": [
+          "humanoid",
+          "battle_worn"
+        ]
+      },
+      "firstSightProse": "Steam parts beside a bubbling sulfur pit where a salt-crusted scavenger crouches over a copper pan. He whips a hooked skinning knife free the instant gravel crunches under your sole, teeth bared in a red, peeling face.",
+      "returnSightProse": "A Bog-Salt Poacher darts between steaming salt puddles, knife low.",
+      "xpReward": 18,
+      "description": "Desperate exile boiling contraband salt and mugging lone travelers in Salt Bog.",
+      "interrogateHint": "Old Soren at Dry Arch knows which bog vents carry clean salt and which choke your lungs.",
+      "intents": [
+        {
+          "kind": "attack",
+          "label": "Hook Slash",
+          "damage": 6,
+          "damageType": "slashing",
+          "status": {
+            "type": "bleeding",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "swings his curved flensing blade."
+        },
+        {
+          "kind": "attack",
+          "label": "Brine Sling",
+          "damage": 5,
+          "damageType": "acid",
+          "status": {
+            "type": "corroded",
+            "turns": 1,
+            "power": 2
+          },
+          "description": "whirls a sulfur-wet stone."
+        }
+      ]
+    },
+    "kiln_flagellant": {
+      "armor": 1,
+      "stats": {
+        "might": 3,
+        "agility": 2,
+        "wit": 2,
+        "grit": 4
+      },
+      "resistances": {
+        "fire": "resistant",
+        "cold": "vulnerable"
+      },
+      "crownReward": [
+        8,
+        15
+      ],
+      "lootTable": [
+        {
+          "itemId": "kiln_pitch",
+          "chance": 0.35
+        },
+        {
+          "itemId": "fire_pot",
+          "chance": 0.2
+        }
+      ],
+      "id": "kiln_flagellant",
+      "name": "Cinder Flagellant",
+      "unidentifiedName": "Chain-Whipped Fanatic",
+      "category": "humanoid",
+      "maxHp": 25,
+      "visibleGear": {
+        "weapon": "Heated iron link-flail",
+        "armor": "Charred sackcloth rags over blistered ribs",
+        "hiddenDetail": "Bites a charred leather strap between his teeth to muffle screams."
+      },
+      "anatomy": {
+        "height": "Average",
+        "weight": "Gaunt",
+        "skinColor": "Soot-Red",
+        "hairLength": "Shaved",
+        "hairStyle": "Singed",
+        "hairColor": "None",
+        "eyeShape": "Wide",
+        "eyeColor": "Bloodshot Grey",
+        "musculature": "Wiry",
+        "bodyShape": "Spare",
+        "facialScars": "Ritual Brand",
+        "bodyScars": "Kiln-Burn",
+        "faceDetail": "Blistered cheeks twitch around wide, unblinking bloodshot eyes.",
+        "chestTorsoDetail": "Raw, weeping burns crisscross a bare chest smeared in furnace soot.",
+        "armsHandsDetail": "Calloused fists wrap iron chain tight around bare knuckles.",
+        "legsStanceDetail": "Marches stiffly over sharp black slag in bare, blackened feet.",
+        "distinguishingMark": "Hot iron links hiss faintly against his scarred shoulders.",
+        "visibleTags": [
+          "humanoid",
+          "kiln_branded",
+          "battle_worn"
+        ]
+      },
+      "firstSightProse": "Iron links clatter rhythmically across black slag as a half-naked, soot-blackened zealot staggers out from behind a brick kiln. Weeping blisters cover his bare shoulders, yet he swings a glowing length of chain straight toward your head.",
+      "returnSightProse": "A Cinder Flagellant whirls a hot iron chain over Brick Hills slag.",
+      "xpReward": 24,
+      "description": "Maddened apostate who burns his own flesh along Brick Hills flues to stave off creeping numbness.",
+      "intents": [
+        {
+          "kind": "attack",
+          "label": "Hot Chain",
+          "damage": 7,
+          "damageType": "fire",
+          "status": {
+            "type": "burned",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "whips heated links overhead."
+        },
+        {
+          "kind": "heavy",
+          "label": "Iron Lash",
+          "damage": 8,
+          "damageType": "bludgeoning",
+          "resolveDamage": 2,
+          "description": "lashes his own back before lunging."
+        }
+      ]
+    },
+    "quarry_cannibal": {
+      "armor": 2,
+      "stats": {
+        "might": 4,
+        "agility": 3,
+        "wit": 1,
+        "grit": 3
+      },
+      "resistances": {
+        "cold": "resistant",
+        "resonant": "vulnerable"
+      },
+      "crownReward": [
+        10,
+        18
+      ],
+      "lootTable": [
+        {
+          "itemId": "poultice",
+          "chance": 0.35
+        },
+        {
+          "itemId": "iron_wire_kit",
+          "chance": 0.15
+        }
+      ],
+      "id": "quarry_cannibal",
+      "name": "Hungry Scavenger",
+      "unidentifiedName": "Cleaver-Bearing Exile",
+      "category": "humanoid",
+      "maxHp": 28,
+      "visibleGear": {
+        "weapon": "Heavy bone-cleaver and rusted meat-hook",
+        "armor": "Greasy apron over mismatched wool and leather",
+        "hiddenDetail": "Keeps strips of salted, unidentifiable jerky stuffed in his coat pocket."
+      },
+      "anatomy": {
+        "height": "Tall",
+        "weight": "Solid",
+        "skinColor": "Sallow Grey",
+        "hairLength": "Long",
+        "hairStyle": "Matted",
+        "hairColor": "Coal Black",
+        "eyeShape": "Deep-Set",
+        "eyeColor": "Dark Brown",
+        "musculature": "Broad",
+        "bodyShape": "Stocky",
+        "facialScars": "Lip Notch",
+        "bodyScars": "Bite Scars",
+        "faceDetail": "Greasy black hair hangs over feverish dark eyes and raw, red gums.",
+        "chestTorsoDetail": "A blood-caked hide apron stiffens over thick winter wool.",
+        "armsHandsDetail": "Stained knuckles white-grip a heavy butcher cleaver.",
+        "legsStanceDetail": "Crouches heavy beside broken hoist-carts.",
+        "distinguishingMark": "Missing two fingertips on his left hand from frostbite.",
+        "visibleTags": [
+          "humanoid",
+          "muscular",
+          "battle_worn"
+        ]
+      },
+      "firstSightProse": "Rusted meat-hooks clink inside a quarry tool-shed before a thick-shouldered man steps out wiping a broad cleaver on his greasy apron. His gums bleed raw in the cold, and his stare drops straight to the meat on your thighs.",
+      "returnSightProse": "A Hungry Scavenger hefts his blood-stained cleaver from the quarry shade.",
+      "xpReward": 27,
+      "description": "Starved Black Quarry exile who stopped waiting for grain and began hunting slower travelers.",
+      "intents": [
+        {
+          "kind": "heavy",
+          "label": "Butcher Chop",
+          "damage": 10,
+          "damageType": "slashing",
+          "status": {
+            "type": "bleeding",
+            "turns": 2,
+            "power": 3
+          },
+          "description": "raises his broad cleaver high."
+        },
+        {
+          "kind": "attack",
+          "label": "Meat Hook",
+          "damage": 6,
+          "damageType": "piercing",
+          "status": {
+            "type": "staggered",
+            "turns": 1,
+            "power": 2
+          },
+          "description": "swings an iron hook toward your ribs."
+        }
+      ]
+    },
+    "robed_copyist": {
+      "armor": 1,
+      "stats": {
+        "might": 2,
+        "agility": 3,
+        "wit": 4,
+        "grit": 2
+      },
+      "resistances": {
+        "resonant": "resistant",
+        "slashing": "vulnerable"
+      },
+      "crownReward": [
+        12,
+        22
+      ],
+      "lootTable": [
+        {
+          "itemId": "writ_star_ward",
+          "chance": 0.2
+        },
+        {
+          "itemId": "amber_tonic",
+          "chance": 0.25
+        }
+      ],
+      "id": "robed_copyist",
+      "name": "Mad Tally-Scribe",
+      "unidentifiedName": "Ink-Blind Wanderer",
+      "category": "humanoid",
+      "maxHp": 26,
+      "visibleGear": {
+        "weapon": "Sharpened iron stylus and heavy slate board",
+        "armor": "Torn scholar wool stiff with frozen ink",
+        "hiddenDetail": "Scores of stolen Onyx rubbings fill his ragged satchel."
+      },
+      "anatomy": {
+        "height": "Average",
+        "weight": "Gaunt",
+        "skinColor": "Pale Ivory",
+        "hairLength": "Long",
+        "hairStyle": "Wild",
+        "hairColor": "Iron-Grey",
+        "eyeShape": "Squinting",
+        "eyeColor": "Milky Blue",
+        "musculature": "Frail",
+        "bodyShape": "Spare",
+        "facialScars": "Ink-Stained",
+        "bodyScars": "Frostbite",
+        "faceDetail": "Black ink smears pale cheeks below half-blind, squinting eyes.",
+        "chestTorsoDetail": "Moth-chewed robes rattle with loose tally-slates sewn inside.",
+        "armsHandsDetail": "Black-stained, frostbitten fingers clutch an iron chisel-stylus.",
+        "legsStanceDetail": "Skates unevenly down oversized tomb steps.",
+        "distinguishingMark": "Carries cracked wire spectacles hanging off one ear.",
+        "visibleTags": [
+          "humanoid",
+          "gaunt",
+          "pale_skin"
+        ]
+      },
+      "firstSightProse": "Chalk scratches frantically against stone before a half-blind, ink-smeared figure lunges up from the dark steps, brandishing a sharpened iron stylus. Frozen wool clatters with sewn slates as he shrieks for your boots and charcoal.",
+      "returnSightProse": "A Mad Tally-Scribe scrabbles across the stone steps with an iron spike.",
+      "xpReward": 25,
+      "description": "Half-blind southern clerk maddened by Long Steps inscriptions, robbing travelers for paper and Onyx.",
+      "intents": [
+        {
+          "kind": "attack",
+          "label": "Stylus Jab",
+          "damage": 7,
+          "damageType": "piercing",
+          "description": "lunges with a sharpened iron spike."
+        },
+        {
+          "kind": "blight",
+          "label": "Slate Hex",
+          "damage": 5,
+          "damageType": "resonant",
+          "resolveDamage": 3,
+          "description": "reads jagged northern syllables aloud."
+        }
+      ]
+    },
+    "orc_raider": {
+      "armor": 2,
+      "stats": {
+        "might": 4,
+        "agility": 3,
+        "wit": 1,
+        "grit": 3
+      },
+      "resistances": {
+        "cold": "resistant",
+        "blight": "vulnerable"
+      },
+      "crownReward": [
+        5,
+        11
+      ],
+      "lootTable": [
+        {
+          "itemId": "stamina_draught",
+          "chance": 0.25
+        },
+        {
+          "itemId": "kiln_pitch",
+          "chance": 0.2
+        }
+      ],
+      "id": "orc_raider",
+      "name": "Bone-Clubber",
+      "unidentifiedName": "Tusked Savage",
+      "category": "orc_kin",
+      "maxHp": 26,
+      "visibleGear": {
+        "weapon": "Femur-bound iron cudgel",
+        "armor": "Raw, blood-stiff wolf pelts",
+        "hiddenDetail": "Strings of cracked human teeth rattle along its belt."
+      },
+      "anatomy": {
+        "height": "Broad-Tall",
+        "weight": "Heavy",
+        "skinColor": "Moss-Green",
+        "hairLength": "Cropped",
+        "hairStyle": "Coarse",
+        "hairColor": "Black",
+        "eyeShape": "Deep-Set",
+        "eyeColor": "Red-Amber",
+        "musculature": "Hulking",
+        "bodyShape": "Broad-Chested",
+        "facialScars": "Split Brow",
+        "bodyScars": "Claw Welts",
+        "faceDetail": "Flat nose and jutting lower tusks frame snarling red-amber eyes.",
+        "chestTorsoDetail": "Thick barrel chest scars criss-cross under raw, stinking pelts.",
+        "armsHandsDetail": "Long, knotty arms end in dirt-caked claws around heavy iron.",
+        "legsStanceDetail": "Bow-legged crouch lunges forward like a beast.",
+        "distinguishingMark": "Cracked southern finger-bones braided into its scalp-lock.",
+        "visibleTags": [
+          "orc_kin",
+          "muscular",
+          "battle_worn"
+        ]
+      },
+      "firstSightProse": "A wet guttural snarl breaks from the scrub as a squat, heavy-jawed brute scrambles over the broken wall. Lower tusks jut yellow past split lips, raw wolf-hide reeks of rancid fat, and a spiked bone club swings low for your knees.",
+      "returnSightProse": "A Bone-Clubber charges low, spitting red froth.",
+      "xpReward": 24,
+      "description": "Brutal, animalistic orc-kin raider prowling High Road and Dead Orchard for meat and scrap iron.",
+      "intents": [
+        {
+          "kind": "heavy",
+          "label": "Knee Smash",
+          "damage": 9,
+          "damageType": "bludgeoning",
+          "status": {
+            "type": "staggered",
+            "turns": 1,
+            "power": 2
+          },
+          "description": "swings its spiked cudgel wide."
+        },
+        {
+          "kind": "attack",
+          "label": "Tusk Gore",
+          "damage": 6,
+          "damageType": "piercing",
+          "status": {
+            "type": "bleeding",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "snaps forward head-first."
+        }
+      ]
+    },
+    "orc_skirmisher": {
+      "armor": 1,
+      "stats": {
+        "might": 3,
+        "agility": 4,
+        "wit": 1,
+        "grit": 2
+      },
+      "resistances": {
+        "cold": "resistant",
+        "fire": "vulnerable"
+      },
+      "crownReward": [
+        4,
+        9
+      ],
+      "lootTable": [
+        {
+          "itemId": "antitoxin",
+          "chance": 0.25
+        }
+      ],
+      "id": "orc_skirmisher",
+      "name": "Gut-Slinger",
+      "unidentifiedName": "Javelin Brute",
+      "category": "orc_kin",
+      "maxHp": 22,
+      "visibleGear": {
+        "weapon": "Barbed flint javelins smeared in offal",
+        "armor": "Boiled dog-hide scraps",
+        "hiddenDetail": "Chews dried sinew constantly while crouching behind stone."
+      },
+      "anatomy": {
+        "height": "Compact",
+        "weight": "Lean",
+        "skinColor": "Mire-Green",
+        "hairLength": "Shaved",
+        "hairStyle": "Wild",
+        "hairColor": "Black",
+        "eyeShape": "Narrow",
+        "eyeColor": "Yellow",
+        "musculature": "Wiry",
+        "bodyShape": "Hunched",
+        "facialScars": "Ear Notch",
+        "bodyScars": "Burn Marks",
+        "faceDetail": "Notched ears flatten back beside twitching yellow eyes and chipped tusks.",
+        "chestTorsoDetail": "Thin, scarred ribs tighten under filthy dog-skin straps.",
+        "armsHandsDetail": "Long forearms cock barbed javelins with snapping speed.",
+        "legsStanceDetail": "Hops sideways across scree like a starved ape.",
+        "distinguishingMark": "Smears rancid grease across its arrowheads.",
+        "visibleTags": [
+          "orc_kin",
+          "small_stature"
+        ]
+      },
+      "firstSightProse": "Flint grates against stone atop a broken pier before a hunched, mire-skinned savage hurls a barbed javelin straight down at your chest. Yellow eyes dart wildly while dirt-caked fingers already draw a second shaft.",
+      "returnSightProse": "A Gut-Slinger crouches behind broken stone, javelin cocked.",
+      "xpReward": 21,
+      "description": "Feral orc-kin ambush hunter pelting High Road travelers with filth-smeared flint.",
+      "intents": [
+        {
+          "kind": "attack",
+          "label": "Filth Javelin",
+          "damage": 7,
+          "damageType": "piercing",
+          "status": {
+            "type": "poisoned",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "cocks a barbed flint spear."
+        },
+        {
+          "kind": "attack",
+          "label": "Flint Slash",
+          "damage": 5,
+          "damageType": "slashing",
+          "description": "lunges in low with jagged stone."
+        }
+      ]
+    },
+    "orc_butcher": {
+      "armor": 3,
+      "stats": {
+        "might": 5,
+        "agility": 3,
+        "wit": 1,
+        "grit": 4
+      },
+      "resistances": {
+        "slashing": "resistant",
+        "cold": "resistant",
+        "resonant": "vulnerable"
+      },
+      "crownReward": [
+        12,
+        22
+      ],
+      "lootTable": [
+        {
+          "itemId": "iron_sap_draught",
+          "chance": 0.35
+        },
+        {
+          "itemId": "fire_pot",
+          "chance": 0.3
+        }
+      ],
+      "id": "orc_butcher",
+      "name": "Marrow-Splitter",
+      "unidentifiedName": "Cleaver Alpha",
+      "category": "orc_kin",
+      "maxHp": 36,
+      "isElite": true,
+      "visibleGear": {
+        "weapon": "Notched iron slab-cleaver",
+        "armor": "Wired quarry-slate plates over raw hide",
+        "hiddenDetail": "Cracks fresh marrow-bones with its molars between raids."
+      },
+      "anatomy": {
+        "height": "Towering",
+        "weight": "Burly",
+        "skinColor": "Slate-Green",
+        "hairLength": "Cropped",
+        "hairStyle": "Spiked",
+        "hairColor": "Coal Black",
+        "eyeShape": "Deep-Set",
+        "eyeColor": "Blood-Red",
+        "musculature": "Hulking",
+        "bodyShape": "Barrel-Chested",
+        "facialScars": "Split Lip",
+        "bodyScars": "Deep Cleaver-Scars",
+        "faceDetail": "Broken tusk-stumps frame blood-red eyes and a scarred, slavering jaw.",
+        "chestTorsoDetail": "Slate quarry shards wire crudely across thick, scarred pectoral muscle.",
+        "armsHandsDetail": "Club-thick wrists swing a slab-cleaver effortlessly one-handed.",
+        "legsStanceDetail": "Heavy stomping stride cracks brittle ice beneath nailed hide.",
+        "distinguishingMark": "Carries an iron pot-helmet hammered flat over its skull.",
+        "visibleTags": [
+          "orc_kin",
+          "towering",
+          "muscular",
+          "battle_worn"
+        ]
+      },
+      "firstSightProse": "Heavy stone slabs scrape apart as a towering, slate-armored savage steps out from behind a brick kiln, chewing raw cartilage off a split femur. One broken tusk juts crooked past a slavering lip as it raises a notched iron cleaver.",
+      "returnSightProse": "A Marrow-Splitter stomps forward, hefting its heavy slab-cleaver.",
+      "xpReward": 38,
+      "description": "Brutal orc-kin pack alpha dominating Brick Hills and Black Quarry ruins.",
+      "intents": [
+        {
+          "kind": "heavy",
+          "label": "Marrow Cleave",
+          "damage": 11,
+          "damageType": "slashing",
+          "status": {
+            "type": "bleeding",
+            "turns": 2,
+            "power": 3
+          },
+          "description": "winds back its heavy slab-cleaver."
+        },
+        {
+          "kind": "attack",
+          "label": "Slate Bash",
+          "damage": 7,
+          "damageType": "bludgeoning",
+          "status": {
+            "type": "staggered",
+            "turns": 1,
+            "power": 2
+          },
+          "description": "charges shoulder-first."
+        }
+      ]
+    },
+    "orc_houndmaster": {
+      "armor": 2,
+      "stats": {
+        "might": 3,
+        "agility": 4,
+        "wit": 2,
+        "grit": 3
+      },
+      "resistances": {
+        "fire": "resistant",
+        "cold": "resistant"
+      },
+      "crownReward": [
+        8,
+        16
+      ],
+      "lootTable": [
+        {
+          "itemId": "ash_resin",
+          "chance": 0.45
+        },
+        {
+          "itemId": "kiln_pitch",
+          "chance": 0.25
+        }
+      ],
+      "id": "orc_houndmaster",
+      "name": "Pack-Whipper",
+      "unidentifiedName": "Chain-Driver Savage",
+      "category": "orc_kin",
+      "maxHp": 30,
+      "visibleGear": {
+        "weapon": "Barbed iron whip-chain and short hatchet",
+        "armor": "Cured hound-hide coat",
+        "hiddenDetail": "Snapped dog-collars jingle from its belt."
+      },
+      "anatomy": {
+        "height": "Average",
+        "weight": "Solid",
+        "skinColor": "Moss-Green",
+        "hairLength": "Long",
+        "hairStyle": "Matted",
+        "hairColor": "Black",
+        "eyeShape": "Narrow",
+        "eyeColor": "Amber",
+        "musculature": "Broad",
+        "bodyShape": "Stocky",
+        "facialScars": "Bite Scars",
+        "bodyScars": "Whip Welts",
+        "faceDetail": "Dog-bite scars furrow its cheek beside fierce amber eyes.",
+        "chestTorsoDetail": "Stitched dog-pelts hang stiff with dried blood and pitch.",
+        "armsHandsDetail": "Coiled iron chain wraps tight around scarred knuckles.",
+        "legsStanceDetail": "Darts low behind cover, whistling sharp through broken teeth.",
+        "distinguishingMark": "Carries three rusted iron dog-hooks at its hip.",
+        "visibleTags": [
+          "orc_kin",
+          "muscular"
+        ]
+      },
+      "firstSightProse": "A sharp whistle pierces the sleet before a scarred, pelt-wrapped savage steps out snapping a barbed iron chain. Three rusted dog-hooks clank at its hip while yellow tusks bare in a vicious grin.",
+      "returnSightProse": "A Pack-Whipper snaps barbed iron chain across the gravel.",
+      "xpReward": 28,
+      "description": "Cruel orc-kin driver scarring feral hounds into attacking Timber Post patrols.",
+      "intents": [
+        {
+          "kind": "attack",
+          "label": "Barbed Lash",
+          "damage": 7,
+          "damageType": "slashing",
+          "status": {
+            "type": "bleeding",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "snaps iron barbs at your face."
+        },
+        {
+          "kind": "attack",
+          "label": "Hatchet Chop",
+          "damage": 8,
+          "damageType": "slashing",
+          "description": "rushes in behind a whistling swing."
+        }
+      ]
+    },
+    "root_husk": {
       "armor": 1,
       "stats": {
         "might": 2,
@@ -18,39 +1869,6 @@
         "poison": "immune",
         "fire": "vulnerable"
       },
-      "harvestItemId": "husk_gland",
-      "visibleGear": {
-        "weapon": "Calcified splinter claws fused to finger bones",
-        "armor": "Rotted wool tunic plated with pale bark over the chest",
-        "hiddenDetail": "A pulsing white spore-sac swells beneath its broken collarbones."
-      },
-      "anatomy": {
-        "height": "Average",
-        "weight": "Gaunt",
-        "skinColor": "Chalk-Grey",
-        "hairLength": "Cropped",
-        "hairStyle": "Unkempt",
-        "hairColor": "Ash-White",
-        "eyeShape": "Hollow",
-        "eyeColor": "Milky Pale",
-        "musculature": "Wiry",
-        "bodyShape": "Skeletal",
-        "facialScars": "Ritual Brand",
-        "bodyScars": "Pale Root-Veins",
-        "faceDetail": "Sunken cheeks pull taut over chalk-white teeth, eyes clouded by pale filament.",
-        "chestTorsoDetail": "Split ribs bow outward where white, bell-shaped tendrils thread through torn homespun.",
-        "armsHandsDetail": "Long, dry forearms terminate in stiffened claws crusted with gray bark.",
-        "legsStanceDetail": "Shambles forward on uneven, root-stiffened knees that scrape the flagstones.",
-        "distinguishingMark": "Faint bronze-like ticking rattles inside its open throat.",
-        "visibleTags": [
-          "husk",
-          "gaunt",
-          "root_veined"
-        ]
-      },
-      "firstSightProse": "Wet gravel crunches in the mist as a stooped human figure lurches out of the reeds. Its skin has turned chalk-grey, white tendrils push through its split wool shirt like pale ribs, and dry fingers harden into splintered bone claws.",
-      "returnSightProse": "A Root-Husk Vagrant staggers out of the gray fog, pale tendrils rattling inside its chest.",
-      "xpReward": 18,
       "crownReward": [
         7,
         13
@@ -69,7 +1887,45 @@
           "chance": 0.35
         }
       ],
-      "description": "A hollow villager whose ribs burst with pale, bell-like tendrils.",
+      "id": "root_husk",
+      "name": "Chalk-Ribbed Walker",
+      "unidentifiedName": "Pale-Veined Walker",
+      "category": "husk",
+      "maxHp": 20,
+      "harvestItemId": "husk_gland",
+      "visibleGear": {
+        "weapon": "Calcified splinter claws fused to finger bones",
+        "armor": "Rotted wool tunic split over pale ribs",
+        "hiddenDetail": "Chalk-white spore-sacs pulse faintly inside its hollow throat."
+      },
+      "anatomy": {
+        "height": "Average",
+        "weight": "Gaunt",
+        "skinColor": "Chalk-Grey",
+        "hairLength": "Cropped",
+        "hairStyle": "Unkempt",
+        "hairColor": "Frost-White",
+        "eyeShape": "Hollow",
+        "eyeColor": "Milky Pale",
+        "musculature": "Wiry",
+        "bodyShape": "Skeletal",
+        "facialScars": "Ritual Brand",
+        "bodyScars": "Pale Seam-Veins",
+        "faceDetail": "Sunken cheeks pull taut over chalk-white teeth and clouded eyes.",
+        "chestTorsoDetail": "Split ribs bow outward where white threads push through rotted wool.",
+        "armsHandsDetail": "Dry forearms harden into splintered bone claws.",
+        "legsStanceDetail": "Shambles forward on stiff knees that scrape flagstone.",
+        "distinguishingMark": "Dry rattling ticks inside its open chest.",
+        "visibleTags": [
+          "husk",
+          "gaunt",
+          "root_veined"
+        ]
+      },
+      "firstSightProse": "Wet gravel crunches in the mist as a stooped figure lurches out of the reeds. Its skin has turned chalk-grey, white threads push through its split wool shirt like pale ribs, and dry fingers harden into splintered bone claws.",
+      "returnSightProse": "A Chalk-Ribbed Walker staggers out of the fog, chest rattling.",
+      "xpReward": 18,
+      "description": "Hollowed exile whose chest split open with chalk-white rot in Salt Bog.",
       "intents": [
         {
           "kind": "attack",
@@ -90,7 +1946,7 @@
             "turns": 2,
             "power": 2
           },
-          "description": "inhales rattling root-spores."
+          "description": "heaves chalky rot-mist from its ribs."
         },
         {
           "kind": "guard",
@@ -98,292 +1954,14 @@
           "damage": 0,
           "damageType": "bludgeoning",
           "armorGain": 3,
-          "description": "plates its ribs in pale bark."
-        }
-      ]
-    },
-    "ash_hound": {
-      "id": "ash_hound",
-      "name": "Cinder-Maw Hound",
-      "unidentifiedName": "Ember-Jawed Hound",
-      "category": "beast",
-      "maxHp": 17,
-      "armor": 0,
-      "stats": {
-        "might": 2,
-        "agility": 4,
-        "wit": 1,
-        "grit": 1
-      },
-      "resistances": {
-        "fire": "resistant",
-        "cold": "vulnerable"
-      },
-      "harvestItemId": "ash_resin",
-      "visibleGear": {
-        "weapon": "Soot-blackened fangs dripping orange sparks",
-        "armor": "Singed, scarred mastiff hide with no barding",
-        "hiddenDetail": "Glow-cinder glands pulse red along its narrow windpipe before a leap."
-      },
-      "anatomy": {
-        "height": "Short",
-        "weight": "Gaunt",
-        "skinColor": "Soot-Black",
-        "hairLength": "Cropped",
-        "hairStyle": "Wild",
-        "hairColor": "Charcoal-Grey",
-        "eyeShape": "Narrow",
-        "eyeColor": "Ember-Orange",
-        "musculature": "Wiry",
-        "bodyShape": "Spare",
-        "facialScars": "Ash-Burn",
-        "bodyScars": "Kiln-Burn",
-        "faceDetail": "A narrow mastiff muzzle parts over blackened teeth, trailing thin curls of grey smoke from cracked gums.",
-        "chestTorsoDetail": "Deep, starved ribcage heaves beneath patches of singed fur and blistered ash-hide.",
-        "armsHandsDetail": "Sinewy forelegs end in split dewclaws blackened from digging through kiln-cinders.",
-        "legsStanceDetail": "Low, coiled hindquarters shift constantly on the ash, built to spring across ten paces.",
-        "distinguishingMark": "Faint orange sparks drift from its nostrils with every panting breath.",
-        "visibleTags": [
-          "beast",
-          "swift",
-          "gaunt"
-        ]
-      },
-      "firstSightProse": "Thin smoke curls low across the damp stones before the beast appears. Out of the haze pads a starved, hound-shaped predator with singed charcoal fur and deep hollow ribs; orange embers glimmer inside its parted jaws as it crouches low to the earth.",
-      "returnSightProse": "A Cinder-Maw Hound pads low across the ash, smoke trailing from its blackened teeth.",
-      "xpReward": 15,
-      "crownReward": [
-        5,
-        10
-      ],
-      "lootTable": [
-        {
-          "itemId": "stamina_draught",
-          "chance": 0.25
-        },
-        {
-          "itemId": "ash_resin",
-          "chance": 0.45
-        }
-      ],
-      "description": "Gaunt frontier mastiff whose breath trails grey embers.",
-      "intents": [
-        {
-          "kind": "attack",
-          "label": "Throat Lunge",
-          "damage": 7,
-          "damageType": "piercing",
-          "status": {
-            "type": "bleeding",
-            "turns": 2,
-            "power": 2
-          },
-          "description": "crouches low for the throat."
-        },
-        {
-          "kind": "heavy",
-          "label": "Ash-Pounce",
-          "damage": 9,
-          "damageType": "fire",
-          "description": "bares ember-lit fangs for a leap."
-        }
-      ]
-    },
-    "chitin_weaver": {
-      "id": "chitin_weaver",
-      "name": "Chitin-Weaver",
-      "unidentifiedName": "Pale Carapace Stalker",
-      "category": "beast",
-      "maxHp": 24,
-      "armor": 2,
-      "stats": {
-        "might": 2,
-        "agility": 3,
-        "wit": 2,
-        "grit": 3
-      },
-      "resistances": {
-        "acid": "resistant",
-        "poison": "resistant",
-        "bludgeoning": "vulnerable",
-        "fire": "vulnerable"
-      },
-      "harvestItemId": "husk_gland",
-      "visibleGear": {
-        "weapon": "Serrated ivory mandibles dripping green acid",
-        "armor": "Layered subterranean chitin plates",
-        "hiddenDetail": "Soft pale joints sit exposed underneath the second thoracic seam."
-      },
-      "anatomy": {
-        "height": "Short",
-        "weight": "Solid",
-        "skinColor": "Ivory-Chitin",
-        "hairLength": "None",
-        "hairStyle": "None",
-        "hairColor": "None",
-        "eyeShape": "Wide",
-        "eyeColor": "Glossy Black",
-        "musculature": "Corded",
-        "bodyShape": "Broad-Chested",
-        "facialScars": "Unmarked",
-        "bodyScars": "Old Spear-Mark",
-        "faceDetail": "Clustered obsidian eyes glint above twin jagged mandibles wet with hissing silk.",
-        "chestTorsoDetail": "Overlapping ivory carapace segments cover a heavy, hunched thorax.",
-        "armsHandsDetail": "Hooked forelimbs grip stone and web-strands with effortless leverage.",
-        "legsStanceDetail": "Six jointed legs skitter sideways without sound across damp stone.",
-        "distinguishingMark": "Pale silver thread glistens between its rear spinnerets.",
-        "visibleTags": [
-          "beast",
-          "armored"
-        ]
-      },
-      "firstSightProse": "Dry clicking echoes from the damp masonry overhead as a pale, six-legged carapace drops onto the flagstones. Clustered black eyes glint above twin serrated mandibles dripping acrid silk across the mossy stone.",
-      "returnSightProse": "A Chitin-Weaver skitters sideways across the stone, mandibles clacking wet with acid.",
-      "xpReward": 22,
-      "crownReward": [
-        9,
-        16
-      ],
-      "lootTable": [
-        {
-          "itemId": "antitoxin",
-          "chance": 0.3
-        },
-        {
-          "itemId": "husk_gland",
-          "chance": 0.5
-        }
-      ],
-      "description": "Subterranean pale beetle-stalker nesting beneath the Cistern aqueducts.",
-      "intents": [
-        {
-          "kind": "attack",
-          "label": "Mandible Shear",
-          "damage": 7,
-          "damageType": "slashing",
-          "description": "clacks jagged mandibles wide."
-        },
-        {
-          "kind": "blight",
-          "label": "Corrosive Silk",
-          "damage": 5,
-          "damageType": "acid",
-          "status": {
-            "type": "corroded",
-            "turns": 3,
-            "power": 2
-          },
-          "description": "gathers hissing acid silk."
-        },
-        {
-          "kind": "guard",
-          "label": "Carapace Lock",
-          "damage": 0,
-          "damageType": "bludgeoning",
-          "armorGain": 4,
-          "description": "tucks beneath armored plates."
-        }
-      ]
-    },
-    "iron_deserter": {
-      "id": "iron_deserter",
-      "name": "Levy-Brigand",
-      "unidentifiedName": "Rusted Pike-Man",
-      "category": "humanoid",
-      "maxHp": 23,
-      "armor": 2,
-      "stats": {
-        "might": 3,
-        "agility": 2,
-        "wit": 2,
-        "grit": 2
-      },
-      "resistances": {
-        "slashing": "resistant",
-        "lightning": "vulnerable"
-      },
-      "interrogateHint": "He coughs out that smugglers trade Under-Warren grafts behind Harken at Cinderford, and the Weeping Barrow hides a silver Echo-Shell.",
-      "visibleGear": {
-        "weapon": "Notched iron halberd with stained haft",
-        "armor": "Dented Iron-Vow brigandine and cracked pavise shield",
-        "hiddenDetail": "His left knee favors an old pike wound whenever he plants his shield."
-      },
-      "anatomy": {
-        "height": "Average",
-        "weight": "Solid",
-        "skinColor": "Weathered Tan",
-        "hairLength": "Cropped",
-        "hairStyle": "Unkempt",
-        "hairColor": "Iron-Grey",
-        "eyeShape": "Deep-Set",
-        "eyeColor": "Bloodshot Hazel",
-        "musculature": "Broad",
-        "bodyShape": "Stocky",
-        "facialScars": "Cheek Slash",
-        "bodyScars": "Old Spear-Mark",
-        "faceDetail": "Hollow, jittery eyes peer beneath a dented kettle helm, jaw clenched tight over stained teeth.",
-        "chestTorsoDetail": "Thick shoulders fill out a torn Iron-Vow surcoat with the garrison badge scraped off.",
-        "armsHandsDetail": "Heavy, calloused forearms work the long iron halberd with practiced militia grip.",
-        "legsStanceDetail": "Wide infantry stance planted solidly in the rutted mud.",
-        "distinguishingMark": "Amber withdrawal tremors twitch faintly in his shield hand.",
-        "visibleTags": [
-          "humanoid",
-          "muscular",
-          "armored"
-        ]
-      },
-      "firstSightProse": "Iron rattles behind a fallen milestone as a stocky soldier steps into the road in a torn surcoat with the garrison crest scraped away. Beneath a dented kettle helm, bloodshot eyes lock onto your purse while thick forearms level a rusted halberd.",
-      "returnSightProse": "A Levy-Brigand steps into the ruts, bracing a dented pavise beside a notched halberd.",
-      "xpReward": 19,
-      "crownReward": [
-        12,
-        20
-      ],
-      "lootTable": [
-        {
-          "itemId": "poultice",
-          "chance": 0.35
-        },
-        {
-          "itemId": "fire_pot",
-          "chance": 0.2
-        }
-      ],
-      "description": "A deserter from the frontier pike-line, eyes clouded by Vesper-withdrawal.",
-      "intents": [
-        {
-          "kind": "attack",
-          "label": "Halberd Slash",
-          "damage": 8,
-          "damageType": "slashing",
-          "description": "sweeps a rusted halberd wide."
-        },
-        {
-          "kind": "guard",
-          "label": "Shield Wall",
-          "damage": 0,
-          "damageType": "bludgeoning",
-          "armorGain": 4,
-          "description": "braces behind a dented pavise."
-        },
-        {
-          "kind": "heavy",
-          "label": "Pommel Smash",
-          "damage": 10,
-          "damageType": "bludgeoning",
-          "description": "hefts steel for an overhead blow."
+          "description": "plates its ribs in stiff pale crust."
         }
       ]
     },
     "blight_acolyte": {
-      "id": "blight_acolyte",
-      "name": "Choir Acolyte",
-      "unidentifiedName": "Censer Zealot",
-      "category": "husk",
-      "maxHp": 26,
       "armor": 1,
       "stats": {
-        "might": 1,
+        "might": 2,
         "agility": 2,
         "wit": 4,
         "grit": 2
@@ -391,295 +1969,710 @@
       "resistances": {
         "blight": "resistant",
         "resonant": "resistant",
-        "fire": "vulnerable",
-        "slashing": "vulnerable"
+        "fire": "vulnerable"
       },
-      "harvestItemId": "husk_gland",
-      "visibleGear": {
-        "weapon": "Tarnished bronze chain-censer smoking with pale spores",
-        "armor": "Soot-stiffened penitent robes over chalky ribs",
-        "hiddenDetail": "Thin silver chimes sewn into its cuffs focus every chant."
-      },
-      "anatomy": {
-        "height": "Tall",
-        "weight": "Gaunt",
-        "skinColor": "Ash-Pale",
-        "hairLength": "Shaved",
-        "hairStyle": "None",
-        "hairColor": "None",
-        "eyeShape": "Hooded",
-        "eyeColor": "Blind White",
-        "musculature": "Frail",
-        "bodyShape": "Spare",
-        "facialScars": "Ritual Brand",
-        "bodyScars": "Lash Welts",
-        "faceDetail": "A frayed linen blindfold binds the brow over cracked lips whispering an unbroken cadence.",
-        "chestTorsoDetail": "Narrow, hollow torso sways like a pendulum beneath damp ash-colored vestments.",
-        "armsHandsDetail": "Bony wrists swing a heavy bronze censer in wide, hypnotic arcs.",
-        "legsStanceDetail": "Bare, blackened feet glide steadily over wet stones without flinching.",
-        "distinguishingMark": "Pale spore smoke trails from beneath its linen hood.",
-        "visibleTags": [
-          "husk",
-          "frail",
-          "occult"
-        ]
-      },
-      "firstSightProse": "A sweet, copper reek rolls ahead of a tall robed figure gliding down the ridge. Linen binds its blind eyes while bony hands swing a heavy bronze censer that pours choking grey spores across the flagstones.",
-      "returnSightProse": "A Choir Acolyte sways out of the haze, swinging its smoking bronze censer.",
-      "xpReward": 24,
       "crownReward": [
-        11,
-        18
+        9,
+        16
       ],
       "lootTable": [
-        {
-          "itemId": "vesper_tonic",
-          "chance": 0.4
-        },
         {
           "itemId": "husk_gland",
           "chance": 0.45
         },
         {
-          "itemId": "ash_resin",
-          "chance": 0.35
+          "itemId": "writ_blight_wave",
+          "chance": 0.15
         }
       ],
-      "description": "Blind zealot swinging a tarnished censer of pale-root incense.",
+      "id": "blight_acolyte",
+      "name": "Dome Cantor",
+      "unidentifiedName": "Censer-Swinging Hollow",
+      "category": "husk",
+      "maxHp": 26,
+      "harvestItemId": "husk_gland",
+      "visibleGear": {
+        "weapon": "Cracked bronze censer packed with frost-mold",
+        "armor": "Tattered grey choir-linen",
+        "hiddenDetail": "Its tongue has stiffened grey, humming flatly on every exhale."
+      },
+      "anatomy": {
+        "height": "Tall",
+        "weight": "Gaunt",
+        "skinColor": "Frost-White",
+        "hairLength": "Shaved",
+        "hairStyle": "Unkempt",
+        "hairColor": "None",
+        "eyeShape": "Wide",
+        "eyeColor": "Blank White",
+        "musculature": "Frail",
+        "bodyShape": "Spare",
+        "facialScars": "Ritual Brand",
+        "bodyScars": "Pale Seam-Veins",
+        "faceDetail": "Blank white eyes stare unwaveringly above a blackened jaw.",
+        "chestTorsoDetail": "Thin grey linen drapes over rattling, chalk-stained ribs.",
+        "armsHandsDetail": "Long fingers swing a heavy bronze censer in slow arcs.",
+        "legsStanceDetail": "Glides unevenly across frost-drifts in bare, blackened feet.",
+        "distinguishingMark": "Cold grey smoke leaks steadily from its parted lips.",
+        "visibleTags": [
+          "husk",
+          "gaunt",
+          "pale_skin",
+          "root_veined"
+        ]
+      },
+      "firstSightProse": "Bronze chains clink slowly in the cold draft as a tall, blank-eyed figure drifts out from behind a white pillar. Tattered grey linen hangs stiff with frost while a cracked bronze censer pours sour white smoke across the tiles.",
+      "returnSightProse": "A Dome Cantor sways forward, swinging its smoking bronze censer.",
+      "xpReward": 24,
+      "description": "Voiceless, hollowed figure swaying inside The White Dome pit, spreading choking frost-mold.",
       "intents": [
         {
-          "kind": "toll",
-          "label": "Censer Toll",
-          "damage": 8,
-          "damageType": "resonant",
-          "resolveDamage": 4,
-          "defilementGain": 2,
-          "status": {
-            "type": "dazed",
-            "turns": 2,
-            "power": 2
-          },
-          "description": "swings a resonant bronze censer."
-        },
-        {
           "kind": "blight",
-          "label": "Mire Incense",
+          "label": "Choking Censer",
           "damage": 6,
           "damageType": "blight",
-          "resolveDamage": 2,
+          "resolveDamage": 3,
           "defilementGain": 3,
           "status": {
             "type": "blighted",
-            "turns": 3,
-            "power": 3
+            "turns": 2,
+            "power": 2
           },
-          "description": "fans choking grey smoke outward."
+          "description": "swings sour white smoke across you."
+        },
+        {
+          "kind": "attack",
+          "label": "Bronze Chain",
+          "damage": 6,
+          "damageType": "bludgeoning",
+          "description": "whips the heavy censer toward your temple."
         }
       ]
     },
     "husk_kale": {
-      "id": "husk_kale",
-      "name": "Husk-Stalker Kale",
-      "unidentifiedName": "Root-Bound Deserter",
-      "category": "husk",
-      "maxHp": 38,
       "armor": 2,
       "stats": {
-        "might": 3,
+        "might": 4,
         "agility": 3,
         "wit": 2,
         "grit": 3
       },
       "resistances": {
         "blight": "resistant",
-        "poison": "immune",
+        "cold": "resistant",
         "fire": "vulnerable"
       },
-      "harvestItemId": "husk_gland",
-      "visibleGear": {
-        "weapon": "Broken broadsword fused to forearm bone by white roots",
-        "armor": "Torn Iron-Vow chainmail knit together with pale tendons",
-        "hiddenDetail": "A half-calcified leather strap still dangles where you tore his satchel."
-      },
-      "anatomy": {
-        "height": "Average",
-        "weight": "Lean",
-        "skinColor": "Chalk-Grey",
-        "hairLength": "Cropped",
-        "hairStyle": "Unkempt",
-        "hairColor": "Matted Brown",
-        "eyeShape": "Wide",
-        "eyeColor": "Clouded Amber",
-        "musculature": "Corded",
-        "bodyShape": "Trim",
-        "facialScars": "Brow Split",
-        "bodyScars": "Pale Root-Veins",
-        "faceDetail": "An unhinged jaw trembles with bronze resonance while familiar haunted eyes stare from chalky sockets.",
-        "chestTorsoDetail": "Rusted mail rings bite into white root-cords binding his ribs tight.",
-        "armsHandsDetail": "His right forearm has calcified completely around a jagged broken sword blade.",
-        "legsStanceDetail": "Hunched, spring-loaded crouch built for desperate lunges out of ditches.",
-        "distinguishingMark": "Rusted Iron-Vow chain links still clink against his collar.",
-        "visibleTags": [
-          "husk",
-          "elite",
-          "root_veined"
-        ]
-      },
-      "firstSightProse": "Pale roots drag a familiar torn mail-shirt out of the ditch. Its jaw hangs unhinged, rattling a hollow bronze whine, and a broken broadsword is fused straight into the calcified bone of its right forearm.",
-      "returnSightProse": "Husk-Stalker Kale drags his root-fused blade across the stones.",
-      "isElite": true,
-      "xpReward": 38,
       "crownReward": [
-        20,
-        30
+        16,
+        26
       ],
       "lootTable": [
         {
-          "itemId": "vesper_tonic",
-          "chance": 0.8
+          "itemId": "husk_gland",
+          "chance": 0.7
+        },
+        {
+          "itemId": "stamina_draught",
+          "chance": 0.45
         }
       ],
-      "description": "The deserter you left to turn, his broken sword fused to his bone by pale roots.",
+      "id": "husk_kale",
+      "name": "Shackled Deserter",
+      "unidentifiedName": "Shackled Walker",
+      "category": "husk",
+      "maxHp": 38,
+      "harvestItemId": "husk_gland",
+      "isElite": true,
+      "visibleGear": {
+        "weapon": "Snapped iron wrist-chains and notched cleaver",
+        "armor": "Rotted garrison mail crusted with pale rot",
+        "hiddenDetail": "A faded southern muster-badge still hangs pinned upside down inside his collar."
+      },
+      "anatomy": {
+        "height": "Tall",
+        "weight": "Solid",
+        "skinColor": "Chalk-Grey",
+        "hairLength": "Cropped",
+        "hairStyle": "Matted",
+        "hairColor": "Mire-Brown",
+        "eyeShape": "Hollow",
+        "eyeColor": "Milky Grey",
+        "musculature": "Broad",
+        "bodyShape": "Broad-Chested",
+        "facialScars": "Cheek Slash",
+        "bodyScars": "Pale Seam-Veins",
+        "faceDetail": "Milky eyes stare blankly above a slack, frost-split mouth.",
+        "chestTorsoDetail": "Rusted mail rings bulge outward over chalk-white growths.",
+        "armsHandsDetail": "Heavy iron shackles swing from thick, grey-veined wrists.",
+        "legsStanceDetail": "Drags one stiffened boot loudly across cracked flagstones.",
+        "distinguishingMark": "Snapped iron chain drags behind his left ankle.",
+        "visibleTags": [
+          "husk",
+          "muscular",
+          "root_veined",
+          "iron_vow_garb"
+        ]
+      },
+      "firstSightProse": "Heavy iron links scrape across paving stones as a broad-shouldered figure drags himself out of the fog. Rusted mail plates bulge apart over chalk-grey skin, and snapped shackles swing from wrists locked tight around a notched blade.",
+      "returnSightProse": "A Shackled Deserter lurches through the mist, dragging snapped iron chains.",
+      "xpReward": 38,
+      "description": "Former High Road deserter abandoned to creeping numbness, haunting the viaduct arches.",
       "intents": [
         {
-          "kind": "attack",
-          "label": "Betrayer's Thrust",
+          "kind": "heavy",
+          "label": "Shackle Smash",
           "damage": 10,
-          "damageType": "piercing",
+          "damageType": "bludgeoning",
           "status": {
-            "type": "bleeding",
-            "turns": 2,
-            "power": 3
+            "type": "staggered",
+            "turns": 1,
+            "power": 2
           },
-          "description": "draws back a root-bound blade."
+          "description": "whirls heavy iron chain overhead."
         },
         {
           "kind": "blight",
-          "label": "Root-Snare",
-          "damage": 7,
+          "label": "Hollow Cough",
+          "damage": 6,
           "damageType": "blight",
           "resolveDamage": 3,
           "defilementGain": 3,
           "status": {
             "type": "blighted",
             "turns": 2,
-            "power": 3
+            "power": 2
           },
-          "description": "drives gnarled knuckles into the mud."
-        },
-        {
-          "kind": "heavy",
-          "label": "Hollow Lunge",
-          "damage": 13,
-          "damageType": "slashing",
-          "description": "poises for a desperate lunge."
+          "description": "rasps wet spore-mist from split mail."
         }
       ]
     },
-    "star_stag": {
-      "id": "star_stag",
-      "name": "Corrupted Star-Stag",
-      "unidentifiedName": "Chime-Antlered Stag",
-      "category": "beast",
-      "maxHp": 44,
+    "hollow_watchman": {
       "armor": 2,
       "stats": {
         "might": 4,
-        "agility": 4,
-        "wit": 3,
+        "agility": 2,
+        "wit": 1,
         "grit": 3
       },
       "resistances": {
-        "cold": "resistant",
-        "resonant": "resistant",
+        "cold": "immune",
+        "blight": "resistant",
         "fire": "vulnerable"
       },
-      "harvestItemId": "star_sap_drop",
-      "visibleGear": {
-        "weapon": "Towering silver antlers choked in bronze root-chimes",
-        "armor": "Fossilized white bark plates grown across chest and flanks",
-        "hiddenDetail": "A silver leaf-blade gleams wedged inside the mossy plinth behind its hooves."
-      },
-      "anatomy": {
-        "height": "Towering",
-        "weight": "Heavy",
-        "skinColor": "Silver-Bark",
-        "hairLength": "Long",
-        "hairStyle": "Wild",
-        "hairColor": "Starlight Silver",
-        "eyeShape": "Almond",
-        "eyeColor": "Clouded Violet",
-        "musculature": "Corded",
-        "bodyShape": "Broad-Chested",
-        "facialScars": "Unmarked",
-        "bodyScars": "Pale Root-Veins",
-        "faceDetail": "A regal silver muzzle drips frosty spore-mist beneath grief-stricken violet eyes.",
-        "chestTorsoDetail": "A massive barrel chest plates over in chalky wood whenever it braces.",
-        "armsHandsDetail": "Forelegs forged like living birch strike hard enough to crack stone.",
-        "legsStanceDetail": "Cloven silver hooves paw sparks out of petrified roots.",
-        "distinguishingMark": "Pale bell-vines ring softly from its great crown of antlers.",
-        "visibleTags": [
-          "beast",
-          "elite",
-          "towering"
-        ]
-      },
-      "firstSightProse": "Petrified ferns snap apart as a towering stag bursts into the glade. Its silver flank is plated in chalky bark, pale vines wind through its immense crown of antlers, and tiny bone-chimes ring with every furious stamp of its hooves.",
-      "returnSightProse": "The Corrupted Star-Stag lowers its chiming rack across the silver clearing.",
-      "isElite": true,
-      "xpReward": 45,
       "crownReward": [
-        18,
-        28
+        8,
+        15
       ],
       "lootTable": [
         {
-          "itemId": "star_glaive",
-          "chance": 1
+          "itemId": "poultice",
+          "chance": 0.3
         },
         {
-          "itemId": "ash_resin",
-          "chance": 1
+          "itemId": "husk_gland",
+          "chance": 0.3
         }
       ],
-      "description": "An ancient spirit of the Ael-Thalor woods, antlers choked in pale spore-chimes.",
+      "id": "hollow_watchman",
+      "name": "Frost-Locked Sentry",
+      "unidentifiedName": "Silent Halberdier",
+      "category": "husk",
+      "maxHp": 31,
+      "harvestItemId": "husk_gland",
+      "visibleGear": {
+        "weapon": "Frost-rimmed halberd",
+        "armor": "Timber Post leather and rusted breastplate",
+        "hiddenDetail": "His eyelids have frozen open without blinking."
+      },
+      "anatomy": {
+        "height": "Average",
+        "weight": "Solid",
+        "skinColor": "Blue-Grey",
+        "hairLength": "Cropped",
+        "hairStyle": "Frozen",
+        "hairColor": "Brown",
+        "eyeShape": "Wide",
+        "eyeColor": "Glazed Grey",
+        "musculature": "Broad",
+        "bodyShape": "Stocky",
+        "facialScars": "Frostbite",
+        "bodyScars": "Pale Seam-Veins",
+        "faceDetail": "Blue-grey lips part silently around frost-glazed eyes that never blink.",
+        "chestTorsoDetail": "Rusted breastplate straps tight over frozen wool.",
+        "armsHandsDetail": "Blackened, frostbitten fingers lock stiff around a halberd shaft.",
+        "legsStanceDetail": "Marches with rigid, mechanical steps across frozen ruts.",
+        "distinguishingMark": "Carries a cracked wooden tally-horn frozen to his belt.",
+        "visibleTags": [
+          "husk",
+          "iron_vow_garb"
+        ]
+      },
+      "firstSightProse": "Stiff leather creaks in the wind as a frostbitten sentry marches mechanically out of the dark. Ice coats his rusted breastplate, his eyelids never blink, and blackened fingers lock rigid around a raised halberd.",
+      "returnSightProse": "A Frost-Locked Sentry advances stiffly with leveled halberd.",
+      "xpReward": 29,
+      "description": "Former Timber Post watchman who wandered north under a full moon and returned silent and cold.",
       "intents": [
         {
-          "kind": "heavy",
-          "label": "Antler Charge",
-          "damage": 13,
-          "damageType": "piercing",
-          "description": "lowers its chiming rack to charge."
-        },
-        {
-          "kind": "blight",
-          "label": "Star-Wither Gale",
+          "kind": "attack",
+          "label": "Halberd Hook",
           "damage": 8,
-          "damageType": "cold",
-          "resolveDamage": 3,
+          "damageType": "slashing",
           "status": {
-            "type": "blighted",
-            "turns": 3,
-            "power": 3
+            "type": "chilled",
+            "turns": 2,
+            "power": 2
           },
-          "description": "gathers freezing spore-frost."
+          "description": "draws back a frost-rimmed polearm."
         },
         {
           "kind": "guard",
-          "label": "Silver Bark",
+          "label": "Frozen Brace",
+          "damage": 0,
+          "damageType": "bludgeoning",
+          "armorGain": 4,
+          "description": "locks stiff joints behind rusted iron."
+        }
+      ]
+    },
+    "silver_sleeper": {
+      "armor": 2,
+      "stats": {
+        "might": 3,
+        "agility": 3,
+        "wit": 2,
+        "grit": 4
+      },
+      "resistances": {
+        "cold": "immune",
+        "resonant": "resistant",
+        "bludgeoning": "vulnerable"
+      },
+      "crownReward": [
+        12,
+        20
+      ],
+      "lootTable": [
+        {
+          "itemId": "silver_ash_oil",
+          "chance": 0.3
+        },
+        {
+          "itemId": "amber_tonic",
+          "chance": 0.25
+        }
+      ],
+      "id": "silver_sleeper",
+      "name": "Frost-Caked Remnant",
+      "unidentifiedName": "Dust-Coated Sleeper",
+      "category": "husk",
+      "maxHp": 34,
+      "visibleGear": {
+        "weapon": "Ice-hard bare fists",
+        "armor": "Silver-dusted noble wool",
+        "hiddenDetail": "Metallic pale dust fills every wrinkle of its skin."
+      },
+      "anatomy": {
+        "height": "Tall",
+        "weight": "Gaunt",
+        "skinColor": "Starlit Alabaster",
+        "hairLength": "Long",
+        "hairStyle": "Straight",
+        "hairColor": "Frost-White",
+        "eyeShape": "Blank",
+        "eyeColor": "Silver-Grey",
+        "musculature": "Wiry",
+        "bodyShape": "Slender",
+        "facialScars": "Unmarked",
+        "bodyScars": "Unmarked",
+        "faceDetail": "Smooth, bloodless face shows zero expression as grey dust settles in its lashes.",
+        "chestTorsoDetail": "Fine rotted wool hangs heavy with tarnished metallic grit.",
+        "armsHandsDetail": "Dead-cold knuckles swing silently without bracing.",
+        "legsStanceDetail": "Steps across pale marble without altering expression or breath.",
+        "distinguishingMark": "Leaves faint silver dust prints wherever its boots land.",
+        "visibleTags": [
+          "husk",
+          "towering",
+          "pale_skin"
+        ]
+      },
+      "firstSightProse": "White dust puffs off marble tiles as a tall, bloodless figure turns smoothly from a colonnade. Tarnished metallic grit coats its tattered coat and unblinking lashes, and it raises dead-cold fists without a single word or breath.",
+      "returnSightProse": "A Frost-Caked Remnant glides forward across the pale paving.",
+      "xpReward": 34,
+      "description": "Voiceless, dust-coated wanderer drifting near North Gate and The White Dome.",
+      "intents": [
+        {
+          "kind": "attack",
+          "label": "Dead Strike",
+          "damage": 8,
+          "damageType": "cold",
+          "status": {
+            "type": "chilled",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "drives a freezing fist toward your sternum."
+        },
+        {
+          "kind": "blight",
+          "label": "Blank Stare",
+          "damage": 5,
+          "damageType": "resonant",
+          "resolveDamage": 4,
+          "defilementGain": 3,
+          "description": "fixes unblinking silver eyes on yours."
+        }
+      ]
+    },
+    "salt_corpse": {
+      "armor": 1,
+      "stats": {
+        "might": 3,
+        "agility": 1,
+        "wit": 1,
+        "grit": 3
+      },
+      "resistances": {
+        "poison": "immune",
+        "cold": "resistant",
+        "fire": "vulnerable",
+        "bludgeoning": "vulnerable"
+      },
+      "crownReward": [
+        6,
+        12
+      ],
+      "lootTable": [
+        {
+          "itemId": "silver_ash_oil",
+          "chance": 0.2
+        },
+        {
+          "itemId": "poultice",
+          "chance": 0.25
+        }
+      ],
+      "id": "salt_corpse",
+      "name": "Brine-Cured Corpse",
+      "unidentifiedName": "Salted Dead",
+      "category": "undead",
+      "maxHp": 22,
+      "visibleGear": {
+        "weapon": "Salt-hardened nails and rusted iron grille-bar",
+        "armor": "Leathery, salt-preserved hide",
+        "hiddenDetail": "Dry white salt pours from its parted ribs when struck."
+      },
+      "anatomy": {
+        "height": "Average",
+        "weight": "Gaunt",
+        "skinColor": "Parchment Tan",
+        "hairLength": "Thin",
+        "hairStyle": "Wispy",
+        "hairColor": "Yellow-White",
+        "eyeShape": "Sunken",
+        "eyeColor": "None",
+        "musculature": "Desiccated",
+        "bodyShape": "Skeletal",
+        "facialScars": "Salt Cracks",
+        "bodyScars": "Autopsy Seam",
+        "faceDetail": "Dry leather skin shrinks tight across toothy gums and empty sockets.",
+        "chestTorsoDetail": "Salt crystals crust inside an open ribcage like dried beef.",
+        "armsHandsDetail": "Stiff, parchment-hard fingers lock around rusted iron.",
+        "legsStanceDetail": "Dry knee-tendons pop loudly with every lurch.",
+        "distinguishingMark": "Smells sharply of lime, brine, and dry cellar dust.",
+        "visibleTags": [
+          "undead",
+          "gaunt"
+        ]
+      },
+      "firstSightProse": "Dry tendons crack like kindling behind an iron grille as a leathery, salt-cured corpse pulls itself upright from the bone pile. Empty eye-sockets turn toward your lantern while parchment-hard fingers drag a rusted iron bar.",
+      "returnSightProse": "A Brine-Cured Corpse lurches out of the salt drifts, joints popping.",
+      "xpReward": 20,
+      "description": "Salt-preserved dead rising from disturbed niches inside Bone Cellars.",
+      "intents": [
+        {
+          "kind": "attack",
+          "label": "Bar Swing",
+          "damage": 7,
+          "damageType": "bludgeoning",
+          "description": "hefts a rusted grille-bar."
+        },
+        {
+          "kind": "attack",
+          "label": "Dry Claw",
+          "damage": 5,
+          "damageType": "slashing",
+          "status": {
+            "type": "bleeding",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "rakes brittle nails at your face."
+        }
+      ]
+    },
+    "barrow_wight": {
+      "armor": 3,
+      "stats": {
+        "might": 4,
+        "agility": 2,
+        "wit": 2,
+        "grit": 3
+      },
+      "resistances": {
+        "piercing": "resistant",
+        "poison": "immune",
+        "bludgeoning": "vulnerable"
+      },
+      "crownReward": [
+        14,
+        24
+      ],
+      "lootTable": [
+        {
+          "itemId": "silver_ash_oil",
+          "chance": 0.35
+        },
+        {
+          "itemId": "echo_shell",
+          "chance": 0.1
+        }
+      ],
+      "id": "barrow_wight",
+      "name": "Long-Stride Skeleton",
+      "unidentifiedName": "Tall Bronze-Clad Dead",
+      "category": "undead",
+      "maxHp": 32,
+      "visibleGear": {
+        "weapon": "Oversized notched bronze broadsword",
+        "armor": "Tarnished late-imperial bronze scale",
+        "hiddenDetail": "Its femurs and stride measure nearly seven feet tall."
+      },
+      "anatomy": {
+        "height": "Towering",
+        "weight": "Skeletal",
+        "skinColor": "None",
+        "hairLength": "None",
+        "hairStyle": "None",
+        "hairColor": "None",
+        "eyeShape": "Hollow",
+        "eyeColor": "Dim Amber",
+        "musculature": "None",
+        "bodyShape": "Tall-Framed",
+        "facialScars": "Skull Fracture",
+        "bodyScars": "Chipped Ribs",
+        "faceDetail": "Elongated yellow skull stares down from a head taller than any human.",
+        "chestTorsoDetail": "Green-tarnished bronze scales hang loose over broad, tall ribs.",
+        "armsHandsDetail": "Long bone fingers weld tight around a heavy bronze hilt.",
+        "legsStanceDetail": "Takes sweeping, unnatural strides across oversized stair treads.",
+        "distinguishingMark": "Carries a cracked black Onyx seal wired to its sternum.",
+        "visibleTags": [
+          "undead",
+          "towering"
+        ]
+      },
+      "firstSightProse": "Tarnished bronze scale chimes faintly in the crypt dark as a seven-foot skeleton rises off a stone bench, ducking beneath the lintel. Its elongated skull tilts downward while long bone fingers draw a broad, verdigris-stained blade.",
+      "returnSightProse": "A Long-Stride Skeleton towers in the crypt dark, bronze scales chiming.",
+      "xpReward": 32,
+      "description": "Oversized, bronze-clad dead of the lost northern builders, guarding Long Steps crypts.",
+      "intents": [
+        {
+          "kind": "heavy",
+          "label": "Long Cleave",
+          "damage": 10,
+          "damageType": "slashing",
+          "description": "raises an oversized bronze blade."
+        },
+        {
+          "kind": "guard",
+          "label": "Scale Lock",
+          "damage": 0,
+          "damageType": "bludgeoning",
+          "armorGain": 4,
+          "description": "sets tarnished bronze across its ribs."
+        }
+      ]
+    },
+    "frozen_revenant": {
+      "armor": 2,
+      "stats": {
+        "might": 4,
+        "agility": 2,
+        "wit": 1,
+        "grit": 3
+      },
+      "resistances": {
+        "cold": "immune",
+        "poison": "immune",
+        "fire": "vulnerable"
+      },
+      "crownReward": [
+        8,
+        16
+      ],
+      "lootTable": [
+        {
+          "itemId": "poultice",
+          "chance": 0.3
+        },
+        {
+          "itemId": "fire_pot",
+          "chance": 0.2
+        }
+      ],
+      "id": "frozen_revenant",
+      "name": "Gate-Sill Dead",
+      "unidentifiedName": "Frostbitten Corpse",
+      "category": "undead",
+      "maxHp": 29,
+      "visibleGear": {
+        "weapon": "Ice-crusted broken sword and frozen fists",
+        "armor": "Rime-locked southern travel cloak",
+        "hiddenDetail": "Blackened frostbite has snapped two toes off its left boot."
+      },
+      "anatomy": {
+        "height": "Average",
+        "weight": "Solid",
+        "skinColor": "Black-Blue",
+        "hairLength": "Short",
+        "hairStyle": "Ice-Matted",
+        "hairColor": "Frost-White",
+        "eyeShape": "Wide",
+        "eyeColor": "Milky Ice",
+        "musculature": "Stiff",
+        "bodyShape": "Bulky",
+        "facialScars": "Split Cheek",
+        "bodyScars": "Frost Rot",
+        "faceDetail": "Blackened nose and frost-split lips gape wide in silent rictus.",
+        "chestTorsoDetail": "Ice fuses tattered wool straight to purple-black flesh.",
+        "armsHandsDetail": "Frozen black fingers clutch a snapped southern blade.",
+        "legsStanceDetail": "Stumps forward trailing crusts of cracked ice.",
+        "distinguishingMark": "Thick hoarfrost steams cold off its open collar.",
+        "visibleTags": [
+          "undead",
+          "battle_worn"
+        ]
+      },
+      "firstSightProse": "Ice crackles like breaking glass as a blackened, frost-locked corpse heaves itself up out of a drift. Thick rime crusts its southern travel wool, and glazed eyes lock onto you as it raises a snapped, ice-rimmed sword.",
+      "returnSightProse": "A Gate-Sill Dead stumps forward, trailing frost and snapped ice.",
+      "xpReward": 27,
+      "description": "Traveler who froze solid near the threshold and dragged onward in blind, cold compulsion.",
+      "intents": [
+        {
+          "kind": "attack",
+          "label": "Frost Strike",
+          "damage": 8,
+          "damageType": "cold",
+          "status": {
+            "type": "chilled",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "swings an ice-crusted blade."
+        },
+        {
+          "kind": "attack",
+          "label": "Dead Clutch",
+          "damage": 6,
+          "damageType": "bludgeoning",
+          "status": {
+            "type": "staggered",
+            "turns": 1,
+            "power": 2
+          },
+          "description": "reaches with frozen black hands."
+        }
+      ]
+    },
+    "ossuary_sentinel": {
+      "armor": 4,
+      "stats": {
+        "might": 4,
+        "agility": 2,
+        "wit": 1,
+        "grit": 4
+      },
+      "resistances": {
+        "slashing": "resistant",
+        "piercing": "resistant",
+        "poison": "immune",
+        "bludgeoning": "vulnerable"
+      },
+      "crownReward": [
+        18,
+        30
+      ],
+      "lootTable": [
+        {
+          "itemId": "iron_wire_kit",
+          "chance": 0.4
+        },
+        {
+          "itemId": "silver_ash_oil",
+          "chance": 0.35
+        }
+      ],
+      "id": "ossuary_sentinel",
+      "name": "Grille-Armored Dead",
+      "unidentifiedName": "Iron-Bound Skeleton",
+      "category": "undead",
+      "maxHp": 38,
+      "isElite": true,
+      "visibleGear": {
+        "weapon": "Heavy wrought-iron cellar mace",
+        "armor": "Rusted tomb-grille bars wired around bone",
+        "hiddenDetail": "Dozens of stolen Onyx coins rattle loose inside its iron-wired ribcage."
+      },
+      "anatomy": {
+        "height": "Tall",
+        "weight": "Heavy",
+        "skinColor": "None",
+        "hairLength": "None",
+        "hairStyle": "None",
+        "hairColor": "None",
+        "eyeShape": "Hollow",
+        "eyeColor": "Dim Grey",
+        "musculature": "None",
+        "bodyShape": "Bulky",
+        "facialScars": "Iron-Riveted",
+        "bodyScars": "Wired Bones",
+        "faceDetail": "Rusted iron straps bolt straight across a yellowed brow.",
+        "chestTorsoDetail": "Bent cellar-grille bars cage a broad chest packed with dry bones.",
+        "armsHandsDetail": "Thick wire binds a heavy wrought-iron mace to its forearm.",
+        "legsStanceDetail": "Heavy iron-shod bones clang loud on limestone steps.",
+        "distinguishingMark": "Onyx coins clink inside its hollow ribs with every blow.",
+        "visibleTags": [
+          "undead",
+          "towering"
+        ]
+      },
+      "firstSightProse": "Wrought iron scrapes limestone as a towering, bone-and-grille figure blocks the cellar archway. Rusted cellar bars are wired straight onto yellowed ribs, and a heavy iron mace lifts slowly toward your skull.",
+      "returnSightProse": "A Grille-Armored Dead clangs forward, iron bars rattling.",
+      "xpReward": 40,
+      "description": "Bone Cellars guardian lashed together with rusted tomb-iron and filled with hoarded Onyx.",
+      "intents": [
+        {
+          "kind": "heavy",
+          "label": "Grille Mace",
+          "damage": 11,
+          "damageType": "bludgeoning",
+          "status": {
+            "type": "staggered",
+            "turns": 1,
+            "power": 2
+          },
+          "description": "hefts a massive iron cellar mace."
+        },
+        {
+          "kind": "guard",
+          "label": "Iron Cage",
           "damage": 0,
           "damageType": "bludgeoning",
           "armorGain": 5,
-          "description": "hardens its hide into petrified bark."
+          "description": "turns its wired grille-plate forward."
         }
       ]
     },
     "forge_automaton": {
-      "id": "forge_automaton",
-      "name": "Basalt Kiln-Warden",
-      "unidentifiedName": "Basalt Furnace-Giant",
-      "category": "construct",
-      "maxHp": 48,
       "armor": 4,
       "stats": {
         "might": 5,
@@ -692,384 +2685,951 @@
         "blight": "immune",
         "slashing": "resistant",
         "piercing": "resistant",
-        "lightning": "vulnerable",
-        "acid": "vulnerable"
+        "lightning": "vulnerable"
       },
-      "harvestItemId": "iron_wire_kit",
-      "visibleGear": {
-        "weapon": "Piston-driven basalt furnace hammer",
-        "armor": "Interlocking Durnfolk slate plates and copper steam-shutters",
-        "hiddenDetail": "A brass pressure pin behind its left shoulder vents all piston force."
-      },
-      "anatomy": {
-        "height": "Towering",
-        "weight": "Massive",
-        "skinColor": "Carved Basalt",
-        "hairLength": "None",
-        "hairStyle": "None",
-        "hairColor": "None",
-        "eyeShape": "Narrow",
-        "eyeColor": "Furnace-Amber",
-        "musculature": "Hulking",
-        "bodyShape": "Barrel-Chested",
-        "facialScars": "Unmarked",
-        "bodyScars": "Kiln-Burn",
-        "faceDetail": "A carved stone faceplate hides a glowing orange ember slit behind iron grate-bars.",
-        "chestTorsoDetail": "A riveted furnace core hisses white steam through heavy slate shutters.",
-        "armsHandsDetail": "Pillar-thick basalt arms pivot on copper gears, right fist forged into a crushing hammer.",
-        "legsStanceDetail": "Heavy stone feet shake the flooded flagstones with each deliberate step.",
-        "distinguishingMark": "Pre-Shattering Durnfolk guild runes glow dull orange across its breastplate.",
-        "visibleTags": [
-          "construct",
-          "elite",
-          "armored",
-          "towering"
-        ]
-      },
-      "firstSightProse": "Water ripples across the flooded hall as a towering figure of carved basalt and copper gears lurches upright from the steam. Orange furnace light burns behind its iron visor-slit while a piston-driven stone hammer rises overhead.",
-      "returnSightProse": "The Basalt Kiln-Warden grinds forward through knee-deep steam, furnace hammer raised.",
-      "isElite": true,
-      "xpReward": 50,
       "crownReward": [
-        25,
-        38
+        20,
+        32
       ],
       "lootTable": [
         {
           "itemId": "basalt_plate",
           "chance": 1
+        },
+        {
+          "itemId": "fire_pot",
+          "chance": 0.5
         }
       ],
-      "description": "A Durnfolk brass-and-slate golem guarding the flooded furnace valve.",
+      "id": "forge_automaton",
+      "name": "Bronze Sluice-Warden",
+      "unidentifiedName": "Bronze Clockwork Giant",
+      "category": "construct",
+      "maxHp": 48,
+      "isElite": true,
+      "visibleGear": {
+        "weapon": "Pillar-thick bronze piston-maul",
+        "armor": "Cast bronze furnace plates",
+        "hiddenDetail": "A loose iron cotter-pin rattles inside its left hip gear."
+      },
+      "anatomy": {
+        "height": "Towering",
+        "weight": "Massive",
+        "skinColor": "Tarnished Bronze",
+        "hairLength": "None",
+        "hairStyle": "None",
+        "hairColor": "None",
+        "eyeShape": "Slit",
+        "eyeColor": "Coal Orange",
+        "musculature": "Mechanical",
+        "bodyShape": "Blocky",
+        "facialScars": "Dented Visor",
+        "bodyScars": "Soot-Scored",
+        "faceDetail": "A headless bronze dome vents dull orange sparks through a narrow slit.",
+        "chestTorsoDetail": "Heavy riveted boiler plates hiss steam along every seam.",
+        "armsHandsDetail": "Gear-driven arms end in a solid bronze maul and valve-hook.",
+        "legsStanceDetail": "Pistons slam down hard enough to shake wet basalt.",
+        "distinguishingMark": "Numbered bronze tally-plates rivet across its chest.",
+        "visibleTags": [
+          "construct",
+          "towering"
+        ]
+      },
+      "firstSightProse": "Steam hisses shrill from a sunken pipe before a towering, headless hulk of tarnished bronze stomps down off the sluice-lip. Internal gears grind behind riveted boiler plates as a pillar-thick piston-maul lifts overhead.",
+      "returnSightProse": "The Bronze Sluice-Warden grinds forward, venting hot coal steam.",
+      "xpReward": 50,
+      "description": "Towering clockwork furnace-guard patrolling Smelter Pit's upper bronze valve.",
       "intents": [
         {
           "kind": "heavy",
-          "label": "Piston Hammer",
-          "damage": 14,
+          "label": "Piston Slam",
+          "damage": 12,
           "damageType": "bludgeoning",
-          "description": "raises a massive furnace hammer."
+          "status": {
+            "type": "staggered",
+            "turns": 1,
+            "power": 2
+          },
+          "description": "pressurizes its bronze piston-arm."
         },
         {
-          "kind": "blight",
-          "label": "Cinder Vent",
-          "damage": 9,
+          "kind": "attack",
+          "label": "Steam Vent",
+          "damage": 7,
           "damageType": "fire",
           "status": {
             "type": "burned",
             "turns": 2,
-            "power": 3
+            "power": 2
           },
-          "description": "opens scalding copper steam-vents."
+          "description": "unlatches its chest grate."
         },
         {
           "kind": "guard",
-          "label": "Kiln Shutter",
+          "label": "Boiler Lock",
           "damage": 0,
           "damageType": "bludgeoning",
-          "armorGain": 6,
-          "description": "locks slate chest shutters tight."
+          "armorGain": 5,
+          "description": "seals its heavy bronze plates."
         }
       ]
     },
-    "sir_vorne": {
-      "id": "sir_vorne",
-      "name": "Sir Vorne",
-      "unidentifiedName": "Bell-Helmed Knight",
-      "category": "humanoid",
-      "maxHp": 52,
+    "aqueduct_surveyor": {
       "armor": 3,
       "stats": {
-        "might": 4,
-        "agility": 2,
-        "wit": 3,
-        "grit": 4
+        "might": 3,
+        "agility": 3,
+        "wit": 2,
+        "grit": 3
+      },
+      "resistances": {
+        "poison": "immune",
+        "blight": "immune",
+        "lightning": "vulnerable",
+        "bludgeoning": "vulnerable"
+      },
+      "crownReward": [
+        12,
+        20
+      ],
+      "lootTable": [
+        {
+          "itemId": "iron_wire_kit",
+          "chance": 0.35
+        },
+        {
+          "itemId": "kiln_pitch",
+          "chance": 0.3
+        }
+      ],
+      "id": "aqueduct_surveyor",
+      "name": "Brass Plumb-Walker",
+      "unidentifiedName": "Tripod Brass Walker",
+      "category": "construct",
+      "maxHp": 34,
+      "visibleGear": {
+        "weapon": "Heated iron measuring-spike",
+        "armor": "Riveted brass drum-shell",
+        "hiddenDetail": "A spinning copper plumb-bob whirs inside its central lens."
+      },
+      "anatomy": {
+        "height": "Tall",
+        "weight": "Heavy",
+        "skinColor": "Verdigris Brass",
+        "hairLength": "None",
+        "hairStyle": "None",
+        "hairColor": "None",
+        "eyeShape": "Round",
+        "eyeColor": "Glass Lens",
+        "musculature": "Mechanical",
+        "bodyShape": "Tripod",
+        "facialScars": "Cracked Lens",
+        "bodyScars": "Dented Drum",
+        "faceDetail": "A thick glass eye-lens clicks loudly inside a rotating brass hood.",
+        "chestTorsoDetail": "Cylindrical brass drum vents dry heat from charcoal embers.",
+        "armsHandsDetail": "Telescoping brass rod snaps out with a red-hot iron tip.",
+        "legsStanceDetail": "Three jointed bronze legs step cleanly across broken flagstones.",
+        "distinguishingMark": "Ticks steadily like a grandfather clock before every jab.",
+        "visibleTags": [
+          "construct",
+          "towering"
+        ]
+      },
+      "firstSightProse": "Sharp clockwork clicks echo off broken arches as a three-legged brass drum stalks over the curb. Its cracked glass lens rotates toward your boots with a mechanical whir, and a red-hot measuring spike snaps out from its side.",
+      "returnSightProse": "A Brass Plumb-Walker clicks briskly across the stone.",
+      "xpReward": 31,
+      "description": "Three-legged late-imperial survey construct still patrolling High Road and Brick Hills drains.",
+      "intents": [
+        {
+          "kind": "attack",
+          "label": "Hot Probe",
+          "damage": 8,
+          "damageType": "piercing",
+          "status": {
+            "type": "burned",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "extends a glowing measuring spike."
+        },
+        {
+          "kind": "attack",
+          "label": "Tripod Kick",
+          "damage": 6,
+          "damageType": "bludgeoning",
+          "description": "whips a bronze leg sideways."
+        }
+      ]
+    },
+    "gate_pendulum": {
+      "armor": 5,
+      "stats": {
+        "might": 5,
+        "agility": 1,
+        "wit": 2,
+        "grit": 5
       },
       "resistances": {
         "slashing": "resistant",
         "piercing": "resistant",
-        "lightning": "vulnerable",
-        "bludgeoning": "vulnerable"
+        "poison": "immune",
+        "blight": "immune",
+        "resonant": "immune",
+        "lightning": "vulnerable"
       },
-      "interrogateHint": "Through his cracked bronze visor he whispers that the Weeping Barrow holds his original oath and the First Kiln ignition cipher.",
-      "visibleGear": {
-        "weapon": "Enormous bronze Bell-Cleaver notched from centuries of vigil",
-        "armor": "Tarnished bronze plate fused at the gorget into a bell-shaped greathelm",
-        "hiddenDetail": "His old knightly oath is still engraved faintly along the flat of the blade."
-      },
-      "anatomy": {
-        "height": "Towering",
-        "weight": "Heavy",
-        "skinColor": "Hidden Under Plate",
-        "hairLength": "None",
-        "hairStyle": "None",
-        "hairColor": "None",
-        "eyeShape": "Narrow",
-        "eyeColor": "Shadowed",
-        "musculature": "Hulking",
-        "bodyShape": "Broad-Chested",
-        "facialScars": "Unmarked",
-        "bodyScars": "Old Spear-Mark",
-        "faceDetail": "No flesh shows beneath the cast bronze bell-helm, only deep shadow and a slow hollow breath.",
-        "chestTorsoDetail": "Massive green-tarnished pauldrons and breastplate stand weathered by mountain wind.",
-        "armsHandsDetail": "Gauntleted hands grip the great cleaver with disciplined, unhurried mastery.",
-        "legsStanceDetail": "Greaved boots plant like fortress pillars along the broken parapet.",
-        "distinguishingMark": "The mountain gale draws a low, mournful hum from his bronze helm.",
-        "visibleTags": [
-          "humanoid",
-          "elite",
-          "towering",
-          "armored"
-        ]
-      },
-      "firstSightProse": "A towering figure in green-tarnished bronze rises from a stone plinth above the chasm. His gorget has fused seamlessly into a cast bell-shaped greathelm that hums in the mountain wind as gauntleted hands hoist an enormous bronze cleaver.",
-      "returnSightProse": "Sir Vorne plants his boots on the shattered parapet, bronze cleaver ringing softly.",
-      "isElite": true,
-      "xpReward": 55,
       "crownReward": [
-        30,
-        42
+        20,
+        34
       ],
       "lootTable": [
         {
-          "itemId": "bell_cleaver",
-          "chance": 1
+          "itemId": "storm_vial",
+          "chance": 0.4
+        },
+        {
+          "itemId": "iron_sap_draught",
+          "chance": 0.35
         }
       ],
-      "description": "A towering knight fused into his bronze-bell helm, keeping hollow watch above the Belfry.",
+      "id": "gate_pendulum",
+      "name": "Bronze Bell-Golem",
+      "unidentifiedName": "Tolling Bronze Hulk",
+      "category": "construct",
+      "maxHp": 46,
+      "isElite": true,
+      "visibleGear": {
+        "weapon": "Swinging bronze clapper-fists",
+        "armor": "Bell-cast bronze cylinder",
+        "hiddenDetail": "Hollow resonance amplifies every blow across stone."
+      },
+      "anatomy": {
+        "height": "Towering",
+        "weight": "Massive",
+        "skinColor": "Dark Bronze",
+        "hairLength": "None",
+        "hairStyle": "None",
+        "hairColor": "None",
+        "eyeShape": "None",
+        "eyeColor": "None",
+        "musculature": "Mechanical",
+        "bodyShape": "Bell-Shaped",
+        "facialScars": "Pitted Rim",
+        "bodyScars": "Bell Cracks",
+        "faceDetail": "A solid cast-bronze bell-crown replaces any head or face.",
+        "chestTorsoDetail": "Thick bell-metal cylinder rings softly with every step.",
+        "armsHandsDetail": "Twin bronze clapper-weights swing from heavy chains.",
+        "legsStanceDetail": "Stubby bronze pillars thud hard against marble.",
+        "distinguishingMark": "Cracked lip along its chest leaks cold air.",
+        "visibleTags": [
+          "construct",
+          "towering"
+        ]
+      },
+      "firstSightProse": "Deep metallic booming shakes dust off the North Gate lintel as a headless bronze bell-hulk lumbers into the arch. Heavy clapper-weights swing at the ends of thick chains, ringing low enough to rattle teeth inside your jaw.",
+      "returnSightProse": "A Bronze Bell-Golem booms forward across the marble.",
+      "xpReward": 48,
+      "description": "Heavy cast-bronze sentinel patrolling North Gate arches, shattering armor with concussive swings.",
+      "intents": [
+        {
+          "kind": "heavy",
+          "label": "Clapper Smash",
+          "damage": 12,
+          "damageType": "bludgeoning",
+          "status": {
+            "type": "dazed",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "swings both bronze weights wide."
+        },
+        {
+          "kind": "blight",
+          "label": "Gate Toll",
+          "damage": 7,
+          "damageType": "resonant",
+          "resolveDamage": 4,
+          "description": "strikes its own hollow chest."
+        }
+      ]
+    },
+    "cinder_imp": {
+      "armor": 1,
+      "stats": {
+        "might": 2,
+        "agility": 4,
+        "wit": 3,
+        "grit": 2
+      },
+      "resistances": {
+        "fire": "immune",
+        "poison": "resistant",
+        "cold": "vulnerable"
+      },
+      "crownReward": [
+        6,
+        14
+      ],
+      "lootTable": [
+        {
+          "itemId": "fire_pot",
+          "chance": 0.4
+        },
+        {
+          "itemId": "kiln_pitch",
+          "chance": 0.3
+        }
+      ],
+      "id": "cinder_imp",
+      "name": "Tallow-Sucking Fiend",
+      "unidentifiedName": "Skinless Oil Crouchling",
+      "category": "demonic",
+      "maxHp": 24,
+      "visibleGear": {
+        "weapon": "Needle teeth and scalding tallow spit",
+        "armor": "Raw, skinless red muscle slicked in grease",
+        "hiddenDetail": "Drinks lamp oil straight from stolen lanterns."
+      },
+      "anatomy": {
+        "height": "Small",
+        "weight": "Lean",
+        "skinColor": "Raw Muscle Red",
+        "hairLength": "None",
+        "hairStyle": "None",
+        "hairColor": "None",
+        "eyeShape": "Wide",
+        "eyeColor": "Sulfur Yellow",
+        "musculature": "Wiry",
+        "bodyShape": "Hunched",
+        "facialScars": "Split Mouth",
+        "bodyScars": "Heat Blisters",
+        "faceDetail": "Skinless red sinew pulls back around needle teeth and sulfur-yellow eyes.",
+        "chestTorsoDetail": "Visible grey ribs shine wetly with stolen mutton tallow.",
+        "armsHandsDetail": "Long, four-fingered claws drip hot oil onto stone.",
+        "legsStanceDetail": "Scuttles backward up broken walls on goat-bent hocks.",
+        "distinguishingMark": "Smells foully of burnt grease and sulfur.",
+        "visibleTags": [
+          "demonic",
+          "small_stature"
+        ]
+      },
+      "firstSightProse": "Hot grease sizzles in the dark before a hunched, skinless thing scuttles down a column drum, licking spilled lamp oil off the stone. Wet red muscle gleams beneath sulfur-yellow eyes as needle teeth snap wide.",
+      "returnSightProse": "A Tallow-Sucking Fiend hisses low, dripping hot grease.",
+      "xpReward": 26,
+      "description": "Skinless horror bred in desperate Dry Arch blood-rites that steals lamp oil and spits scalding fat.",
       "intents": [
         {
           "kind": "attack",
-          "label": "Bell-Cleaver Arc",
-          "damage": 12,
-          "damageType": "slashing",
+          "label": "Scalding Spit",
+          "damage": 7,
+          "damageType": "fire",
+          "status": {
+            "type": "burned",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "gulps hot grease inside its throat."
+        },
+        {
+          "kind": "attack",
+          "label": "Needle Bite",
+          "damage": 6,
+          "damageType": "piercing",
           "status": {
             "type": "bleeding",
             "turns": 2,
             "power": 2
           },
-          "description": "swings his bronze greatblade wide."
-        },
-        {
-          "kind": "guard",
-          "label": "Oath-Vigil",
-          "damage": 0,
-          "damageType": "bludgeoning",
-          "armorGain": 5,
-          "description": "plants his steel guard firmly."
-        },
-        {
-          "kind": "toll",
-          "label": "Helm Resonance",
-          "damage": 11,
-          "damageType": "resonant",
-          "resolveDamage": 4,
-          "status": {
-            "type": "dazed",
-            "turns": 2,
-            "power": 3
-          },
-          "description": "rings his great helm with a gauntlet."
+          "description": "leaps toward your lantern hand."
         }
       ]
     },
-    "silk_assassin": {
-      "id": "silk_assassin",
-      "name": "Cistern Vengeance",
-      "unidentifiedName": "Veiled Wire-Hunter",
-      "category": "humanoid",
-      "maxHp": 40,
-      "armor": 1,
+    "flayed_penitent": {
+      "armor": 2,
       "stats": {
-        "might": 2,
-        "agility": 5,
-        "wit": 4,
-        "grit": 2
+        "might": 4,
+        "agility": 3,
+        "wit": 2,
+        "grit": 4
       },
       "resistances": {
-        "poison": "resistant",
-        "acid": "resistant",
-        "fire": "vulnerable"
+        "fire": "resistant",
+        "blight": "resistant",
+        "resonant": "vulnerable"
       },
-      "interrogateHint": "She hisses that the Seal of Silence breaks Malakor's Drowning Toll, though the Matrons will never forgive the drained Font.",
-      "visibleGear": {
-        "weapon": "Twin Vesper-glass stilettos and coiled acid wire",
-        "armor": "Pale luminous spider-silk mantle that blurs outlines in mist",
-        "hiddenDetail": "Every step lands completely silent on silk-wrapped soles."
-      },
-      "anatomy": {
-        "height": "Average",
-        "weight": "Lean",
-        "skinColor": "Moon-Pale",
-        "hairLength": "Long",
-        "hairStyle": "Tied Back",
-        "hairColor": "Silver-White",
-        "eyeShape": "Almond",
-        "eyeColor": "Blindfolded",
-        "musculature": "Wiry",
-        "bodyShape": "Slender",
-        "facialScars": "Ritual Brand",
-        "bodyScars": "Unmarked",
-        "faceDetail": "A translucent white silk veil hides eyes and brow, leaving only a calm, unforgiving mouth visible.",
-        "chestTorsoDetail": "Lithe, slender torso drapes in layered pale silk weighted with small silver needles.",
-        "armsHandsDetail": "Long, steady fingers spin amber-glass blades with effortless precision.",
-        "legsStanceDetail": "Weightless, crouching balance poised to vanish sideways through fog.",
-        "distinguishingMark": "Pale cistern ink spirals up both wrists.",
-        "visibleTags": [
-          "humanoid",
-          "elite",
-          "swift"
-        ]
-      },
-      "firstSightProse": "A silver wire sings past your ear and snaps taut into a roadside stone. Out of the fog glides a lithe, veiled woman wrapped in luminous white silk, spinning twin amber-glass stilettos without a sound.",
-      "returnSightProse": "The Cistern Vengeance circles through the fog, twin amber stilettos gleaming.",
-      "isElite": true,
-      "xpReward": 42,
       "crownReward": [
-        22,
-        32
+        12,
+        22
       ],
       "lootTable": [
         {
-          "itemId": "vesper_needle",
-          "chance": 1
-        }
-      ],
-      "description": "A veiled sister of the Silken Cistern dispatched to reclaim stolen Vesper blood.",
-      "intents": [
-        {
-          "kind": "attack",
-          "label": "Needle Flurry",
-          "damage": 11,
-          "damageType": "piercing",
-          "status": {
-            "type": "bleeding",
-            "turns": 3,
-            "power": 3
-          },
-          "description": "spins twin Vesper-glass stilettos."
+          "itemId": "vesper_tonic",
+          "chance": 0.3
         },
         {
-          "kind": "blight",
-          "label": "Venom Thread",
-          "damage": 8,
-          "damageType": "poison",
+          "itemId": "writ_bone_shatter",
+          "chance": 0.15
+        }
+      ],
+      "id": "flayed_penitent",
+      "name": "Flayed Apostate",
+      "unidentifiedName": "Chain-Hooked Horror",
+      "category": "demonic",
+      "maxHp": 36,
+      "visibleGear": {
+        "weapon": "Hooked iron flaying-chains",
+        "armor": "Torn skin-strips hanging off raw sinew",
+        "hiddenDetail": "Bronze pins pierce straight through its ribs to ward off cold."
+      },
+      "anatomy": {
+        "height": "Tall",
+        "weight": "Gaunt",
+        "skinColor": "Flayed Red",
+        "hairLength": "None",
+        "hairStyle": "None",
+        "hairColor": "None",
+        "eyeShape": "Lidless",
+        "eyeColor": "Bloodshot White",
+        "musculature": "Corded",
+        "bodyShape": "Lean",
+        "facialScars": "Flayed Cheek",
+        "bodyScars": "Hook Punctures",
+        "faceDetail": "Lidless white eyes stare wildly out of raw, salt-crusted face-muscle.",
+        "chestTorsoDetail": "Tarnished bronze pins stab straight into exposed, steaming ribs.",
+        "armsHandsDetail": "Hooked iron chains dangle straight from pierced wrists.",
+        "legsStanceDetail": "Strides relentlessly through salt drifts without slowing.",
+        "distinguishingMark": "Leaves steaming red footprints in dry cellar salt.",
+        "visibleTags": [
+          "demonic",
+          "towering",
+          "implanted"
+        ]
+      },
+      "firstSightProse": "Wet hooks clink against stone before a tall, lidless horror lurches out of a bone gallery. Flayed muscle steams in the cold air where bronze pins stab straight into its ribs, and hooked iron chains whip violently from pierced wrists.",
+      "returnSightProse": "A Flayed Apostate stalks forward, hooked chains screaming.",
+      "xpReward": 36,
+      "description": "Apostate twisted beyond human limits inside Bone Cellars after trying to flay out northern numbness.",
+      "intents": [
+        {
+          "kind": "heavy",
+          "label": "Hook Whip",
+          "damage": 10,
+          "damageType": "slashing",
           "status": {
-            "type": "poisoned",
+            "type": "bleeding",
             "turns": 2,
             "power": 3
           },
-          "description": "coils a glistening venom wire."
+          "description": "whirls barbed iron hooks wide."
+        },
+        {
+          "kind": "blight",
+          "label": "Salt Shriek",
+          "damage": 6,
+          "damageType": "blight",
+          "resolveDamage": 4,
+          "defilementGain": 3,
+          "description": "opens a raw, salt-stung throat."
+        }
+      ]
+    },
+    "pit_maw": {
+      "armor": 3,
+      "stats": {
+        "might": 5,
+        "agility": 2,
+        "wit": 2,
+        "grit": 4
+      },
+      "resistances": {
+        "fire": "immune",
+        "acid": "resistant",
+        "cold": "vulnerable"
+      },
+      "crownReward": [
+        16,
+        28
+      ],
+      "lootTable": [
+        {
+          "itemId": "fire_pot",
+          "chance": 0.6
+        },
+        {
+          "itemId": "kiln_pitch",
+          "chance": 0.5
+        }
+      ],
+      "id": "pit_maw",
+      "name": "Slag-Belly Horror",
+      "unidentifiedName": "Multi-Jawed Pit Beast",
+      "category": "demonic",
+      "maxHp": 44,
+      "isElite": true,
+      "visibleGear": {
+        "weapon": "Split belly-maw and slag-caked claws",
+        "armor": "Vitrified black glass crusted over fat",
+        "hiddenDetail": "Half-melted iron buckles jut out of its swollen gut."
+      },
+      "anatomy": {
+        "height": "Tall",
+        "weight": "Massive",
+        "skinColor": "Scorched Grey",
+        "hairLength": "None",
+        "hairStyle": "None",
+        "hairColor": "None",
+        "eyeShape": "Clustered",
+        "eyeColor": "Molten Orange",
+        "musculature": "Hulking",
+        "bodyShape": "Bloated",
+        "facialScars": "Split Skull",
+        "bodyScars": "Slag Crust",
+        "faceDetail": "Clustered orange eyes blink above a jawless face split straight to the belly.",
+        "chestTorsoDetail": "A second jagged tooth-ring opens wetly across its bloated stomach.",
+        "armsHandsDetail": "Heavy claws crusted in black kiln glass drag along the ground.",
+        "legsStanceDetail": "Lumbers on thick, blistered stumps across glowing slag.",
+        "distinguishingMark": "Belches sour acid and glowing cinders together.",
+        "visibleTags": [
+          "demonic",
+          "towering",
+          "muscular"
+        ]
+      },
+      "firstSightProse": "Glazed black slag crunches under massive weight as a bloated, glass-crusted horror heaves itself out of a furnace-pit. Its chest splits vertically into a second jagged mouth steaming with orange heat and sour bile.",
+      "returnSightProse": "A Slag-Belly Horror heaves forward, glowing cinders spilling from its gut.",
+      "xpReward": 46,
+      "description": "Swollen furnace abomination festering beneath Brick Hills slag-pits.",
+      "intents": [
+        {
+          "kind": "heavy",
+          "label": "Belly Crunch",
+          "damage": 11,
+          "damageType": "piercing",
+          "status": {
+            "type": "corroded",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "lunges forward with its split torso-maw."
+        },
+        {
+          "kind": "attack",
+          "label": "Slag Belch",
+          "damage": 8,
+          "damageType": "fire",
+          "status": {
+            "type": "burned",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "heaves glowing cinders from its gut."
+        }
+      ]
+    },
+    "pale_mirror_stalker": {
+      "armor": 2,
+      "stats": {
+        "might": 3,
+        "agility": 5,
+        "wit": 5,
+        "grit": 4
+      },
+      "resistances": {
+        "cold": "immune",
+        "resonant": "resistant",
+        "blight": "resistant",
+        "bludgeoning": "vulnerable"
+      },
+      "crownReward": [
+        22,
+        38
+      ],
+      "lootTable": [
+        {
+          "itemId": "star_sap_drop",
+          "chance": 0.5
+        },
+        {
+          "itemId": "veil_elixir",
+          "chance": 0.45
+        }
+      ],
+      "id": "pale_mirror_stalker",
+      "name": "Glass-Skinned Echo",
+      "unidentifiedName": "Faceless Silver Silhouette",
+      "category": "lunar",
+      "maxHp": 46,
+      "isElite": true,
+      "visibleGear": {
+        "weapon": "Razor-thin frost glass limbs",
+        "armor": "Refracted silver-white sheen",
+        "hiddenDetail": "Casts no shadow under direct moonlight."
+      },
+      "anatomy": {
+        "height": "Towering",
+        "weight": "Lean",
+        "skinColor": "Mirror Silver",
+        "hairLength": "None",
+        "hairStyle": "None",
+        "hairColor": "None",
+        "eyeShape": "None",
+        "eyeColor": "None",
+        "musculature": "Wiry",
+        "bodyShape": "Elongated",
+        "facialScars": "Smooth Blank",
+        "bodyScars": "Glass Fractures",
+        "faceDetail": "A smooth, featureless curve of silvered ice reflects your own torchlight back.",
+        "chestTorsoDetail": "Translucent pale ribs pulse faintly in silence.",
+        "armsHandsDetail": "Elongated limbs taper to razor-sharp frost glass.",
+        "legsStanceDetail": "Mirrors your exact footwork half a beat late.",
+        "distinguishingMark": "Air freezes into silent frost-rings around its heels.",
+        "visibleTags": [
+          "lunar",
+          "towering",
+          "pale_skin"
+        ]
+      },
+      "firstSightProse": "Air snaps dead-quiet under white moonlight as a tall, faceless silhouette steps out of a marble colonnade. Its smooth silvered skin reflects your own lantern back without eyes or mouth, and every joint moves in uncanny mimicry of your own stance.",
+      "returnSightProse": "A Glass-Skinned Echo glides silently across the frost, mirroring your stance.",
+      "xpReward": 65,
+      "description": "Ultra-rare lunar anomaly manifesting only under Full Moon alignment or extreme Defilement.",
+      "intents": [
+        {
+          "kind": "blight",
+          "label": "Hollow Mirror",
+          "damage": 8,
+          "damageType": "resonant",
+          "resolveDamage": 5,
+          "defilementGain": 6,
+          "description": "tilts its blank silver face toward yours."
+        },
+        {
+          "kind": "attack",
+          "label": "Glass Shear",
+          "damage": 11,
+          "damageType": "slashing",
+          "status": {
+            "type": "chilled",
+            "turns": 2,
+            "power": 3
+          },
+          "description": "sweeps razor-thin frost limbs."
+        }
+      ]
+    },
+    "silver_chorister": {
+      "armor": 3,
+      "stats": {
+        "might": 2,
+        "agility": 4,
+        "wit": 6,
+        "grit": 5
+      },
+      "resistances": {
+        "cold": "immune",
+        "poison": "immune",
+        "blight": "immune",
+        "resonant": "immune",
+        "bludgeoning": "vulnerable"
+      },
+      "crownReward": [
+        28,
+        45
+      ],
+      "lootTable": [
+        {
+          "itemId": "writ_star_ward",
+          "chance": 0.5
+        },
+        {
+          "itemId": "star_sap_drop",
+          "chance": 0.6
+        }
+      ],
+      "id": "silver_chorister",
+      "name": "Moon-Tuned Resonance",
+      "unidentifiedName": "Floating Silver Rings",
+      "category": "lunar",
+      "maxHp": 54,
+      "isElite": true,
+      "visibleGear": {
+        "weapon": "Spinning silver-plated ribs and harmonic rings",
+        "armor": "Orbiting frost-locked bronze arcs",
+        "hiddenDetail": "Hummed pitches match the exact intervals of the 12-day moon cycle."
+      },
+      "anatomy": {
+        "height": "Towering",
+        "weight": "Weightless",
+        "skinColor": "Pale Silver",
+        "hairLength": "None",
+        "hairStyle": "None",
+        "hairColor": "None",
+        "eyeShape": "None",
+        "eyeColor": "None",
+        "musculature": "None",
+        "bodyShape": "Ringed",
+        "facialScars": "None",
+        "bodyScars": "Etched Rings",
+        "faceDetail": "No head exists—only three concentric silver rings hovering above pale ribs.",
+        "chestTorsoDetail": "Hollow silvered rib-arcs spin slowly in dead silence.",
+        "armsHandsDetail": "Thin frost-threads lash outward whenever a ring aligns.",
+        "legsStanceDetail": "Hovers six inches above pale marble without touching the frost.",
+        "distinguishingMark": "Draws loose silver dust upward into slow orbits.",
+        "visibleTags": [
+          "lunar",
+          "towering"
+        ]
+      },
+      "firstSightProse": "Frost lifts gently off the floor without wind as three concentric silver rings drift between white pillars, hovering above a cage of pale, hollow ribs. A freezing hum vibrates straight inside your skull before a single sound reaches your ears.",
+      "returnSightProse": "A Moon-Tuned Resonance hovers silently, rings turning in cold air.",
+      "xpReward": 78,
+      "description": "Strictly scarce cosmic anomaly found only inside The White Dome under peak lunar alignment.",
+      "intents": [
+        {
+          "kind": "blight",
+          "label": "Lunar Pulse",
+          "damage": 10,
+          "damageType": "resonant",
+          "resolveDamage": 6,
+          "defilementGain": 7,
+          "status": {
+            "type": "dazed",
+            "turns": 2,
+            "power": 2
+          },
+          "description": "aligns three spinning silver rings."
+        },
+        {
+          "kind": "attack",
+          "label": "Frost Thread",
+          "damage": 10,
+          "damageType": "cold",
+          "status": {
+            "type": "chilled",
+            "turns": 2,
+            "power": 3
+          },
+          "description": "lashes freezing silver filaments outward."
+        },
+        {
+          "kind": "guard",
+          "label": "Phase Orbit",
+          "damage": 0,
+          "damageType": "resonant",
+          "armorGain": 5,
+          "description": "spins its outer bronze arcs tight."
         }
       ]
     },
     "malakor": {
-      "id": "malakor",
-      "name": "Malakor, Choir-Husk",
-      "unidentifiedName": "Crowned Choir-Warden",
-      "category": "boss",
-      "maxHp": 88,
       "armor": 3,
       "stats": {
-        "might": 4,
+        "might": 5,
         "agility": 2,
         "wit": 5,
         "grit": 5
       },
       "resistances": {
-        "blight": "resistant",
+        "blight": "immune",
         "poison": "immune",
         "resonant": "resistant",
-        "fire": "vulnerable",
-        "lightning": "vulnerable"
+        "cold": "resistant",
+        "fire": "vulnerable"
       },
+      "crownReward": [
+        60,
+        95
+      ],
+      "lootTable": [
+        {
+          "itemId": "husk_gland",
+          "chance": 1
+        },
+        {
+          "itemId": "writ_blight_wave",
+          "chance": 0.7
+        }
+      ],
+      "id": "malakor",
+      "name": "Crowned Dome-Prelate",
+      "unidentifiedName": "Crowned Dome Prelate",
+      "category": "boss",
+      "maxHp": 88,
+      "harvestItemId": "husk_gland",
+      "isBoss": true,
       "visibleGear": {
-        "weapon": "Root-twisted bronze bell-scepter",
-        "armor": "Living pale-root vestments and fractured High Warden bell-crown",
-        "hiddenDetail": "Three resonance conduits link his crown to the great upside-down bell overhead."
+        "weapon": "Bronze bell-crozier fused into bone",
+        "armor": "Cracked bell-crown and rotted silver-threaded robes",
+        "hiddenDetail": "Three bronze seals bind his hollow chest to the sunken pit."
       },
       "anatomy": {
         "height": "Towering",
-        "weight": "Heavy",
-        "skinColor": "Calcified Ivory",
-        "hairLength": "Trailing",
-        "hairStyle": "Wild",
-        "hairColor": "Pale Root-Filaments",
+        "weight": "Gaunt",
+        "skinColor": "Chalk-White",
+        "hairLength": "Long",
+        "hairStyle": "Matted",
+        "hairColor": "Silver-Grey",
         "eyeShape": "Hollow",
-        "eyeColor": "Amber-Gold",
-        "musculature": "Corded",
-        "bodyShape": "Broad-Chested",
-        "facialScars": "Ritual Brand",
-        "bodyScars": "Pale Root-Veins",
-        "faceDetail": "Beneath a cracked bronze bell-crown, an ancient calcified visage gazes down with steady amber sparks in hollow sockets.",
-        "chestTorsoDetail": "A towering chest woven from old royal vestments and thick, breathing white roots rises from the sunken throne.",
-        "armsHandsDetail": "Long, pale arms grip a bronze scepter thick as a lance while root-tendrils curl around each wrist.",
-        "legsStanceDetail": "Root-bound lower limbs anchor directly into the amphitheater dais, dragging free with stone-grinding power.",
-        "distinguishingMark": "Every breath draws a deep metallic shudder from the colossal bell suspended overhead.",
+        "eyeColor": "Blank White",
+        "musculature": "Wiry",
+        "bodyShape": "Elongated",
+        "facialScars": "Crown Welts",
+        "bodyScars": "Bronze Rivets",
+        "faceDetail": "A cracked bronze bell-crown bites deep into pale, unblinking brows.",
+        "chestTorsoDetail": "Silver-threaded rags part over a cavernous chest ringing with cold air.",
+        "armsHandsDetail": "Long, bone-white fingers fuse directly around a bronze crozier.",
+        "legsStanceDetail": "Stands planted atop the cracked bronze dais.",
+        "distinguishingMark": "Cold air rushes steadily out from beneath his cracked crown.",
         "visibleTags": [
           "boss",
           "husk",
           "towering",
-          "occult"
+          "pale_skin"
         ]
       },
-      "firstSightProse": "At the center of the drowned amphitheater hangs an upside-down bronze bell vast as a keep. Beneath its silent lip rises a towering crowned figure woven into a throne of living white roots, ancient amber light burning inside hollow eyes as a bronze scepter lifts from the stone.",
-      "returnSightProse": "Malakor, the Choir-Husk, rises from his pale-root throne beneath the great drowned bell.",
-      "isBoss": true,
+      "firstSightProse": "Freezing air surges up from the sunken dais as a towering, silver-robed figure rises slowly behind a fractured bronze bell. A heavy bell-crown sits riveted into chalk-white brows, and bone-white fingers lift a bronze crozier fused straight to his wrist.",
+      "returnSightProse": "The Crowned Dome-Prelate stands enthroned beneath the fractured white dome.",
       "xpReward": 150,
-      "crownReward": [
-        80,
-        120
-      ],
-      "lootTable": [],
-      "description": "The fallen High Bell-Warden, throne-bound to the Pale Root beneath a cracked bronze spire.",
+      "description": "Hollowed prelate enthroned in the drowned pit beneath The White Dome.",
       "intents": [
         {
-          "kind": "attack",
-          "label": "Root-Scepter Smash",
-          "damage": 13,
+          "kind": "heavy",
+          "label": "Crozier Toll",
+          "damage": 14,
           "damageType": "bludgeoning",
+          "resolveDamage": 4,
           "status": {
-            "type": "bleeding",
-            "turns": 2,
+            "type": "staggered",
+            "turns": 1,
             "power": 2
           },
-          "description": "lifts a root-twisted bronze scepter."
+          "description": "hefts the fused bronze crozier."
         },
         {
           "kind": "blight",
-          "label": "Calcifying Choir",
+          "label": "Dome Chime",
           "damage": 10,
-          "damageType": "blight",
-          "resolveDamage": 4,
-          "defilementGain": 4,
-          "status": {
-            "type": "blighted",
-            "turns": 3,
-            "power": 3
-          },
-          "description": "chants a pale-root chorus."
-        },
-        {
-          "kind": "toll",
-          "label": "Drowning Toll",
-          "damage": 18,
           "damageType": "resonant",
-          "resolveDamage": 7,
+          "resolveDamage": 6,
           "defilementGain": 5,
           "status": {
-            "type": "dazed",
+            "type": "blighted",
             "turns": 2,
             "power": 3
           },
-          "description": "draws breath beneath the great drowned bell."
+          "description": "strikes the cracked bronze dais."
+        },
+        {
+          "kind": "toll",
+          "label": "Cold Pull",
+          "damage": 11,
+          "damageType": "cold",
+          "resolveDamage": 5,
+          "defilementGain": 4,
+          "description": "draws freezing air through his hollow ribs."
+        }
+      ]
+    },
+    "quarry_matriarch": {
+      "armor": 4,
+      "stats": {
+        "might": 6,
+        "agility": 3,
+        "wit": 2,
+        "grit": 5
+      },
+      "resistances": {
+        "acid": "immune",
+        "poison": "immune",
+        "slashing": "resistant",
+        "bludgeoning": "vulnerable"
+      },
+      "crownReward": [
+        50,
+        80
+      ],
+      "lootTable": [
+        {
+          "itemId": "chitin_serum",
+          "chance": 1
+        },
+        {
+          "itemId": "iron_wire_kit",
+          "chance": 0.6
+        }
+      ],
+      "id": "quarry_matriarch",
+      "name": "The Slate-Back Queen",
+      "unidentifiedName": "Wagon-Sized Acid Crawler",
+      "category": "boss",
+      "maxHp": 74,
+      "harvestItemId": "chitin_serum",
+      "harvestModId": "chitin_skin",
+      "isBoss": true,
+      "visibleGear": {
+        "weapon": "Crushing quarry-pincers and acid spray",
+        "armor": "Onyx-studded black slate carapace",
+        "hiddenDetail": "Indestructible black Onyx coins lie fused into her thick dorsal plates."
+      },
+      "anatomy": {
+        "height": "Massive",
+        "weight": "Massive",
+        "skinColor": "Onyx-Black",
+        "hairLength": "None",
+        "hairStyle": "Plated",
+        "hairColor": "None",
+        "eyeShape": "Clustered",
+        "eyeColor": "Pale Green",
+        "musculature": "Hulking",
+        "bodyShape": "Segmented",
+        "facialScars": "Broken Pincer",
+        "bodyScars": "Onyx Crust",
+        "faceDetail": "Twin wagon-tongue pincers drip smoking black acid below pale green eyes.",
+        "chestTorsoDetail": "Broad slate-black dorsal plates carry fused Onyx shards like armor studs.",
+        "armsHandsDetail": "Forelimbs thick as pit-props slam down to pin prey.",
+        "legsStanceDetail": "Twelve jointed legs grip sheer quarry walls effortlessly.",
+        "distinguishingMark": "Rattles like falling slate whenever she turns.",
+        "visibleTags": [
+          "boss",
+          "beast",
+          "chitin_plated"
+        ]
+      },
+      "firstSightProse": "Bronze hoist chains snap tight as a wagon-sized, slate-armored crawler heaves up out of the deepest quarry shaft. Sharp black Onyx shards stud her overlapping dorsal plates while smoking acid pools beneath twin crushing pincers.",
+      "returnSightProse": "The Slate-Back Queen blocks the quarry shaft, pincers dripping acid.",
+      "xpReward": 120,
+      "description": "Apex acid-crawler matriarch nested beneath Black Quarry, armored in fused Onyx shards.",
+      "intents": [
+        {
+          "kind": "heavy",
+          "label": "Quarry Crush",
+          "damage": 14,
+          "damageType": "bludgeoning",
+          "status": {
+            "type": "staggered",
+            "turns": 1,
+            "power": 2
+          },
+          "description": "rears her massive plated forequarters."
+        },
+        {
+          "kind": "attack",
+          "label": "Acid Flood",
+          "damage": 9,
+          "damageType": "acid",
+          "status": {
+            "type": "corroded",
+            "turns": 3,
+            "power": 3
+          },
+          "description": "heaves green acid across the stone."
         },
         {
           "kind": "guard",
-          "label": "Belfry Aegis",
+          "label": "Onyx Curl",
           "damage": 0,
           "damageType": "bludgeoning",
           "armorGain": 6,
-          "description": "summons living bark around his throne."
+          "description": "locks her Onyx-studded shell plates."
         }
       ]
     }

@@ -62,7 +62,8 @@ Fill/replace content for: [INSERT TARGET DOMAIN: e.g., "Area 1-3 in data/places.
 STRICT RULES:
 - Actor's-eye view ONLY: describe what a living traveler physically sees, hears, smells, and feels right there—never world-building exposition or textbook history.
 - NEVER copy, paraphrase, or recite phrasing from docs/lore/*. Every room, area, and event needs fresh local sensory detail.
-- NEVER use cliché slop (ancient, whispers, palpable, obsidian, shadows dance, a testament to).
+- NEVER use cliché slop (ancient, whispers, palpable, obsidian, shadows dance, a testament to) or legacy Gloaming Reach terms (Gloam, Belfry, Cinderford, Pale Root, Pale Choir, Husk-Tide, Aethel, Vesper, Malakor, Vorne, Kale, Veyra, Shattering, Khaz-Durn, First Kiln, Ash-Born, Ash-Rain).
+- Name enemies by observable form/role only (never proper personal names).
 - STRICT LATE-GAME SECRECY: Do NOT mention or hint at the meteoric stone's origin, why the silver capital failed, or lunar entities in early/mid-game prose.
 - Describe before naming: every enemy/NPC needs unidentifiedName/unidentifiedLabel, firstSightProse (without the proper name), and a full mirrored AnatomyProfile.
 - Zero brackets [...] or parentheses (...) anywhere in player-facing text.

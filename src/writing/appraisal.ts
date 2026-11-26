@@ -216,7 +216,7 @@ export function runActiveObserveCheck(state: GameState, enemyIdx: number): strin
     enemy.appraisalTier = 1;
     upgradeEnemyAppraisal(state, enemy.templateId, 1);
     return [
-      `Through the ash-haze you catch rough outlines of ${getEnemyDisplayName(state, enemy)}: ${enemy.visibleGear.weapon}, ${enemy.visibleGear.armor}.`,
+      `Through the freezing mist you catch rough outlines of ${getEnemyDisplayName(state, enemy)}: ${enemy.visibleGear.weapon}, ${enemy.visibleGear.armor}.`,
       ...describeStatImpressions(enemy.stats, 1),
     ];
   }

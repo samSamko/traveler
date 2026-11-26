@@ -105,15 +105,11 @@
         {
           "id": "poultice",
           "qty": 1
-        },
-        {
-          "id": "stamina_draught",
-          "qty": 1
         }
       ],
-      "startingCrowns": 20,
-      "startingRations": 4,
-      "startingTorches": 2,
+      "startingCrowns": 10,
+      "startingRations": 2,
+      "startingTorches": 1,
       "abilityIds": [
         "cleave",
         "iron_riposte",
@@ -138,16 +134,12 @@
       "startingItems": [
         {
           "id": "vesper_tonic",
-          "qty": 2
-        },
-        {
-          "id": "poultice",
           "qty": 1
         }
       ],
-      "startingCrowns": 22,
-      "startingRations": 3,
-      "startingTorches": 3,
+      "startingCrowns": 12,
+      "startingRations": 2,
+      "startingTorches": 2,
       "abilityIds": [
         "soul_dart",
         "wither_bell",
@@ -155,7 +147,7 @@
       ],
       "passive": {
         "id": "vesper_reservoir",
-        "name": "Vesper Reservoir",
+        "name": "Deep Reservoir",
         "description": "Draws ambient focus at the start of every combat round."
       }
     },
@@ -173,17 +165,13 @@
       "startingTrinketId": "grixi_loupe",
       "startingItems": [
         {
-          "id": "fire_pot",
-          "qty": 1
-        },
-        {
           "id": "poultice",
           "qty": 1
         }
       ],
-      "startingCrowns": 26,
-      "startingRations": 4,
-      "startingTorches": 3,
+      "startingCrowns": 14,
+      "startingRations": 2,
+      "startingTorches": 2,
       "abilityIds": [
         "hamstring_shot",
         "heart_seeker",
@@ -209,16 +197,12 @@
       "startingItems": [
         {
           "id": "poultice",
-          "qty": 2
-        },
-        {
-          "id": "antitoxin",
           "qty": 1
         }
       ],
-      "startingCrowns": 16,
-      "startingRations": 4,
-      "startingTorches": 3,
+      "startingCrowns": 8,
+      "startingRations": 2,
+      "startingTorches": 2,
       "abilityIds": [
         "chime_of_rebuke",
         "blood_tithe",
@@ -231,40 +215,10 @@
       }
     }
   },
-  "heirlooms": {
-    "kiln_lantern": {
-      "id": "kiln_lantern",
-      "name": "Iron Lantern",
-      "unlockRequirement": "Starter Heirloom",
-      "description": "A soot-blackened brass lantern burning a sliver of pre-Shattering ember.",
-      "combatDescription": "Searing kiln-light that breaks guard, restores focus, and lights dark crypts."
-    },
-    "orin_bell_shard": {
-      "id": "orin_bell_shard",
-      "name": "Bronze Bell-Shard",
-      "unlockRequirement": "Reach Day 7 or slay an Elite foe",
-      "description": "A bronze splinter cast from the bell that first cracked the Pale Choir.",
-      "combatDescription": "Counter-harmonic chime that staggers foes and raises armor."
-    },
-    "star_dew_vial": {
-      "id": "star_dew_vial",
-      "name": "Silver-Dew Vial",
-      "unlockRequirement": "Discover two seals or aid the Silken Cistern",
-      "description": "Moon-distilled sap gathered before the Star-Wood turned to stone.",
-      "combatDescription": "Restores health and resolve, purges afflictions, and blesses rolls."
-    },
-    "grixi_chronometer": {
-      "id": "grixi_chronometer",
-      "name": "Brass Chronometer",
-      "unlockRequirement": "Hold 100 Crowns in a run or win a run",
-      "description": "Ticking brass astrolabe that slips half a heartbeat sideways in time.",
-      "combatDescription": "Evades the enemy intent completely and strikes back."
-    }
-  },
   "abilities": {
     "kiln_spark": {
       "id": "kiln_spark",
-      "name": "Kiln-Spark",
+      "name": "Cinder-Spark",
       "kind": "cantrip",
       "actionCost": "swift",
       "damageType": "fire",
@@ -286,7 +240,7 @@
     },
     "gloam_weave": {
       "id": "gloam_weave",
-      "name": "Gloam-Weave",
+      "name": "Silver-Weave",
       "kind": "cantrip",
       "damageType": "resonant",
       "staminaCost": 0,
@@ -303,7 +257,7 @@
         "power": 3
       },
       "pierceArmor": true,
-      "description": "Ael-Thalor cantrip that strikes with twilight resonance and dazes."
+      "description": "Ael-Thalor cantrip that strikes with cold resonance and dazes."
     },
     "anvil_strike": {
       "id": "anvil_strike",
@@ -328,7 +282,7 @@
     },
     "vesper_flask": {
       "id": "vesper_flask",
-      "name": "Vesper-Flask",
+      "name": "Vitriol-Flask",
       "kind": "cantrip",
       "damageType": "acid",
       "staminaCost": 0,
@@ -520,7 +474,7 @@
     },
     "veil_of_ash": {
       "id": "veil_of_ash",
-      "name": "Veil of Ash",
+      "name": "Veil of Frost",
       "kind": "cantrip",
       "staminaCost": 0,
       "focusCost": 2,
@@ -532,7 +486,7 @@
       },
       "restoreStamina": 2,
       "restoreResolve": 2,
-      "description": "Cloaks you in drifting ash while restoring stamina and resolve."
+      "description": "Cloaks you in drifting rime while restoring stamina and resolve."
     },
     "chime_of_rebuke": {
       "id": "chime_of_rebuke",
@@ -595,7 +549,7 @@
     },
     "keen_focus": {
       "id": "keen_focus",
-      "name": "Vesper Conduit",
+      "name": "Keen Conduit",
       "description": "Deepens wit and maximum focus.",
       "statBonus": {
         "wit": 1
@@ -646,6 +600,180 @@
       "name": "Relentless Tempo",
       "description": "Grants one extra Swift action every combat round.",
       "extraSwiftActions": 1
+    }
+  },
+  "southernPasts": {
+    "pit_brawler": {
+      "id": "pit_brawler",
+      "name": "Pit-Brawler",
+      "subtitle": "Bone-knuckled ring fighter who broke a bailiff jaw",
+      "lore": "You fought chained dogs and debtors in muddy tavern pits before snapping a collector jaw and bolting north.",
+      "statMods": {
+        "might": 2,
+        "grit": 1,
+        "agility": 0,
+        "wit": -1
+      },
+      "bonusCrowns": 4,
+      "bonusRations": 1,
+      "bonusTorches": 0,
+      "bonusItems": [
+        {
+          "id": "kiln_pitch",
+          "qty": 1
+        }
+      ]
+    },
+    "fence_smuggler": {
+      "id": "fence_smuggler",
+      "name": "Fence & Smuggler",
+      "subtitle": "Ditch-runner dealing forged seals and hot silver",
+      "lore": "You moved stolen plate and forged road-writs through river ditches until a partner sold your name for bounty coin.",
+      "statMods": {
+        "wit": 2,
+        "agility": 1,
+        "grit": 0,
+        "might": -1
+      },
+      "bonusCrowns": 8,
+      "bonusRations": 0,
+      "bonusTorches": 0,
+      "bonusItems": [
+        {
+          "id": "iron_wire_kit",
+          "qty": 1
+        }
+      ]
+    },
+    "poacher_runner": {
+      "id": "poacher_runner",
+      "name": "Poacher & Runner",
+      "subtitle": "Night-snarer chased out by lordly hounds",
+      "lore": "You snared lordly deer by moonlight and outran hounds across thorn hedges with bleeding shins.",
+      "statMods": {
+        "agility": 2,
+        "grit": 1,
+        "wit": 0,
+        "might": -1
+      },
+      "bonusCrowns": 0,
+      "bonusRations": 2,
+      "bonusTorches": 1,
+      "bonusItems": [
+        {
+          "id": "venom_grease",
+          "qty": 1
+        }
+      ]
+    },
+    "hedge_leech": {
+      "id": "hedge_leech",
+      "name": "Hedge-Leech",
+      "subtitle": "Plague-alley bone-setter blamed for a dead bailiff",
+      "lore": "You boiled moldy poultices and pulled rotten teeth in plague alleys until a magistrate blamed your knives for a fever.",
+      "statMods": {
+        "wit": 2,
+        "grit": 1,
+        "might": 0,
+        "agility": -1
+      },
+      "bonusCrowns": 2,
+      "bonusRations": 0,
+      "bonusTorches": 0,
+      "bonusItems": [
+        {
+          "id": "poultice",
+          "qty": 1
+        },
+        {
+          "id": "antitoxin",
+          "qty": 1
+        }
+      ]
+    },
+    "ditch_digger": {
+      "id": "ditch_digger",
+      "name": "Ditch-Digger",
+      "subtitle": "Winter grave-hand who split an overseer skull",
+      "lore": "You hauled limestone and dug winter mass-graves for copper pennies until your shovel split an overseer skull.",
+      "statMods": {
+        "grit": 2,
+        "might": 1,
+        "agility": 0,
+        "wit": -1
+      },
+      "bonusCrowns": 0,
+      "bonusRations": 1,
+      "bonusTorches": 2,
+      "bonusItems": [
+        {
+          "id": "stamina_draught",
+          "qty": 1
+        }
+      ]
+    },
+    "alley_cutthroat": {
+      "id": "alley_cutthroat",
+      "name": "Alley Cutthroat",
+      "subtitle": "River-slum thief who survived more knives than winters",
+      "lore": "You lifted purses off drunken levies in river slums, surviving more alley blades than honest winters.",
+      "statMods": {
+        "agility": 2,
+        "might": 1,
+        "wit": 0,
+        "grit": -1
+      },
+      "bonusCrowns": 6,
+      "bonusRations": 0,
+      "bonusTorches": 0,
+      "bonusItems": [
+        {
+          "id": "parry_dirk",
+          "qty": 1
+        }
+      ]
+    },
+    "caravan_guard": {
+      "id": "caravan_guard",
+      "name": "Caravan Guard",
+      "subtitle": "Salt-wagon spearman left behind in the sleet",
+      "lore": "You walked beside salt-wagons through bandit hills until half your company froze or bolted with the strongbox.",
+      "statMods": {
+        "grit": 2,
+        "agility": 1,
+        "might": 0,
+        "wit": -1
+      },
+      "bonusCrowns": 0,
+      "bonusRations": 1,
+      "bonusTorches": 1,
+      "bonusItems": [
+        {
+          "id": "amber_tonic",
+          "qty": 1
+        }
+      ]
+    },
+    "forged_clerk": {
+      "id": "forged_clerk",
+      "name": "Forged-Writ Clerk",
+      "subtitle": "Parish tally-skimmer fleeing a burned ledger",
+      "lore": "You skimmed grain-tallies and forged dead men pay-chits behind cold parish desks until the ledger caught fire.",
+      "statMods": {
+        "wit": 2,
+        "agility": 1,
+        "might": 0,
+        "grit": -1
+      },
+      "bonusCrowns": 6,
+      "bonusRations": 0,
+      "bonusTorches": 0,
+      "bonusItems": [
+        {
+          "id": "tallow_lantern",
+          "qty": 1
+        }
+      ]
     }
   }
 }

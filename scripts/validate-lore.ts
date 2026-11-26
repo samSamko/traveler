@@ -13,6 +13,17 @@ import type { AnatomyProfile } from '../src/types.ts';
 
 const errors: string[] = [];
 
+// Incident 2026-11-25: Legacy Gloaming Reach canon leaked into Far North prose and named enemies.
+const LEGACY_CANON_RE =
+  /(gloaming|gloam|belfry|cinderford|weeping barrow|ash-fen|pale root|pale choir|husk-tide|aethel|vesper|malakor|vorne|\bkale\b|veyra|star-wood|khaz-durn|first kiln|kiln-spark|kiln-light|kiln-ember|ash-born|ash-rain|ash-settling|ash-text|\bash\b|ash-|-ash)/i;
+
+function checkNoLegacyCanon(val: string, context: string): void {
+  const m = val.match(LEGACY_CANON_RE);
+  if (m) {
+    errors.push(`Legacy canon term "${m[0]}" in ${context}: "${val}"`);
+  }
+}
+
 function checkNoBracketsOrParens(val: string, context: string): void {
   if (/[\[\]()]/.test(val)) {
     errors.push(`Forbidden brackets/parentheses in ${context}: "${val}"`);
@@ -54,7 +65,6 @@ const sampleState = createNewGame({
   sex: 'female',
   race: 'ael_thalor',
   background: 'root_scholar',
-  heirloom: 'kiln_lantern',
   skipIntro: true,
   rngState: 1,
 });
@@ -76,6 +86,11 @@ for (const [id, enemy] of Object.entries(ENEMIES)) {
   checkNoBracketsOrParens(enemy.firstSightProse, `enemy:${id}.firstSightProse`);
   checkNoBracketsOrParens(enemy.returnSightProse, `enemy:${id}.returnSightProse`);
   checkNoBracketsOrParens(enemy.unidentifiedName, `enemy:${id}.unidentifiedName`);
+  checkNoLegacyCanon(enemy.name, `enemy:${id}.name`);
+  checkNoLegacyCanon(enemy.unidentifiedName, `enemy:${id}.unidentifiedName`);
+  checkNoLegacyCanon(enemy.firstSightProse, `enemy:${id}.firstSightProse`);
+  checkNoLegacyCanon(enemy.returnSightProse, `enemy:${id}.returnSightProse`);
+  checkNoLegacyCanon(enemy.description, `enemy:${id}.description`);
   checkAnatomy(enemy.anatomy, `enemy:${id}`);
   for (const intent of enemy.intents) {
     checkNoBracketsOrParens(intent.description, `enemy:${id}.intent.${intent.label}`);
@@ -91,9 +106,26 @@ for (const [id, mod] of Object.entries(BODY_MODS)) {
   checkNoBracketsOrParens(mod.description, `bodymod:${id}.description`);
   checkNoBracketsOrParens(mod.bonusSummary, `bodymod:${id}.bonusSummary`);
   checkNoBracketsOrParens(mod.drawbackSummary, `bodymod:${id}.drawbackSummary`);
+  checkNoLegacyCanon(mod.name, `bodymod:${id}.name`);
+  checkNoLegacyCanon(mod.description, `bodymod:${id}.description`);
+  checkNoLegacyCanon(mod.bonusSummary, `bodymod:${id}.bonusSummary`);
   if (mod.grantedAbilityId && !ABILITIES[mod.grantedAbilityId]) {
     errors.push(`BodyMod ${id} grants unknown ability "${mod.grantedAbilityId}"`);
   }
+}
+
+// 1c. Validate Items, Heirlooms & Abilities
+for (const [id, item] of Object.entries(ITEMS)) {
+  checkNoBracketsOrParens(item.name, `item:${id}.name`);
+  checkNoBracketsOrParens(item.description, `item:${id}.description`);
+  checkNoLegacyCanon(item.name, `item:${id}.name`);
+  checkNoLegacyCanon(item.description, `item:${id}.description`);
+}
+for (const [id, ab] of Object.entries(ABILITIES)) {
+  checkNoBracketsOrParens(ab.name, `ability:${id}.name`);
+  checkNoBracketsOrParens(ab.description, `ability:${id}.description`);
+  checkNoLegacyCanon(ab.name, `ability:${id}.name`);
+  checkNoLegacyCanon(ab.description, `ability:${id}.description`);
 }
 
 for (const [id, inj] of Object.entries(INJURIES)) {
@@ -119,9 +151,12 @@ for (const [id, loc] of Object.entries(LOCATIONS)) {
     allNpcIds.add(npc.id);
     if (!npc.unidentifiedLabel.trim()) errors.push(`NPC ${npc.id} missing unidentifiedLabel`);
     checkNoBracketsOrParens(npc.unidentifiedLabel, `npc:${npc.id}.unidentifiedLabel`);
+    checkNoLegacyCanon(npc.name, `npc:${npc.id}.name`);
+    checkNoLegacyCanon(npc.unidentifiedLabel, `npc:${npc.id}.unidentifiedLabel`);
     const npcFirst = npc.firstSightProse(sampleState);
     if (!npcFirst.trim()) errors.push(`NPC ${npc.id} missing firstSightProse`);
     checkNoBracketsOrParens(npcFirst, `npc:${npc.id}.firstSightProse`);
+    checkNoLegacyCanon(npcFirst, `npc:${npc.id}.firstSightProse`);
     checkAnatomy(npc.anatomy, `npc:${npc.id}`);
     for (const topic of npc.topics) {
       checkNoBracketsOrParens(topic.label, `npc:${npc.id}.topic.${topic.id}`);
@@ -136,6 +171,16 @@ for (const [id, loc] of Object.entries(LOCATIONS)) {
 for (const ev of EVENTS) {
   checkNoBracketsOrParens(ev.title, `event:${ev.id}.title`);
   checkNoBracketsOrParens(ev.prompt(sampleState), `event:${ev.id}.prompt`);
+  checkNoLegacyCanon(ev.title, `event:${ev.id}.title`);
+  checkNoLegacyCanon(ev.prompt(sampleState), `event:${ev.id}.prompt`);
+  if (ev.promptBeats) {
+    ev.promptBeats.forEach((beatFn, idx) => {
+      const txt = beatFn(sampleState);
+      if (!txt.trim()) errors.push(`Event ${ev.id} beat ${idx} is empty`);
+      checkNoBracketsOrParens(txt, `event:${ev.id}.beat.${idx}`);
+      checkNoLegacyCanon(txt, `event:${ev.id}.beat.${idx}`);
+    });
+  }
   for (const ch of ev.choices) {
     checkNoBracketsOrParens(ch.label, `event:${ev.id}.choice.${ch.id}`);
     if (ch.label.split(/\s+/).length > 2) {
@@ -175,7 +220,7 @@ if (fkViolations.length > 0) {
 const requiredTables = [
   'races',
   'backgrounds',
-  'heirlooms',
+  'southern_pasts',
   'abilities',
   'perks',
   'items',

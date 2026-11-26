@@ -14,15 +14,13 @@ export function enterMobileCamp(state: GameState): string[] {
   state.scene = 'camp';
   state.subMenu = 'root';
   state.camp = {
-    fireLit: state.player.heirloom === 'kiln_lantern',
+    fireLit: false,
     hoursCamped: 0,
     tendedThisCamp: false,
     foragedThisCamp: false,
   };
   return [
-    state.camp.fireLit
-      ? 'You shelter beneath broken stone and set your Kiln Lantern low to warm the camp.'
-      : 'You clear wet ash beneath broken stone and lay out a solo camp.',
+    'You clear wet slush beneath broken stone and lay out a solo camp.',
   ];
 }
 
@@ -45,8 +43,7 @@ export function getCampChoices(
   if (!camp.fireLit) {
     const canLight =
       state.player.torches > 0 ||
-      state.player.abilities.includes('kiln_spark') ||
-      state.player.heirloom === 'kiln_lantern';
+      state.player.abilities.includes('kiln_spark');
     opts.push({
       index: opts.length + 1,
       id: 'camp:kindle',
@@ -87,7 +84,7 @@ export function executeCampAction(state: GameState, actionId: string): string[] 
   const loc = LOCATIONS[state.locationId];
 
   if (actionId === 'camp:kindle') {
-    if (p.heirloom !== 'kiln_lantern' && !p.abilities.includes('kiln_spark')) {
+    if (!p.abilities.includes('kiln_spark')) {
       if (p.torches <= 0) return ['No torch left to strike fire.'];
       p.torches -= 1;
     }

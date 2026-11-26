@@ -11,23 +11,23 @@ export const LUNAR_PHASE_DATA: Record<
 > = {
   new_moon: {
     label: 'New Moon',
-    subtitle: 'The Severed Thread',
-    atmosphere: 'The moon goes dark; warmth fades quickly and cold rot leaks deeper through the quiet streets.',
+    subtitle: 'Darkest Nights',
+    atmosphere: 'The moon goes dark; warmth fades fast and frostbite bites deeper along unlit roads.',
   },
   waxing_moon: {
     label: 'Waxing Moon',
-    subtitle: 'The Silver Tugging',
+    subtitle: 'Growing Light',
     atmosphere: 'A growing crescent sharpens the compulsive pull northward, drawing more drifters along the frost.',
   },
   full_moon: {
     label: 'Full Moon',
-    subtitle: 'The Lunar Eye',
+    subtitle: 'Peak Alignment',
     atmosphere: 'Stark pale moonlight floods the broken marble arches and intensifies Defilement exposure outdoors.',
   },
   waning_moon: {
     label: 'Waning Moon',
-    subtitle: 'The Ash-Settling',
-    atmosphere: 'The northern sky settles into heavy, sluggish quiet while scavengers pick over frozen remains.',
+    subtitle: 'Fading Cycle',
+    atmosphere: 'The northern sky settles into heavy, sluggish cold while scavengers pick over frozen remains.',
   },
 };
 
@@ -55,8 +55,8 @@ export const WEATHER_DATA: Record<
     ambushBonus: 0,
   },
   ash_rain: {
-    label: 'Ash-Rain',
-    atmosphere: 'Cold, soot-flecked rain hisses across stone and cloak.',
+    label: 'Sleet-Rain',
+    atmosphere: 'Cold, soot-flecked sleet hisses across stone and cloak.',
     observeMod: -1,
     ambushBonus: 0.05,
   },

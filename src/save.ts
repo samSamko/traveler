@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { GameState, HeirloomId, MetaProfile } from './types.ts';
+import type { GameState, MetaProfile } from './types.ts';
 import { countBrokenSeals, hasFlag } from './memory.ts';
 
 const DEFAULT_SAVE_DIR = join(process.cwd(), '.traveler-saves');
@@ -91,7 +91,6 @@ export function loadMetaProfile(saveDir = DEFAULT_SAVE_DIR): MetaProfile {
     return {
       runsPlayed: 0,
       victories: 0,
-      unlockedHeirlooms: ['kiln_lantern'],
       bestDayReached: 0,
       history: [],
     };
@@ -102,7 +101,6 @@ export function loadMetaProfile(saveDir = DEFAULT_SAVE_DIR): MetaProfile {
     return {
       runsPlayed: 0,
       victories: 0,
-      unlockedHeirlooms: ['kiln_lantern'],
       bestDayReached: 0,
       history: [],
     };
@@ -122,35 +120,12 @@ export function recordRunCompletion(
   outcome: 'victory' | 'death',
   endingTitle?: string,
   saveDir = DEFAULT_SAVE_DIR,
-): { profile: MetaProfile; newlyUnlocked: HeirloomId[] } {
+): { profile: MetaProfile; newlyUnlocked: string[] } {
   deleteActiveSave(saveDir);
   const profile = loadMetaProfile(saveDir);
   profile.runsPlayed += 1;
   if (outcome === 'victory') profile.victories += 1;
   profile.bestDayReached = Math.max(profile.bestDayReached, state.day);
-
-  const newlyUnlocked: HeirloomId[] = [];
-  const tryUnlock = (id: HeirloomId, condition: boolean) => {
-    if (condition && !profile.unlockedHeirlooms.includes(id)) {
-      profile.unlockedHeirlooms.push(id);
-      newlyUnlocked.push(id);
-    }
-  };
-
-  const eliteSlain =
-    hasFlag(state, 'star_stag_resolved') ||
-    hasFlag(state, 'forge_cleared') ||
-    hasFlag(state, 'vorne_resolved') ||
-    hasFlag(state, 'kale_husk_slain');
-
-  tryUnlock('orin_bell_shard', state.day >= 7 || eliteSlain || outcome === 'victory');
-  tryUnlock(
-    'star_dew_vial',
-    countBrokenSeals(state) >= 2 ||
-      state.memory.factions.silken_cistern >= 2 ||
-      outcome === 'victory',
-  );
-  tryUnlock('grixi_chronometer', state.player.crowns >= 100 || outcome === 'victory');
 
   profile.history.unshift({
     name: state.player.name,
@@ -165,5 +140,5 @@ export function recordRunCompletion(
   profile.history = profile.history.slice(0, 15);
 
   saveMetaProfile(profile, saveDir);
-  return { profile, newlyUnlocked };
+  return { profile, newlyUnlocked: [] };
 }

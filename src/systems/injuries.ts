@@ -7,6 +7,7 @@ import { advanceHours } from './clock.ts';
 import { installBodyMod } from './bodymods.ts';
 import { addItemToInventory, consumeInventoryItem } from '../combat.ts';
 import { loadWorldDatabase } from '../db/loader.ts';
+import { renderProse } from '../writing/prose.ts';
 
 export const INJURIES: Record<string, InjuryDef> = loadWorldDatabase().injuries;
 
@@ -85,7 +86,7 @@ export function resolvePlayerDefeat(
   if (cause === 'resolve') {
     msgs.push('Your resolve shatters beneath the weight of the encounter.');
   } else {
-    msgs.push('Your knees buckle into wet ash as darkness rushes in.');
+    msgs.push('Your knees buckle into freezing slush as darkness rushes in.');
   }
 
   const fatalLoad =
@@ -98,7 +99,7 @@ export function resolvePlayerDefeat(
     state.scene = 'dead';
     msgs.push(
       state.survivalMode === 'ironman'
-        ? 'Ironman claims the fallen. The Gloaming Reach swallows your bones.'
+        ? 'Ironman claims the fallen. The northern frost swallows your bones.'
         : p.defilement >= 100
           ? 'Your defiled flesh calcifies where you fall.'
           : 'Too many untreated wounds finally bleed your life into the mud.',
@@ -110,10 +111,14 @@ export function resolvePlayerDefeat(
   if (state.frontier) {
     state.frontier.activeDungeonId = null;
   }
-  state.locationId = 'camp_hub';
-  state.scene = 'camp_hub';
+  const defeatLoc = state.locationId;
+  state.scene = 'defeat';
   state.subMenu = 'root';
   p.statuses = [];
+
+  const summaryNotes: string[] = [];
+  let beat1 = '';
+  let beat2 = '';
 
   if (leadCategory === 'humanoid') {
     const stolen = Math.floor(p.crowns * 0.45);
@@ -121,55 +126,106 @@ export function resolvePlayerDefeat(
     const injMsg = inflictInjury(state, cause === 'resolve' ? 'shattered_nerve' : 'fractured_ribs');
     p.anatomy.facialScars = 'Boot-Split Brow';
     if (!p.anatomy.visibleTags.includes('scarred_face')) p.anatomy.visibleTags.push('scarred_face');
-    msgs.push(
-      `Hours later you wake bruised and bound beside a ditch, ${stolen} Crowns lighter and stripped of dignity.`,
+    beat1 = renderProse(
+      'Your knees buckle into freezing slush as darkness rushes in. Before your eyes roll shut, iron-shod boots slam into your ribs to make sure you stay down.\n\nRough hands wrench your pack straps loose, dumping oilcloth and {weapon} aside into the slush.{if:female} Someone yanks your {hair} hair back to spit a sneer in your face before kicking your jaw sideways.{/if}{if:greenskin} A boot heel grinds across your {skin} cheek while someone laughs about goblin pelts.{/if}',
+      state,
     );
-    if (injMsg) msgs.push(injMsg);
-    msgs.push(...advanceHours(state, 6));
-  } else if (leadCategory === 'beast') {
+    beat2 = renderProse(
+      `Hours later you wake shivering and half-bound in a freezing ditch, dried blood crusted across a boot-split brow and ${stolen} Onyx lighter.{if:towering} Even your tall frame aches from being dragged across sharp gravel.{/if}\n\nYou saw your stiff wrists free against a jagged stone edge while sleet needles raw skin.`,
+      state,
+    );
+    summaryNotes.push(`Lost ${stolen} Onyx to your captors.`);
+    if (injMsg) summaryNotes.push(injMsg);
+    summaryNotes.push(...advanceHours(state, 6));
+  } else if (leadCategory === 'orc_kin') {
+    const stolen = Math.floor(p.crowns * 0.35);
+    const lostRations = Math.min(p.rations, 1);
+    p.crowns -= stolen;
+    p.rations -= lostRations;
+    const injMsg = inflictInjury(state, 'deep_laceration');
+    p.anatomy.bodyScars = 'Cleaver Welts';
+    if (!p.anatomy.visibleTags.includes('battle_worn')) p.anatomy.visibleTags.push('battle_worn');
+    beat1 = renderProse(
+      'A heavy blow drops you face-first into gravel. Foul, rancid breath washes over your neck as heavy tusked brutes stomp your shoulders flat and tear open your ration pouch.\n\nOnly a distant howl draws the pack off your back before they crack your skull for marrow.',
+      state,
+    );
+    beat2 = renderProse(
+      `You come to groaning beneath a broken wall, ${lostRations} Ration and ${stolen} Onyx gone, with fresh cleaver-welts stiffening across your ribs.\n\nCold air burns raw along torn wool as you bind the worst gashes with dirty linen.`,
+      state,
+    );
+    summaryNotes.push(`Lost ${stolen} Onyx and ${lostRations} Ration.`);
+    if (injMsg) summaryNotes.push(injMsg);
+    summaryNotes.push(...advanceHours(state, 6));
+  } else if (leadCategory === 'beast' || leadCategory === 'animal') {
     const lostRations = Math.min(p.rations, 2);
     p.rations -= lostRations;
     const injMsg = inflictInjury(state, 'deep_laceration');
     p.anatomy.bodyScars = 'Maul Scars';
     if (!p.anatomy.visibleTags.includes('battle_worn')) p.anatomy.visibleTags.push('battle_worn');
-    msgs.push(
-      'Teeth drag you through mire before the predator tears into your pack and leaves you bleeding among broken reeds.',
+    beat1 = renderProse(
+      'Teeth clamp hard into your shoulder and drag you ten paces through freezing mud before your {armor} tears loose.\n\nYou curl tight over your throat while claws shred your pack straps and jaws snap at your rations.',
+      state,
     );
-    if (injMsg) msgs.push(injMsg);
-    msgs.push(...advanceHours(state, 5));
+    beat2 = renderProse(
+      `When your eyes finally open under flat grey sky, the predator is gone with ${lostRations} Ration torn from your oilcloth.\n\nDark blood freezes stiff inside your sleeves while sharp pain pulses across fresh maul scars.`,
+      state,
+    );
+    summaryNotes.push(`Lost ${lostRations} Ration torn from your pack.`);
+    if (injMsg) summaryNotes.push(injMsg);
+    summaryNotes.push(...advanceHours(state, 5));
   } else if (leadCategory === 'construct') {
     const injMsg = inflictInjury(state, 'concussion');
-    msgs.push(
-      'A crushing stone blow flings you clear of the chamber threshold; you wake hours later with blood drying in your hair.',
+    beat1 = renderProse(
+      'A crushing bronze blow flings your {build} frame clear across the stone threshold, knocking every ounce of air out of your lungs.\n\nHeavy clockwork footsteps grind back to their post, leaving you sprawled motionless in cold dust.',
+      state,
     );
-    if (injMsg) msgs.push(injMsg);
-    msgs.push(...advanceHours(state, 4));
+    beat2 = renderProse(
+      'Hours later your vision swims back in painful double-images, dried blood matting your hair above one ear.\n\nEvery heartbeat hammers behind your eyes as you haul yourself upright against the cold wall.',
+      state,
+    );
+    if (injMsg) summaryNotes.push(injMsg);
+    summaryNotes.push(...advanceHours(state, 4));
   } else {
     p.defilement = Math.min(100, p.defilement + 18);
     const injMsg = inflictInjury(state, cause === 'resolve' ? 'shattered_nerve' : 'spore_burn');
-    msgs.push(
-      'Pale tendrils crawl across your unconscious chest, branding chalky spores deep into your blood before leaving you shivering on the edge of the road.',
+    beat1 = renderProse(
+      'Your limbs go dead-cold as frost and chalky rot close over your chest. Pale, unblinking silhouettes stand over you in silence without raising another blow.\n\nNumbness creeps straight under your {skin} skin while cold dust settles across your lips.',
+      state,
     );
-    if (injMsg) msgs.push(injMsg);
+    beat2 = renderProse(
+      'You wake trembling violently on the edge of the trail, teeth chattering against a bitter metallic taste in your throat.\n\nDark veins pulse faintly beneath your collar where the northern cold sank deep.',
+      state,
+    );
+    summaryNotes.push(`Defilement rose to ${p.defilement}/100.`);
+    if (injMsg) summaryNotes.push(injMsg);
     if (p.defilement >= 45 && !p.bodyMods.hands) {
-      msgs.push(...installBodyMod(state, 'pale_root_hands'));
+      summaryNotes.push(...installBodyMod(state, 'pale_root_hands'));
     } else if (p.defilement >= 65 && !p.bodyMods.skin) {
-      msgs.push(...installBodyMod(state, 'chitin_skin'));
+      summaryNotes.push(...installBodyMod(state, 'chitin_skin'));
     }
-    msgs.push(...advanceHours(state, 6));
+    summaryNotes.push(...advanceHours(state, 6));
   }
 
-  if (state.scene !== 'dead') {
-    p.hp = Math.max(4, Math.floor(p.maxHp * 0.35));
-    p.resolve = Math.max(4, Math.floor(p.maxResolve * 0.5));
-    p.stamina = Math.max(2, Math.floor(p.maxStamina * 0.5));
-    recordChronicle(
-      state,
-      'Scarred Survival',
-      `Survived brutal defeat at ${state.locationId}, carrying fresh scars onward.`,
-      'defeat',
-    );
-  }
+  const beat3 = renderProse(
+    'Limping mile after freezing mile with {weapon} slung crooked at your hip, you drag your bruised body back toward the banked coals of your Lone Camp before nightfall.',
+    state,
+  );
+
+  p.hp = Math.max(4, Math.floor(p.maxHp * 0.35));
+  p.resolve = Math.max(4, Math.floor(p.maxResolve * 0.5));
+  p.stamina = Math.max(2, Math.floor(p.maxStamina * 0.5));
+  recordChronicle(
+    state,
+    'Scarred Survival',
+    `Survived brutal defeat at ${defeatLoc}, carrying fresh scars onward.`,
+    'defeat',
+  );
+
+  state.defeatState = {
+    beatIndex: 0,
+    beats: [beat1, beat2, beat3],
+    summaryNotes,
+  };
 
   return msgs;
 }
@@ -179,7 +235,7 @@ export function getAftermathChoices(state: GameState): Array<{ index: number; id
   if (!after) return [];
   const current = after.downedEnemies[after.activeIndex];
   if (!current) {
-    return [{ index: 1, id: 'after:done', label: 'Move On', enabled: true }];
+    return [{ index: 1, id: 'after:done', label: 'Continue', enabled: true }];
   }
 
   const opts: Array<{ index: number; id: string; label: string; enabled: boolean }> = [];
@@ -248,12 +304,25 @@ export function executeAftermathAction(state: GameState, actionId: string): stri
 
   if (actionId === 'after:question') {
     current.questioned = true;
-    const check = resolveCheck(state, 'wit', 11, { label: 'Interrogation' });
+    const bonus =
+      state.player.anatomy.visibleTags.includes('scarred_face') ||
+      state.player.anatomy.visibleTags.includes('towering')
+        ? 1
+        : 0;
+    const check = resolveCheck(state, 'wit', 11, { label: 'Interrogation', extraBonus: bonus });
     if (check.success) {
+      const reaction =
+        state.player.race === 'grixi' || state.player.anatomy.visibleTags.includes('greenskin')
+          ? 'Eyes wide at your sharp teeth, '
+          : state.player.sex === 'female'
+            ? 'Spitting red froth at your boots, '
+            : '';
       return [
         check.logLine,
-        tpl?.interrogateHint ??
-          `${current.displayName} gasps out rumors of hidden caches along the old Causeway and the Silken Cistern below Ash-Fen.`,
+        `${reaction}${
+          tpl?.interrogateHint ??
+          `${current.displayName} gasps out rumors of hidden caches along the High Road and the Old Bathhouse below Salt Bog.`
+        }`,
       ];
     }
     return [check.logLine, `${current.displayName} spits blood and refuses to speak.`];
@@ -288,7 +357,7 @@ export function executeAftermathAction(state: GameState, actionId: string): stri
       'aftermath',
     );
     advanceAftermathQueue(state);
-    return [`You sheathe steel and leave ${current.displayName} breathing in the ash.`];
+    return [`You sheathe steel and leave ${current.displayName} breathing in the slush.`];
   }
 
   if (actionId === 'after:harvest') {

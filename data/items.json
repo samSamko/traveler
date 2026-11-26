@@ -16,7 +16,7 @@
     },
     "ash_staff": {
       "id": "ash_staff",
-      "name": "Whispering Ash-Staff",
+      "name": "Scorched Ironwood Staff",
       "slot": "mainHand",
       "twoHanded": true,
       "traits": [
@@ -33,7 +33,7 @@
       "bonusDamage": 1,
       "statScaling": "wit",
       "maxFocusBonus": 1,
-      "description": "Chiseled from scorched star-ash; delivers bludgeoning blows and steadies focus."
+      "description": "Chiseled from scorched northern ironwood; delivers bludgeoning blows and steadies focus."
     },
     "horn_bow": {
       "id": "horn_bow",
@@ -92,7 +92,7 @@
       "statBonus": {
         "grit": 1
       },
-      "description": "Heavy Khaz-Durn warhammer forged before the Kiln fell."
+      "description": "Heavy Durnfolk warhammer forged in deep mountain foundries."
     },
     "star_glaive": {
       "id": "star_glaive",
@@ -136,11 +136,11 @@
       "statBonus": {
         "grit": 1
       },
-      "description": "Vorne's heavy bronze blade; tolls with resonant force on every swing."
+      "description": "Heavy bronze blade cast for gate-wardens; tolls with resonant force on every swing."
     },
     "vesper_needle": {
       "id": "vesper_needle",
-      "name": "Vesper Stiletto",
+      "name": "Onyx-Tipped Stiletto",
       "slot": "mainHand",
       "traits": [
         "finesse",
@@ -157,7 +157,7 @@
       "statBonus": {
         "wit": 2
       },
-      "description": "Amber-glass piercing blade that hums near soul-amber."
+      "description": "Needle-thin piercing blade weighted with black Onyx that slips cleanly between mail rings."
     },
     "chain_hauberk": {
       "id": "chain_hauberk",
@@ -293,7 +293,7 @@
         "resonant": "resistant",
         "blight": "resistant"
       },
-      "description": "Silken shroud that quietens the Pale Choir."
+      "description": "Silken shroud that dulls resonant hums and steadies the mind."
     },
     "poultice": {
       "id": "poultice",
@@ -307,13 +307,13 @@
     },
     "vesper_tonic": {
       "id": "vesper_tonic",
-      "name": "Vesper Tonic",
+      "name": "Brine-Amber Tonic",
       "slot": "consumable",
       "value": 14,
       "healHp": 4,
       "restoreFocus": 6,
       "restoreResolve": 4,
-      "description": "Liquid amber-distillate that restores focus, resolve, and vigor."
+      "description": "Bitter amber-distillate boiled in Old Bathhouse stills that restores focus, resolve, and vigor."
     },
     "stamina_draught": {
       "id": "stamina_draught",
@@ -402,7 +402,7 @@
     },
     "ash_resin": {
       "id": "ash_resin",
-      "name": "Ash Resin",
+      "name": "Slag Resin",
       "slot": "reagent",
       "value": 7,
       "description": "Volatile amber sap scraped from petrified timber."
@@ -458,7 +458,7 @@
     },
     "ash_mantle": {
       "id": "ash_mantle",
-      "name": "Ash-Weave Mantle",
+      "name": "Soot-Weave Mantle",
       "slot": "cloak",
       "value": 24,
       "resistances": {
@@ -492,7 +492,7 @@
       "visibleTags": [
         "iron_vow_garb"
       ],
-      "description": "Heavy grey ranger cloak bearing the iron key of Cinderford Keep."
+      "description": "Heavy grey ranger cloak bearing the iron key of Timber Post."
     },
     "kiln_pitch": {
       "id": "kiln_pitch",
@@ -507,7 +507,7 @@
     },
     "silver_ash_oil": {
       "id": "silver_ash_oil",
-      "name": "Silver-Ash Oil",
+      "name": "Silver-Salt Oil",
       "slot": "coating",
       "actionCost": "swift",
       "value": 16,
@@ -559,7 +559,7 @@
     },
     "ash_purge_draught": {
       "id": "ash_purge_draught",
-      "name": "Ash-Purge Draught",
+      "name": "Blight-Purge Draught",
       "slot": "draught",
       "actionCost": "swift",
       "value": 22,
@@ -570,7 +570,7 @@
     },
     "writ_bone_shatter": {
       "id": "writ_bone_shatter",
-      "name": "Ancient Text: Shatter",
+      "name": "Charred Writ: Shatter",
       "slot": "ash_text",
       "actionCost": "main",
       "value": 28,
@@ -580,7 +580,7 @@
     },
     "writ_star_ward": {
       "id": "writ_star_ward",
-      "name": "Ancient Text: Ward",
+      "name": "Charred Writ: Ward",
       "slot": "ash_text",
       "actionCost": "main",
       "value": 26,
@@ -590,13 +590,238 @@
     },
     "writ_blight_wave": {
       "id": "writ_blight_wave",
-      "name": "Ancient Text: Blight",
+      "name": "Charred Writ: Blight",
       "slot": "ash_text",
       "actionCost": "main",
       "value": 32,
       "ashTextDc": 13,
       "ashTextEffect": "blight_wave",
       "description": "Forbidden mire-scroll that sweeps all foes with rot on a Wit check or triggers Ruin."
+    },
+    "rusty_shortsword": {
+      "id": "rusty_shortsword",
+      "name": "Pitted Shortsword",
+      "slot": "mainHand",
+      "value": 20,
+      "traits": [
+        "finesse"
+      ],
+      "damageType": "slashing",
+      "damageDice": [
+        1,
+        8
+      ],
+      "bonusDamage": 1,
+      "statScaling": "agility",
+      "description": "Short southern infantry steel kept sharp enough for tight cellar alleys."
+    },
+    "quarry_pickaxe": {
+      "id": "quarry_pickaxe",
+      "name": "Quarry Pick",
+      "slot": "mainHand",
+      "twoHanded": true,
+      "traits": [
+        "twoHanded",
+        "armorPiercing"
+      ],
+      "value": 34,
+      "damageType": "piercing",
+      "damageDice": [
+        2,
+        5
+      ],
+      "bonusDamage": 2,
+      "statScaling": "might",
+      "description": "Heavy iron stone-splitter salvaged from Black Quarry benches."
+    },
+    "frost_halberd": {
+      "id": "frost_halberd",
+      "name": "Gate Halberd",
+      "slot": "mainHand",
+      "twoHanded": true,
+      "traits": [
+        "twoHanded"
+      ],
+      "value": 38,
+      "damageType": "slashing",
+      "damageDice": [
+        2,
+        6
+      ],
+      "bonusDamage": 2,
+      "statScaling": "might",
+      "description": "Long oak-shafted polearm carried by desperate border pickets."
+    },
+    "silver_dagger": {
+      "id": "silver_dagger",
+      "name": "Onyx-Hilted Dagger",
+      "slot": "mainHand",
+      "traits": [
+        "finesse"
+      ],
+      "value": 26,
+      "damageType": "piercing",
+      "damageDice": [
+        1,
+        6
+      ],
+      "bonusDamage": 2,
+      "statScaling": "agility",
+      "description": "Balanced steel blade gripped with a notched black Onyx pommel."
+    },
+    "oak_heater_shield": {
+      "id": "oak_heater_shield",
+      "name": "Iron-Rimmed Shield",
+      "slot": "offHand",
+      "value": 28,
+      "armorBonus": 3,
+      "visibleTags": [
+        "iron_vow_garb"
+      ],
+      "description": "Scarred oak heater shield banded in cold-hammered iron."
+    },
+    "torch_spike": {
+      "id": "torch_spike",
+      "name": "Iron Torch-Spike",
+      "slot": "offHand",
+      "value": 19,
+      "traits": [
+        "lightSource"
+      ],
+      "damageType": "fire",
+      "bonusDamage": 1,
+      "description": "Heavy iron sconce-spike holding burning pitch for dark cellars."
+    },
+    "boiled_hide_jerkin": {
+      "id": "boiled_hide_jerkin",
+      "name": "Boiled Hide Jerkin",
+      "slot": "armor",
+      "value": 22,
+      "armorBonus": 2,
+      "armorTier": 1,
+      "resistances": {
+        "cold": "resistant"
+      },
+      "description": "Thick wax-boiled hide stitched with sinew against winter sleet."
+    },
+    "scale_coat": {
+      "id": "scale_coat",
+      "name": "Verdigris Scale Coat",
+      "slot": "armor",
+      "value": 38,
+      "armorBonus": 4,
+      "armorTier": 2,
+      "resistances": {
+        "slashing": "resistant"
+      },
+      "description": "Overlapping bronze scales stripped from Long Steps crypts."
+    },
+    "steel_halfplate": {
+      "id": "steel_halfplate",
+      "name": "Dented Half-Plate",
+      "slot": "armor",
+      "value": 58,
+      "armorBonus": 6,
+      "armorTier": 3,
+      "resistances": {
+        "slashing": "resistant",
+        "piercing": "resistant",
+        "lightning": "vulnerable"
+      },
+      "visibleTags": [
+        "iron_vow_garb"
+      ],
+      "description": "Heavy southern breastplate and pauldrons scarred by frontier steel."
+    },
+    "wolfskin_cloak": {
+      "id": "wolfskin_cloak",
+      "name": "Wolfskin Cloak",
+      "slot": "cloak",
+      "value": 24,
+      "maxHpBonus": 3,
+      "resistances": {
+        "cold": "resistant"
+      },
+      "description": "Coarse grey winter pelt smelling faintly of woodsmoke and tallow."
+    },
+    "salt_charm": {
+      "id": "salt_charm",
+      "name": "Brine-Salt Charm",
+      "slot": "trinket",
+      "value": 22,
+      "maxResolveBonus": 3,
+      "resistances": {
+        "poison": "resistant"
+      },
+      "description": "Stitched leather pouch of coarse Dry Arch salt worn against numbness."
+    },
+    "brass_compass": {
+      "id": "brass_compass",
+      "name": "Seized Brass Compass",
+      "slot": "trinket",
+      "value": 32,
+      "maxFocusBonus": 2,
+      "statBonus": {
+        "wit": 1
+      },
+      "description": "A cracked brass needle locked pointing straight north toward the white hills."
+    },
+    "venom_grease": {
+      "id": "venom_grease",
+      "name": "Bog-Venom Grease",
+      "slot": "coating",
+      "value": 15,
+      "coatingDamageType": "poison",
+      "coatingBonusDamage": 3,
+      "coatingCharges": 3,
+      "description": "Thick green paste boiled from marsh weeds that fouls open cuts."
+    },
+    "frost_tallow": {
+      "id": "frost_tallow",
+      "name": "Rime-Salt Tallow",
+      "slot": "coating",
+      "value": 15,
+      "coatingDamageType": "cold",
+      "coatingBonusDamage": 3,
+      "coatingCharges": 3,
+      "description": "Freezing brine fat that bites stiffly into flesh on steel impact."
+    },
+    "healing_draught": {
+      "id": "healing_draught",
+      "name": "Red Bitter-Draught",
+      "slot": "draught",
+      "value": 18,
+      "healHp": 14,
+      "draughtDefilement": 4,
+      "description": "Sharp-tasting red root tonic that knits torn flesh at a slight chalky toll."
+    },
+    "bull_strength_brew": {
+      "id": "bull_strength_brew",
+      "name": "Ox-Blood Tonic",
+      "slot": "draught",
+      "value": 22,
+      "restoreStamina": 4,
+      "draughtStatus": {
+        "type": "blessed",
+        "turns": 3,
+        "power": 2
+      },
+      "draughtDefilement": 6,
+      "description": "Thick iron-bitter brew that steadies sword-arms through freezing fatigue."
+    },
+    "acid_flask": {
+      "id": "acid_flask",
+      "name": "Sulfur Acid Flask",
+      "slot": "consumable",
+      "value": 16,
+      "throwDamage": 12,
+      "throwDamageType": "acid",
+      "throwStatus": {
+        "type": "corroded",
+        "turns": 3,
+        "power": 2
+      },
+      "description": "Stoppered clay flask of Salt Bog vitriol that eats through iron plate."
     }
   },
   "recipes": [
@@ -642,7 +867,7 @@
     },
     {
       "id": "craft_vesper_tonic",
-      "name": "Vesper Tonic",
+      "name": "Brine-Amber Tonic",
       "outputItemId": "vesper_tonic",
       "outputQty": 1,
       "ingredients": [
@@ -751,13 +976,73 @@
     },
     {
       "id": "craft_ash_purge_draught",
-      "name": "Ash-Purge Draught",
+      "name": "Blight-Purge Draught",
       "outputItemId": "ash_purge_draught",
       "outputQty": 1,
       "ingredients": [
         {
           "itemId": "bog_herb",
           "qty": 2
+        }
+      ]
+    },
+    {
+      "id": "craft_healing_draught",
+      "name": "Red Bitter-Draught",
+      "outputItemId": "healing_draught",
+      "outputQty": 1,
+      "ingredients": [
+        {
+          "itemId": "bog_herb",
+          "qty": 1
+        },
+        {
+          "itemId": "ash_resin",
+          "qty": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_venom_grease",
+      "name": "Bog-Venom Grease",
+      "outputItemId": "venom_grease",
+      "outputQty": 1,
+      "ingredients": [
+        {
+          "itemId": "bog_herb",
+          "qty": 1
+        },
+        {
+          "itemId": "husk_gland",
+          "qty": 1
+        }
+      ]
+    },
+    {
+      "id": "craft_frost_tallow",
+      "name": "Rime-Salt Tallow",
+      "outputItemId": "frost_tallow",
+      "outputQty": 1,
+      "ingredients": [
+        {
+          "itemId": "bog_herb",
+          "qty": 2
+        }
+      ]
+    },
+    {
+      "id": "craft_acid_flask",
+      "name": "Sulfur Acid Flask",
+      "outputItemId": "acid_flask",
+      "outputQty": 1,
+      "ingredients": [
+        {
+          "itemId": "ash_resin",
+          "qty": 1
+        },
+        {
+          "itemId": "husk_gland",
+          "qty": 1
         }
       ]
     }

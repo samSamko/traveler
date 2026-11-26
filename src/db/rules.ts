@@ -54,7 +54,6 @@ export interface ConditionSpec {
   notRace?: string;
   background?: string;
   backgrounds?: string[];
-  heirloom?: string;
   hasFlag?: string;
   notFlag?: string;
   flagEquals?: { key: string; value: string | number | boolean };
@@ -118,7 +117,14 @@ export interface EffectSpec {
     onVictoryChronicle?: { title: string; summary: string; tag: string };
   };
   triggerEnding?: {
-    endingId: 'shatter_belfry' | 'rekindle_kiln' | 'ascend_warden';
+    endingId:
+      | 'shatter_belfry'
+      | 'rekindle_kiln'
+      | 'ascend_warden'
+      | 'frozen_debt'
+      | 'quarry_chains'
+      | 'consumed_rot'
+      | 'dome_echo';
     title: string;
     openingText: string;
   };
@@ -148,7 +154,6 @@ export function evaluateCondition(
   if (cond.notRace && p.race === cond.notRace) return false;
   if (cond.background && p.background !== cond.background) return false;
   if (cond.backgrounds && !cond.backgrounds.includes(p.background)) return false;
-  if (cond.heirloom && p.heirloom !== cond.heirloom) return false;
   if (cond.hasFlag && !hasFlag(state, cond.hasFlag)) return false;
   if (cond.notFlag && hasFlag(state, cond.notFlag)) return false;
   if (cond.flagEquals && !hasFlag(state, cond.flagEquals.key, cond.flagEquals.value)) {
@@ -231,7 +236,7 @@ export function executeEffect(state: GameState, spec: EffectSpec): ActionOutcome
 
   if (spec.consumeTorchIfNotHeirloomOrAbility) {
     const t = spec.consumeTorchIfNotHeirloomOrAbility;
-    if (p.heirloom === t.heirloomId || p.abilities.includes(t.abilityId)) {
+    if (p.abilities.includes(t.abilityId)) {
       msgs.push(runtime.renderProse(t.onHeirloomMsg, state));
     } else if (p.torches > 0) {
       p.torches -= 1;
@@ -352,7 +357,7 @@ export function executeEffect(state: GameState, spec: EffectSpec): ActionOutcome
 function resolveSunkenBelfryEncounter(state: GameState): ActionOutcome {
   const brokenSeals: string[] = [];
   const msgs: string[] = [
-    'You descend onto the cracked bronze dais. Above you, the great drowned bell trembles with gathered air.',
+    'You descend onto the cracked bronze dais beneath The White Dome. Freezing air trembles above the sunken pit.',
   ];
   let preDamageRatio = 0;
   let thrallCleared = false;
@@ -361,28 +366,28 @@ function resolveSunkenBelfryEncounter(state: GameState): ActionOutcome {
     preDamageRatio += 0.2;
     thrallCleared = true;
     msgs.push(
-      "A shout echoes from the upper gallery as Kale hurls chain-shot into the choir pillars, cutting down Malakor's acolyte guard.",
+      'A shout echoes from the upper gallery as Kale hurls iron chain-shot into the marble pillars, cutting down the cantor guard.',
     );
   }
   if (hasFlag(state, 'vorne_redeemed')) {
     preDamageRatio += 0.15;
     thrallCleared = true;
     msgs.push(
-      'Heavy bronze footsteps thunder beside you as Sir Vorne charges into the pale choir, breaking their outer guard.',
+      'Heavy bronze footsteps thunder beside you as Vorne charges into the dust-caked guard, breaking their outer line.',
     );
   }
   if (hasFlag(state, 'seal_of_silence')) {
     brokenSeals.push('seal_of_silence');
-    msgs.push('Your Seal of Silence hums against the air, dampening the bell.');
+    msgs.push('Old Veyra\'s lead disk hums dead-quiet against your hip, muting the bronze dais.');
   }
   if (hasFlag(state, 'root_conduit_severed')) {
     brokenSeals.push('root_conduit_severed');
-    msgs.push("With the deep Root Conduit severed, Malakor's bark-shield crumbles.");
+    msgs.push('With the deep Smelter Conduit shut, the frost-crust around the throne fractures.');
   }
   if (hasFlag(state, 'kiln_cipher_learned')) {
     brokenSeals.push('kiln_cipher_learned');
     preDamageRatio += 0.12;
-    msgs.push("Speaking the First Kiln Cipher sears Malakor's throne with pale fire.");
+    msgs.push('Tracing the Long Steps furnace cipher sears the bronze throne with pale orange heat.');
   }
 
   return {
@@ -395,7 +400,7 @@ function resolveSunkenBelfryEncounter(state: GameState): ActionOutcome {
       onVictoryFlag: 'malakor_slain',
       onVictoryChronicle: {
         title: 'Slew Malakor',
-        summary: 'Defeated the Choir-Husk beneath the Sunken Belfry.',
+        summary: 'Defeated the Bell-Prelate beneath The White Dome.',
         tag: 'boss',
       },
     },

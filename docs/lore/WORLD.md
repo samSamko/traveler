@@ -1,5 +1,11 @@
 # World Canon — The Far North & The Black Stone Gate
 
+## 0. Tone & World Reality: Realistic-Grimdark
+Traveler is a **realistic-grimdark** frontier survival world shaped by three interlocking realities:
+- **Bleak Survival Realism**: Cold kills faster than steel, rations spoil, firewood is hoarded behind barred doors, and early frontier places and beasts look ordinary on the surface.
+- **Brutalist Violence & Body-Horror**: Wounds fester, limbs shatter, desperate survivors pin bone or bronze into their own flesh to keep feeling in their nerves, and deeper ruins house graphic gore and creeping physical corruption.
+- **Moral Cynicism**: Heroism is a liability. No southern king governs beyond the Gate; trapped deserters, scavengers, and apostates deal strictly in salt, steel, and black Onyx coin, and survival choices regularly demand ugly trade-offs.
+
 ## 1. What Every Southern Traveler Knows (Observable Legend)
 In every southern city, town, and village, stories persist of the Far North: looming mountains with castles carved into the stone, tundras so cold the air burns the lungs, barren taigas where you can hear your own heartbeat for miles, jagged rocky hills that chew through boot-leather, and grim forests whose roots seem to grip the earth.
 
@@ -16,11 +22,11 @@ Past a certain point, the mountains narrow to a single enormous gate carved of i
 The lost northern civilization minted uniform, sharp-edged coins of an indestructible black onyx-like material. In the south, common coin and barter rule; beyond the Black Stone Gate, these indestructible **Onyx** coins are the sole currency hoarded by trapped scavengers, hermits, and remnants.
 
 ## 4. The 4-Phase Lunar Cycle
-Every 12 days, the moon completes a 4-phase cycle (3 days per phase) that governs survival and dread across the Northern Expanse:
-1. **New Moon — The Severed Thread**: Outward pull weakens, residual warmth drops, sightlines narrow, and cold + Defilement leakage bite harder at night.
-2. **Waxing Moon — The Silver Tugging**: Growing lunar light sharpens the compulsive northward pull; more desperate drifters and scavengers press deeper into the ruins as old conduits begin to hum.
-3. **Full Moon — The Lunar Eye**: Peak alignment. Overgrown marble plazas sit under stark pale light, Defilement spikes outdoors at night, and the veil thins to its narrowest point.
-4. **Waning Moon — The Ash-Settling**: The pull recedes into heavy, sluggish quiet. Scavengers strip what remains while rations and warmth strain under late-cycle attrition.
+Every 12 days, the moon completes a 4-phase cycle (3 days per phase) that governs cold, visibility, and the northward compulsion:
+1. **New Moon**: Darkest nights. Sightlines narrow, frostbite bites harder, and straying far from shelter drains warmth fast.
+2. **Waxing Moon**: Growing moonlight sharpens the compulsive pull northward; more drifters and scavengers press deeper into the ruins.
+3. **Full Moon**: Stark pale light over the ruins. Exposure outdoors at night spikes Defilement and draws out rare late-ruin anomalies.
+4. **Waning Moon**: The compulsion dulls into sluggish fatigue while rations, firewood, and warmth strain under late-cycle cold.
 
 ## 5. WRITER-ONLY LATE-GAME SECRETS (FORBIDDEN IN EARLY PROSE)
 > Do NOT reveal or hint directly at these in the intro, early areas, or casual NPC dialogue. Surface only through deep-ruin inscriptions, late-game dossiers, and extreme Defilement / Full Moon triggers.

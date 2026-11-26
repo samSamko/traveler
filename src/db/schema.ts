@@ -99,12 +99,16 @@ CREATE TABLE backgrounds (
   passive_desc TEXT NOT NULL
 );
 
-CREATE TABLE heirlooms (
+CREATE TABLE southern_pasts (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
-  unlock_requirement TEXT NOT NULL,
-  description TEXT NOT NULL,
-  combat_description TEXT NOT NULL
+  subtitle TEXT NOT NULL,
+  lore TEXT NOT NULL,
+  stat_mods_json TEXT NOT NULL,
+  bonus_crowns INTEGER NOT NULL DEFAULT 0,
+  bonus_rations INTEGER NOT NULL DEFAULT 0,
+  bonus_torches INTEGER NOT NULL DEFAULT 0,
+  bonus_items_json TEXT NOT NULL
 );
 
 CREATE TABLE perks (
@@ -286,7 +290,8 @@ CREATE TABLE events (
   cooldown_hours INTEGER,
   weight INTEGER NOT NULL DEFAULT 1,
   condition_json TEXT,
-  prompt_variants_json TEXT NOT NULL
+  prompt_variants_json TEXT NOT NULL,
+  prompt_beats_json TEXT
 );
 
 CREATE TABLE event_choices (

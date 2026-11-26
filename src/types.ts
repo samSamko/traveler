@@ -8,6 +8,16 @@ export type BackgroundId =
   | 'barrow_stalker'
   | 'shrine_penitent';
 
+export type SouthernPastId =
+  | 'pit_brawler'
+  | 'fence_smuggler'
+  | 'poacher_runner'
+  | 'hedge_leech'
+  | 'ditch_digger'
+  | 'alley_cutthroat'
+  | 'caravan_guard'
+  | 'forged_clerk';
+
 export type HeirloomId =
   | 'kiln_lantern'
   | 'orin_bell_shard'
@@ -269,13 +279,18 @@ export interface BackgroundDef {
   passive: PassiveDef;
 }
 
-export interface HeirloomDef {
-  id: HeirloomId;
+export interface SouthernPastDef {
+  id: SouthernPastId;
   name: string;
-  unlockRequirement: string;
-  description: string;
-  combatDescription: string;
+  subtitle: string;
+  lore: string;
+  statMods: Partial<Stats>;
+  bonusCrowns: number;
+  bonusRations: number;
+  bonusTorches: number;
+  bonusItems: Array<{ id: string; qty: number }>;
 }
+
 
 export type EquipSlot = 'mainHand' | 'offHand' | 'armor' | 'cloak' | 'trinket';
 
@@ -483,7 +498,6 @@ export interface CombatState {
   swiftLeft: number;
   freeLeft: number;
   graceMaxDamagePending: boolean;
-  heirloomUsedThisFight: boolean;
   guaranteedDodgeThisTurn: boolean;
   counterDamagePending: number;
   bossSealsBroken: string[];
@@ -533,7 +547,7 @@ export interface PlayerCharacter {
   sex: SexId;
   race: RaceId;
   background: BackgroundId;
-  heirloom: HeirloomId;
+  southernPast?: SouthernPastId;
   anatomy: AnatomyProfile;
   bodyMods: Partial<Record<BodySlot, string>>;
   injuries: string[];
@@ -597,6 +611,7 @@ export interface EventCard {
   weight?: number;
   condition?: (state: GameState) => boolean;
   prompt: (state: GameState) => string;
+  promptBeats?: Array<(state: GameState) => string>;
   choices: ChoiceOption[];
 }
 
@@ -758,14 +773,18 @@ export type SceneMode =
   | 'intro'
   | 'camp_hub'
   | 'location'
+  | 'travel'
+  | 'explore_beat'
   | 'dungeon'
   | 'camp'
   | 'event'
+  | 'combat_approach'
   | 'combat'
   | 'aftermath'
   | 'shop'
   | 'journal'
   | 'level_up'
+  | 'defeat'
   | 'ending'
   | 'dead';
 
@@ -792,10 +811,51 @@ export type JournalTab =
   | 'people'
   | 'places'
   | 'items'
-  | 'chronicle';
+  | 'chronicle'
+  | 'guide';
+
+export interface TravelState {
+  fromId: string;
+  destId: string;
+  beatIndex: number;
+  beats: string[];
+  pendingAmbushEnemyId?: string;
+}
+
+export interface ExploreBeatState {
+  title: string;
+  prose: string;
+  kind: 'salvage' | 'curiosity' | 'landscape' | 'discovery' | 'empty';
+  itemId?: string;
+  crownsMin?: number;
+  crownsMax?: number;
+  resolved: boolean;
+  outcomeText?: string;
+  returnScene: 'camp_hub' | 'location';
+}
+
+export interface CombatApproachState {
+  enemyIds: string[];
+  canFlee: boolean;
+  ambushed: boolean;
+  observed: boolean;
+  observedLines?: string[];
+  openingBark?: string;
+  onVictoryFlag?: string;
+  onVictoryChronicle?: { title: string; summary: string; tag: string };
+  preDamageRatio?: number;
+  brokenSeals?: string[];
+}
+
+export interface DefeatState {
+  beatIndex: number;
+  beats: string[];
+  summaryNotes: string[];
+}
 
 export interface ActiveEventState {
   eventId: string;
+  beatIndex?: number;
   resolved: boolean;
   resolutionText?: string;
 }
@@ -812,7 +872,14 @@ export interface ActionOutcome {
     brokenSeals?: string[];
   };
   triggerEnding?: {
-    endingId: 'shatter_belfry' | 'rekindle_kiln' | 'ascend_warden';
+    endingId:
+      | 'shatter_belfry'
+      | 'rekindle_kiln'
+      | 'ascend_warden'
+      | 'frozen_debt'
+      | 'quarry_chains'
+      | 'consumed_rot'
+      | 'dome_echo';
     title: string;
     openingText: string;
   };
@@ -824,7 +891,6 @@ export interface ActionOutcome {
 export interface MetaProfile {
   runsPlayed: number;
   victories: number;
-  unlockedHeirlooms: HeirloomId[];
   bestDayReached: number;
   history: Array<{
     name: string;
@@ -865,6 +931,10 @@ export interface GameState {
   frontier: FrontierState;
   activeMerchant: { name: string; keeper: string; items: ShopListing[] } | null;
   pendingPerkIds: string[];
+  defeatState?: DefeatState | null;
+  travelState?: TravelState | null;
+  exploreBeat?: ExploreBeatState | null;
+  combatApproach?: CombatApproachState | null;
   endingSummary: string | null;
   lastMessages: string[];
   rngState?: number;

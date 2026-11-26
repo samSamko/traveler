@@ -1,5 +1,5 @@
 import type { GameState } from '../types.ts';
-import { ABILITIES, BACKGROUNDS, HEIRLOOMS, PERKS, RACES } from '../content/characters.ts';
+import { ABILITIES, BACKGROUNDS, PERKS, RACES } from '../content/characters.ts';
 import { ITEMS, RECIPES } from '../content/items.ts';
 import { ENEMIES } from '../content/enemies.ts';
 import { LOCATIONS } from '../content/locations.ts';
@@ -43,6 +43,7 @@ export function getJournalChoices(state: GameState): JournalChoice[] {
       { id: 'jtab:places', label: 'Places' },
       { id: 'jtab:items', label: 'Items' },
       { id: 'jtab:chronicle', label: 'Chronicle' },
+      { id: 'jtab:guide', label: 'Guide' },
       { id: 'jclose', label: 'Back' },
     ];
     tabs.forEach((t, i) => choices.push({ index: i + 1, id: t.id, label: t.label, enabled: true }));
@@ -205,7 +206,6 @@ export function renderJournalBody(state: GameState): string[] {
 
   if (state.journalTab === 'arts') {
     const weapon = p.equipment.mainHand ? ITEMS[p.equipment.mainHand] : undefined;
-    const heirloom = HEIRLOOMS[p.heirloom];
     const [wdCount, wdSides] = weapon?.damageDice ?? [1, 6];
     const wBonus = (weapon?.bonusDamage ?? 0) + (p.weaponHoned ? 1 : 0);
     const wStat = weapon?.statScaling ?? 'might';
@@ -255,9 +255,6 @@ export function renderJournalBody(state: GameState): string[] {
       lines.push(`    ${ab.description}`);
     }
 
-    lines.push('');
-    lines.push(`Heirloom - ${heirloom.name} | Once per fight`);
-    lines.push(`  ${heirloom.combatDescription}`);
     return lines;
   }
 
@@ -440,20 +437,47 @@ export function renderJournalBody(state: GameState): string[] {
     ];
   }
 
+  if (state.journalTab === 'guide') {
+    return [
+      'JOURNAL - SURVIVAL AND COMBAT GUIDE',
+      '',
+      'Turn Actions:',
+      '  - Main Action: Strike, Subdue, Guard, heavy Skills, or Spells.',
+      '  - Swift Action: Quick Cantrips, tactical Skills, or certain Draughts.',
+      '  - Free Action: Observe an enemy once per round, or spend Grace.',
+      '',
+      'Vitals and Resources:',
+      '  - HP and Resolve: Reaching 0 in either drops you. Resolve breaks under dread and horror.',
+      '  - Stamina and Focus: Fuel martial Skills and Spells/Cantrips; Guard restores both.',
+      '  - Grace: Spend as a Free action to force maximum dice damage on your next blow or spell.',
+      '  - Reserves: Spend at Camp for a Brief Rest to recover without losing a full night.',
+      '  - Armor Tier: Absorbs part of every hit; heavy blows can degrade it until repaired at Camp.',
+      '',
+      'Wounds, Subdue, and Defilement:',
+      '  - Subdue: Deals bludgeoning damage and leaves foes downed alive so you can Strip, Question, or Spare them.',
+      '  - Injuries: Defeat in Scarred Survival leaves lasting injuries with stat penalties until tended.',
+      '  - Defilement: Exposure to northern blight, mutations, and Full Moon nights warps flesh. At 100, you turn.',
+      '',
+      'The Moon and Unnatural Forces:',
+      '  - 12-Day Lunar Cycle: New Moon deepens the cold; Waxing sharpens the northward pull; Full Moon spikes Defilement outdoors; Waning brings heavy fatigue.',
+      '  - Strange Phenomena: Beyond the Black Gate, slag-hounds burn with trapped furnace-salt, dead bodies walk in frost-lock, and cantrips bite deeper—all tied to the same northern ore and the moon overhead.',
+    ];
+  }
+
   const lines = ['JOURNAL - CHRONICLE', '', 'Faction Standing:'];
   (Object.keys(FACTION_NAMES) as Array<keyof typeof FACTION_NAMES>).forEach((fid) => {
     const val = state.memory.factions[fid] ?? 0;
     lines.push(`  - ${FACTION_NAMES[fid]}: ${val >= 0 ? `+${val}` : val} - ${getFactionStance(val)}`);
   });
   lines.push('');
-  lines.push(`Counter-Seals Broken: ${countBrokenSeals(state)}/3`);
-  lines.push(`  - Seal of Silence: ${state.memory.flags['seal_of_silence'] ? 'Acquired' : 'Unfound'}`);
-  lines.push(`  - Root Conduit: ${state.memory.flags['root_conduit_severed'] ? 'Severed' : 'Intact'}`);
-  lines.push(`  - First Kiln Cipher: ${state.memory.flags['kiln_cipher_learned'] ? 'Learned' : 'Unfound'}`);
+  lines.push(`Deep Marks Broken: ${countBrokenSeals(state)}/3`);
+  lines.push(`  - Silent Cistern Seal: ${state.memory.flags['seal_of_silence'] ? 'Acquired' : 'Unfound'}`);
+  lines.push(`  - Deep Conduit: ${state.memory.flags['root_conduit_severed'] ? 'Severed' : 'Intact'}`);
+  lines.push(`  - Northern Cipher: ${state.memory.flags['kiln_cipher_learned'] ? 'Learned' : 'Unfound'}`);
   lines.push('');
   lines.push('Recorded Deeds:');
   if (state.memory.chronicle.length === 0) {
-    lines.push('  Your deeds are not yet written in the Reach.');
+    lines.push('  Your deeds are not yet written in the North.');
   } else {
     for (const c of state.memory.chronicle) {
       lines.push(`  Day ${c.day} - ${c.title}: ${c.summary}`);

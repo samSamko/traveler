@@ -29,7 +29,7 @@ import {
   repairEquippedArmor,
   rollArmorTierReduction,
 } from '../src/systems/frontier.ts';
-import type { BackgroundId, HeirloomId, RaceId, SexId } from '../src/types.ts';
+import type { BackgroundId, RaceId, SexId } from '../src/types.ts';
 
 function assertNoParensOrBrackets(text: string, context: string): void {
   const visible = text.replace(/\x1b\[[0-9;]*m/g, '');
@@ -57,7 +57,7 @@ describe('Writing Framework: Customizer, Prose Interpolator & Compositional Intr
       bodyShape: 'Curved',
       facialScars: 'Cheek Slash',
       bodyScars: 'Old Spear-Mark',
-      distinguishingMark: 'Kiln-Ember Brand',
+      distinguishingMark: 'Hearth-Brand',
     });
 
     const state = createNewGame({
@@ -65,7 +65,6 @@ describe('Writing Framework: Customizer, Prose Interpolator & Compositional Intr
       sex: 'female',
       race: 'vaelorian',
       background: 'ashen_blade',
-      heirloom: 'kiln_lantern',
       anatomy: customAnatomy,
       stealthMode: true,
       rngState: 42,
@@ -77,7 +76,7 @@ describe('Writing Framework: Customizer, Prose Interpolator & Compositional Intr
       'Cold {weather} beads on {name}\'s {skin} skin at {period}.{if:scarred_face} A fresh glint catches the scar.{/if}{if:defilement>=40} Pale hum stirs in {his} blood.{/if}',
       state,
     );
-    assert.match(templated, /ash-rain beads on Valeria's bronze skin at morning/);
+    assert.match(templated, /sleet-rain beads on Valeria's bronze skin at morning/);
     assert.match(templated, /fresh glint catches the scar/);
     assert.match(templated, /Pale hum stirs in her blood/);
 
@@ -103,7 +102,6 @@ describe('Writing Framework: Customizer, Prose Interpolator & Compositional Intr
       sex: 'female',
       race: 'ael_thalor',
       background: 'root_scholar',
-      heirloom: 'kiln_lantern',
       skipIntro: true,
       stealthMode: true,
       rngState: 42,
@@ -128,7 +126,6 @@ describe('24-Hour Clock, Dynamic Weather & Mobile Solo Camp', () => {
       sex: 'male',
       race: 'durnfolk',
       background: 'barrow_stalker',
-      heirloom: 'kiln_lantern',
       skipIntro: true,
       stealthMode: true,
       rngState: 88,
@@ -145,13 +142,13 @@ describe('24-Hour Clock, Dynamic Weather & Mobile Solo Camp', () => {
     assert.equal(state.scene, 'camp_hub');
 
     // Cannot wild camp inside town
-    state.locationId = 'cinderford';
+    state.locationId = 'frostwall_redoubt';
     state.scene = 'location';
     const failCamp = processInput(state, 'camp');
     assert.match(failCamp.messages.join(' '), /town walls/);
 
     // Move to wild area -> Camp state opens cleanly
-    state.locationId = 'kings_causeway';
+    state.locationId = 'imperial_viaduct';
     assert.ok(getSceneChoices(state).some((c) => c.label === 'Camp'));
     processInput(state, 'Camp');
     assert.equal(state.scene, 'camp');
@@ -179,7 +176,6 @@ describe('Body Modifications (Mutations, Surgeries, Implants) & Defilement', () 
       sex: 'male',
       race: 'grixi',
       background: 'barrow_stalker',
-      heirloom: 'kiln_lantern',
       skipIntro: true,
       stealthMode: true,
       rngState: 21,
@@ -233,7 +229,6 @@ describe('10 Damage Types, Subdue Aftermath & Scarred Survival Defeat', () => {
       sex: 'female',
       race: 'durnfolk',
       background: 'ashen_blade',
-      heirloom: 'kiln_lantern',
       survivalMode: 'scarred',
       skipIntro: true,
       stealthMode: true,
@@ -253,17 +248,26 @@ describe('10 Damage Types, Subdue Aftermath & Scarred Survival Defeat', () => {
     const qRes = processInput(state, 'Question');
     assert.ok(qRes.messages.length > 0);
     const spareRes = processInput(state, 'Spare');
-    assert.match(spareRes.messages.join(' '), /breathing in the ash/);
+    assert.match(spareRes.messages.join(' '), /breathing in the slush/);
     assert.equal(state.scene, 'camp_hub');
 
-    // Scarred Survival player defeat inflicts injury & scar instead of game over
+    // Scarred Survival player defeat opens 3-beat defeat cutscene -> camp_hub
     startCombatEncounter(state, { enemyId: 'iron_deserter', canFlee: true });
     state.player.crowns = 40;
-    const defMsgs = resolvePlayerDefeat(state, 'hp');
+    resolvePlayerDefeat(state, 'hp');
+    assert.equal(state.scene, 'defeat');
+    assert.ok(state.defeatState);
+    assert.equal(state.defeatState.beats.length, 3);
+    assertNoParensOrBrackets(renderCurrentScreen(state, []), 'defeat beat 0');
+    processInput(state, 'Continue');
+    assert.equal(state.defeatState?.beatIndex, 1);
+    processInput(state, 'Continue');
+    assert.equal(state.defeatState?.beatIndex, 2);
+    const finalDefRes = processInput(state, 'Continue');
     assert.equal(state.scene, 'camp_hub');
     assert.ok(state.player.injuries.length >= 1);
     assert.ok(state.player.crowns < 40);
-    assert.match(defMsgs.join(' '), /Fractured Ribs/);
+    assert.match(finalDefRes.messages.join(' '), /Fractured Ribs/);
 
     // Ironman mode defeat kills immediately
     const ironman = createNewGame({
@@ -271,7 +275,6 @@ describe('10 Damage Types, Subdue Aftermath & Scarred Survival Defeat', () => {
       sex: 'male',
       race: 'vaelorian',
       background: 'ashen_blade',
-      heirloom: 'kiln_lantern',
       survivalMode: 'ironman',
       skipIntro: true,
       rngState: 9,
@@ -289,7 +292,6 @@ describe('Combat Qualitative UI, Appraisal, Mid-Combat Journal & Persistence', (
       sex: 'female',
       race: 'vaelorian',
       background: 'root_scholar',
-      heirloom: 'kiln_lantern',
       skipIntro: true,
       rngState: 1234,
     });
@@ -310,7 +312,7 @@ describe('Combat Qualitative UI, Appraisal, Mid-Combat Journal & Persistence', (
     processInput(state, 'Arts');
     const artsScreen = renderCurrentScreen(state, []);
     assertNoParensOrBrackets(artsScreen, 'mid-combat arts');
-    assert.match(artsScreen, /Resonant/);
+    assert.match(artsScreen, /Bludgeoning/);
     assert.match(artsScreen, /Subdue/);
     processInput(state, 'Back');
     processInput(state, 'Back');
@@ -343,9 +345,8 @@ describe('Combat Qualitative UI, Appraisal, Mid-Combat Journal & Persistence', (
       assert.equal(loaded.clock.day, 1);
       assert.ok(hasFlag(loaded, 'seal_of_silence'));
 
-      const completion = recordRunCompletion(loaded, 'victory', 'Heir of the First Kiln', tempDir);
+      const completion = recordRunCompletion(loaded, 'victory', 'Keeper of the Silver Dome', tempDir);
       assert.equal(loadGame(tempDir), null);
-      assert.ok(completion.newlyUnlocked.includes('grixi_chronometer'));
       const meta = loadMetaProfile(tempDir);
       assert.equal(meta.victories, 1);
     } finally {
@@ -360,15 +361,14 @@ describe('Combat Qualitative UI, Appraisal, Mid-Combat Journal & Persistence', (
 
     const placeCount = db.prepare('SELECT COUNT(*) AS cnt FROM places').get() as { cnt: number };
     const eventCount = db.prepare('SELECT COUNT(*) AS cnt FROM events').get() as { cnt: number };
-    assert.equal(placeCount.cnt, 13);
-    assert.equal(eventCount.cnt, 18);
+    assert.equal(placeCount.cnt, 14);
+    assert.equal(eventCount.cnt, 36);
 
     const state = createNewGame({
       name: 'Kael',
       sex: 'male',
       race: 'grixi',
       background: 'barrow_stalker',
-      heirloom: 'grixi_chronometer',
       skipIntro: true,
       rngState: 99,
     });
@@ -400,7 +400,6 @@ describe('5-Slot Equipment, Action Economy, Draughts & Tabletop Mechanics', () =
       sex: 'male',
       race: 'vaelorian',
       background: 'ashen_blade',
-      heirloom: 'kiln_lantern',
       skipIntro: true,
       rngState: 12,
     });
@@ -459,7 +458,6 @@ describe('5-Slot Equipment, Action Economy, Draughts & Tabletop Mechanics', () =
       sex: 'female',
       race: 'grixi',
       background: 'barrow_stalker',
-      heirloom: 'grixi_chronometer',
       skipIntro: true,
       rngState: 77,
     });
@@ -493,7 +491,7 @@ describe('5-Slot Equipment, Action Economy, Draughts & Tabletop Mechanics', () =
     assert.equal(state.player.armorTierCurrent, 3);
 
     // Brief Rest & Full Rest at Camp
-    state.locationId = 'kings_causeway';
+    state.locationId = 'imperial_viaduct';
     enterMobileCamp(state);
     executeCampAction(state, 'camp:kindle');
     state.player.hp = 10;
@@ -543,7 +541,6 @@ describe('Core Frontier Loop: Hub, 10 Areas, Sub-Areas, Dungeons & Towns', () =>
       sex: 'male',
       race: 'vaelorian',
       background: 'ashen_blade',
-      heirloom: 'kiln_lantern',
       skipIntro: true,
       stealthMode: true,
       rngState: 5,
@@ -563,36 +560,46 @@ describe('Core Frontier Loop: Hub, 10 Areas, Sub-Areas, Dungeons & Towns', () =>
 
     // Camp Explore unlocks areas/towns or triggers encounter
     processInput(state, 'Explore');
-    if (state.scene === 'combat') {
+    if (state.scene === 'combat' || state.scene === 'combat_approach') {
       state.combat = null;
+      state.combatApproach = null;
       state.scene = 'camp_hub';
+    } else if (state.scene === 'explore_beat') {
+      if (state.exploreBeat && !state.exploreBeat.resolved && state.exploreBeat.kind === 'salvage') {
+        processInput(state, 'Search');
+      }
+      processInput(state, 'Continue');
     } else if (state.scene === 'shop') {
       processInput(state, 'Leave');
     }
     assert.equal(state.scene, 'camp_hub');
 
-    // Unlock Cinderford Town -> verify NO Explore action inside town
-    state.frontier.unlockedTowns.push('cinderford');
+    // Unlock Timber Post Town -> verify NO Explore action inside town
+    state.frontier.unlockedTowns.push('frostwall_redoubt');
     processInput(state, 'Travel');
-    processInput(state, 'Cinderford Keep');
+    processInput(state, 'Timber Post');
+    assert.equal(state.scene, 'travel');
+    for (let i = 0; i < 5 && state.scene === 'travel'; i++) processInput(state, 'Continue');
     assert.equal(state.scene, 'location');
-    assert.equal(state.locationId, 'cinderford');
+    assert.equal(state.locationId, 'frostwall_redoubt');
     const townLabels = getSceneChoices(state).map((c) => c.label);
     assert.equal(townLabels.includes('Explore'), false);
     assert.ok(townLabels.includes('Talk'));
     assert.ok(townLabels.includes('Return'));
 
-    // Return to Camp, Travel to Weeping Barrow (Area), toggle Sub-Area, Enter Dungeon
+    // Return to Camp, Travel to Long Steps (Area), toggle Sub-Area, Enter Dungeon
     processInput(state, 'Return');
     assert.equal(state.scene, 'camp_hub');
-    state.frontier.unlockedAreas.push('weeping_barrow');
+    state.frontier.unlockedAreas.push('stepped_barrow');
     state.frontier.unlockedSubAreas.push('barrow_crypt_ledge');
     state.frontier.unlockedDungeons.push('barrow_undercroft');
 
     processInput(state, 'Travel');
-    processInput(state, 'Weeping Barrow');
-    if (state.scene === 'combat') {
+    processInput(state, 'Long Steps');
+    for (let i = 0; i < 5 && state.scene === 'travel'; i++) processInput(state, 'Continue');
+    if (state.scene === 'combat' || state.scene === 'combat_approach') {
       state.combat = null;
+      state.combatApproach = null;
       state.scene = 'location';
     }
     assert.equal(state.scene, 'location');
@@ -603,7 +610,7 @@ describe('Core Frontier Loop: Hub, 10 Areas, Sub-Areas, Dungeons & Towns', () =>
 
     // Toggle Sub-Area
     processInput(state, 'Sub-Area');
-    assert.equal(state.frontier.activeSubArea.weeping_barrow, 'barrow_crypt_ledge');
+    assert.equal(state.frontier.activeSubArea.stepped_barrow, 'barrow_crypt_ledge');
 
     // Enter Dungeon -> Room-by-Room navigation + ASCII fog-of-war + Switch + Exit
     processInput(state, 'Dungeon');
@@ -623,12 +630,12 @@ describe('Core Frontier Loop: Hub, 10 Areas, Sub-Areas, Dungeons & Towns', () =>
     processInput(state, 'Pull Chain');
     assert.ok(state.frontier.dungeonStates.barrow_undercroft.pulledSwitches.includes('bu_gate_switch'));
 
-    // Backtrack South -> West -> Leave back to Weeping Barrow
+    // Backtrack South -> West -> Leave back to Stepped Barrow
     processInput(state, 'South');
     processInput(state, 'West');
     processInput(state, 'Leave');
     assert.equal(state.scene, 'location');
-    assert.equal(state.locationId, 'weeping_barrow');
+    assert.equal(state.locationId, 'stepped_barrow');
   });
 
   it('cycles all 4 Lunar Phases over 12 days, shows Onyx currency, and keeps intro free of spoilers', () => {
@@ -637,13 +644,12 @@ describe('Core Frontier Loop: Hub, 10 Areas, Sub-Areas, Dungeons & Towns', () =>
       sex: 'male',
       race: 'durnfolk',
       background: 'barrow_stalker',
-      heirloom: 'kiln_lantern',
       skipIntro: false,
       stealthMode: true,
       rngState: 21,
     });
 
-    for (let i = 0; i < 4; i += 1) {
+    for (let i = 0; i < 5; i += 1) {
       const beat = getIntroBeat(state, i);
       assertNoParensOrBrackets(beat.body, `intro beat ${i}`);
       assert.equal(/meteoric|philosopher|lunar entity/i.test(beat.body), false);
@@ -651,7 +657,7 @@ describe('Core Frontier Loop: Hub, 10 Areas, Sub-Areas, Dungeons & Towns', () =>
 
     processInput(state, 'Skip');
     const hubScreen = renderCurrentScreen(state, []);
-    assert.match(hubScreen, /Onyx 26/);
+    assert.match(hubScreen, /Onyx 14/);
     assert.match(hubScreen, /Waxing Moon/);
 
     state.player.rations = 20;
@@ -672,7 +678,6 @@ describe('Core Frontier Loop: Hub, 10 Areas, Sub-Areas, Dungeons & Towns', () =>
       sex: 'male',
       race: 'vaelorian',
       background: 'ashen_blade',
-      heirloom: 'kiln_lantern',
       skipIntro: true,
       stealthMode: true,
       rngState: 33,
@@ -704,5 +709,185 @@ describe('Core Frontier Loop: Hub, 10 Areas, Sub-Areas, Dungeons & Towns', () =>
     assert.equal(state.scene, 'camp');
     const campScreen = renderCurrentScreen(state, []);
     assert.match(campScreen, /CAMP - LONE CAMP/);
+  });
+
+  it('paces multi-beat event cutscenes with Continue before revealing choices', () => {
+    const state = createNewGame({
+      name: 'Sable',
+      sex: 'female',
+      race: 'vaelorian',
+      background: 'root_scholar',
+      skipIntro: true,
+      stealthMode: true,
+      rngState: 77,
+    });
+
+    state.locationId = 'stepped_barrow';
+    state.scene = 'event';
+    state.activeEvent = { eventId: 'star_glass_obelisk', beatIndex: 0, resolved: false };
+
+    const beat0Screen = renderCurrentScreen(state, []);
+    assertNoParensOrBrackets(beat0Screen, 'cutscene beat 0');
+    assert.deepEqual(
+      getSceneChoices(state).map((c) => c.label),
+      ['Continue'],
+    );
+
+    processInput(state, 'Continue');
+    assert.equal(state.activeEvent?.beatIndex, 1);
+    const beat1Screen = renderCurrentScreen(state, []);
+    assertNoParensOrBrackets(beat1Screen, 'cutscene beat 1');
+    assert.deepEqual(
+      getSceneChoices(state).map((c) => c.label),
+      ['Continue'],
+    );
+
+    processInput(state, 'Continue');
+    assert.equal(state.activeEvent?.beatIndex, 2);
+    const finalLabels = getSceneChoices(state).map((c) => c.label);
+    assert.ok(finalLabels.includes('Trace Notches'));
+    assert.ok(finalLabels.includes('Chip Resin'));
+  });
+
+  it('always transitions to aftermath after lethal combat victory with Continue', () => {
+    const state = createNewGame({
+      name: 'Bram',
+      sex: 'male',
+      race: 'vaelorian',
+      background: 'ashen_blade',
+      skipIntro: true,
+      stealthMode: true,
+      rngState: 88,
+    });
+
+    startCombatEncounter(state, { enemyId: 'gaunt_wolf', canFlee: true });
+    assert.ok(state.combat);
+    state.combat.enemies[0].hp = 1;
+    executeCombatAction(state, 'strike');
+    assert.equal(state.scene, 'aftermath');
+    assert.ok(state.aftermath);
+    assert.deepEqual(
+      getSceneChoices(state).map((c) => c.label),
+      ['Continue'],
+    );
+    const screen = renderCurrentScreen(state, []);
+    assertNoParensOrBrackets(screen, 'lethal aftermath screen');
+    assert.match(screen, /Silence settles back over the cold stone/);
+    processInput(state, 'Continue');
+    assert.equal(state.scene, 'camp_hub');
+  });
+
+  it('categorizes appearance into semantic visibleTags and drives reactive prose', () => {
+    const goblinAnat = buildPlayerAnatomy('female', 'grixi', 'barrow_stalker', {
+      height: 'Wiry-Short',
+      weight: 'Lean',
+      skinColor: 'Soot-Green',
+      hairLength: 'Shaved',
+      hairStyle: 'Unkempt',
+      hairColor: 'Soot Black',
+      eyeShape: 'Wide',
+      eyeColor: 'Lantern-Yellow',
+      musculature: 'Wiry',
+      bodyShape: 'Spare',
+      facialScars: 'Frost-Burn',
+      bodyScars: 'Unmarked',
+      distinguishingMark: 'Notched Ears',
+    });
+    assert.ok(goblinAnat.visibleTags.includes('greenskin'));
+    assert.ok(goblinAnat.visibleTags.includes('lantern_eyes'));
+    assert.ok(goblinAnat.visibleTags.includes('small_stature'));
+    assert.ok(goblinAnat.visibleTags.includes('burn_scarred'));
+    assert.ok(goblinAnat.visibleTags.includes('shaved_head'));
+
+    const dwarfAnat = buildPlayerAnatomy('male', 'durnfolk', 'ashen_blade', {
+      height: 'Stout',
+      weight: 'Burly',
+      skinColor: 'Slate-Grey',
+      hairLength: 'Long',
+      hairStyle: 'Braided',
+      hairColor: 'Soot-White',
+      eyeShape: 'Deep-Set',
+      eyeColor: 'Mist-Grey',
+      musculature: 'Broad',
+      bodyShape: 'Barrel-Chested',
+      facialScars: 'Unmarked',
+      bodyScars: 'Unmarked',
+      distinguishingMark: 'None',
+    });
+    assert.ok(dwarfAnat.visibleTags.includes('stone_skin'));
+    assert.ok(dwarfAnat.visibleTags.includes('heavy_build'));
+    assert.ok(dwarfAnat.visibleTags.includes('long_hair'));
+    assert.ok(dwarfAnat.visibleTags.includes('white_hair'));
+    assert.ok(dwarfAnat.visibleTags.includes('unmarked_face'));
+
+    const state = createNewGame({
+      name: 'Skra',
+      sex: 'female',
+      race: 'grixi',
+      background: 'barrow_stalker',
+      anatomy: goblinAnat,
+      skipIntro: true,
+      stealthMode: true,
+      rngState: 91,
+    });
+    const campScreen = renderCurrentScreen(state, []);
+    assert.match(campScreen, /narrow iron-barred drain grate/);
+    assert.match(campScreen, /burn-scars/);
+
+    state.locationId = 'imperial_viaduct';
+    state.scene = 'event';
+    state.activeEvent = { eventId: 'press_gang', beatIndex: 1, resolved: false };
+    const gangScreen = renderCurrentScreen(state, []);
+    assert.match(gangScreen, /stray woman/);
+    assert.match(gangScreen, /greenskin hide/);
+  });
+
+  it('applies Southern Past standard array stats and starting scrap', () => {
+    const baseState = createNewGame({
+      name: 'Kaelen',
+      sex: 'male',
+      race: 'vaelorian',
+      background: 'ashen_blade',
+      skipIntro: true,
+      stealthMode: true,
+      rngState: 12,
+    });
+    const pastState = createNewGame({
+      name: 'Kaelen',
+      sex: 'male',
+      race: 'vaelorian',
+      background: 'ashen_blade',
+      southernPast: 'fence_smuggler',
+      skipIntro: true,
+      stealthMode: true,
+      rngState: 12,
+    });
+    assert.equal(pastState.player.baseStats.wit, baseState.player.baseStats.wit + 2);
+    assert.equal(pastState.player.baseStats.agility, baseState.player.baseStats.agility + 1);
+    assert.equal(pastState.player.baseStats.might, baseState.player.baseStats.might - 1);
+    assert.equal(pastState.player.crowns, baseState.player.crowns + 8);
+    assert.ok(pastState.player.inventory.some((i) => i.id === 'iron_wire_kit'));
+    const intro0 = getIntroBeat(pastState, 0);
+    assert.match(intro0.body, /forged road-writs/);
+  });
+
+  it('starts Lv1 with 0 abilities and unlocks racial ability on level-up', () => {
+    const state = createNewGame({
+      name: 'Nora',
+      sex: 'female',
+      race: 'ael_thalor',
+      background: 'root_scholar',
+      skipIntro: true,
+      stealthMode: true,
+      rngState: 55,
+    });
+    assert.equal(state.player.abilities.length, 0);
+    state.player.xp = state.player.xpToNext;
+    startCombatEncounter(state, { enemyId: 'gaunt_wolf', canFlee: true });
+    state.combat!.enemies[0].hp = 1;
+    const winRes = executeCombatAction(state, 'strike');
+    assert.equal(state.player.level, 2);
+    assert.ok(state.player.abilities.includes('gloam_weave'));
+    assert.ok(winRes.messages.some((m) => m.includes('Learned Silver-Weave')));
   });
 });

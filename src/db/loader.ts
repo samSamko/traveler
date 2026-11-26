@@ -14,8 +14,6 @@ import type {
   EntityLink,
   EventCard,
   ExploreEncounterDef,
-  HeirloomDef,
-  HeirloomId,
   InjuryDef,
   ItemDef,
   LocationNode,
@@ -26,6 +24,8 @@ import type {
   RecipeDef,
   SecretSubAreaDef,
   ShopListing,
+  SouthernPastDef,
+  SouthernPastId,
 } from '../types.ts';
 import { WORLD_DB_SCHEMA } from './schema.ts';
 import {
@@ -47,7 +47,7 @@ export interface WorldRepository {
   db: DatabaseSync;
   races: Record<RaceId, RaceDef>;
   backgrounds: Record<BackgroundId, BackgroundDef>;
-  heirlooms: Record<HeirloomId, HeirloomDef>;
+  southernPasts: Record<SouthernPastId, SouthernPastDef>;
   abilities: Record<string, AbilityDef>;
   perks: Record<string, PerkDef>;
   items: Record<string, ItemDef>;
@@ -75,7 +75,7 @@ export function loadWorldDatabase(): WorldRepository {
   const charJson = readDataJson<{
     races: Record<RaceId, RaceDef>;
     backgrounds: Record<BackgroundId, BackgroundDef>;
-    heirlooms: Record<HeirloomId, HeirloomDef>;
+    southernPasts: Record<SouthernPastId, SouthernPastDef>;
     abilities: Record<string, AbilityDef>;
     perks: Record<string, PerkDef>;
   }>('characters.json');
@@ -154,6 +154,7 @@ export function loadWorldDatabase(): WorldRepository {
       weight?: number;
       condition?: ConditionSpec;
       promptVariants: ProseVariant[];
+      promptBeats?: ProseVariant[][];
       choices: Array<{
         id: string;
         label: string;
@@ -348,12 +349,24 @@ export function loadWorldDatabase(): WorldRepository {
       );
     }
 
-    const insHeirloom = db.prepare(
-      `INSERT INTO heirlooms (id, name, unlock_requirement, description, combat_description) VALUES (?, ?, ?, ?, ?)`,
+    const insPast = db.prepare(
+      `INSERT INTO southern_pasts (id, name, subtitle, lore, stat_mods_json, bonus_crowns, bonus_rations, bonus_torches, bonus_items_json)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     );
-    for (const h of Object.values(charJson.heirlooms)) {
-      insHeirloom.run(h.id, h.name, h.unlockRequirement, h.description, h.combatDescription);
+    for (const sp of Object.values(charJson.southernPasts)) {
+      insPast.run(
+        sp.id,
+        sp.name,
+        sp.subtitle,
+        sp.lore,
+        JSON.stringify(sp.statMods),
+        sp.bonusCrowns,
+        sp.bonusRations,
+        sp.bonusTorches,
+        JSON.stringify(sp.bonusItems),
+      );
     }
+
 
     const insPerk = db.prepare(
       `INSERT INTO perks (id, name, description, stat_bonus_json, max_hp_bonus, max_stamina_bonus, max_focus_bonus, max_resolve_bonus, armor_bonus, damage_bonus, extra_main_actions, extra_swift_actions, swift_items)
@@ -570,8 +583,8 @@ export function loadWorldDatabase(): WorldRepository {
 
     // 8. Events & Choices
     const insEvent = db.prepare(
-      `INSERT INTO events (id, title, locations_json, min_day, max_day, periods_json, weathers_json, min_defilement, max_defilement, required_tags_json, repeatable, cooldown_hours, weight, condition_json, prompt_variants_json)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO events (id, title, locations_json, min_day, max_day, periods_json, weathers_json, min_defilement, max_defilement, required_tags_json, repeatable, cooldown_hours, weight, condition_json, prompt_variants_json, prompt_beats_json)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     );
     const insChoice = db.prepare(
       `INSERT INTO event_choices (id, event_id, sort_order, label, visible_cond_json, enabled_cond_json, disabled_reason, effect_json)
@@ -594,6 +607,7 @@ export function loadWorldDatabase(): WorldRepository {
         ev.weight ?? 1,
         ev.condition ? JSON.stringify(ev.condition) : null,
         JSON.stringify(ev.promptVariants),
+        ev.promptBeats ? JSON.stringify(ev.promptBeats) : null,
       );
       ev.choices.forEach((ch, idx) => {
         insChoice.run(
@@ -833,6 +847,9 @@ export function loadWorldDatabase(): WorldRepository {
     const evId = String(er.id);
     const cond = er.condition_json ? (JSON.parse(String(er.condition_json)) as ConditionSpec) : null;
     const promptVariants = JSON.parse(String(er.prompt_variants_json)) as ProseVariant[];
+    const promptBeatsRaw = er.prompt_beats_json
+      ? (JSON.parse(String(er.prompt_beats_json)) as ProseVariant[][])
+      : undefined;
     const chRows = chStmt.all(evId) as Array<Record<string, unknown>>;
 
     const choices: EventCard['choices'] = chRows.map((cr) => {
@@ -867,6 +884,9 @@ export function loadWorldDatabase(): WorldRepository {
       weight: Number(er.weight ?? 1),
       condition: cond ? (state) => evaluateCondition(state, cond) : undefined,
       prompt: (state) => selectProseVariant(state, promptVariants),
+      promptBeats: promptBeatsRaw
+        ? promptBeatsRaw.map((beatVars) => (state) => selectProseVariant(state, beatVars))
+        : undefined,
       choices,
     });
   }
@@ -901,7 +921,7 @@ export function loadWorldDatabase(): WorldRepository {
     db,
     races: charJson.races,
     backgrounds: charJson.backgrounds,
-    heirlooms: charJson.heirlooms,
+    southernPasts: charJson.southernPasts,
     abilities: charJson.abilities,
     perks: charJson.perks,
     items: itemsJson.items,

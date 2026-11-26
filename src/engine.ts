@@ -5,16 +5,17 @@ import type {
   BackgroundId,
   BodySlot,
   GameState,
-  HeirloomId,
   JournalTab,
   RaceId,
   RecipeDef,
   SexId,
+  SouthernPastId,
   SurvivalMode,
 } from './types.ts';
-import { BACKGROUNDS, PERKS, RACES } from './content/characters.ts';
+import { BACKGROUNDS, PERKS, RACES, SOUTHERN_PASTS } from './content/characters.ts';
 import { ITEMS, RECIPES } from './content/items.ts';
 import { LOCATIONS } from './content/locations.ts';
+import { ENEMIES } from './content/enemies.ts';
 import { EVENTS } from './content/events.ts';
 import { nextRandom, resolveCheck } from './dice.ts';
 import { registerRuleRuntime } from './db/rules.ts';
@@ -23,6 +24,7 @@ import { hasFlag, recordChronicle, setFlag, synthesizeEpilogue } from './memory.
 import {
   addItemToInventory,
   consumeInventoryItem,
+  beginCombatApproach,
   executeCombatAction,
   getCombatMenuOptions,
   startCombatEncounter,
@@ -88,19 +90,20 @@ registerRuleRuntime({
 });
 
 const SHORT_LOCATION_NAMES: Record<string, string> = {
-  cinderford: 'Cinderford Keep',
-  kings_causeway: "King's Causeway",
-  weeping_barrow: 'Weeping Barrow',
-  ash_fen: 'Ash-Fen',
-  silken_cistern: 'Silken Cistern',
-  petrified_starwood: 'Star-Wood',
-  drowned_forge: 'Drowned Forge',
-  crown_watchtower: 'Crown Watchtower',
-  sunken_belfry: 'Sunken Belfry',
-  sunken_orchard: 'Sunken Orchard',
-  kiln_scars: 'Kiln Scars',
-  salt_catacombs: 'Salt Catacombs',
-  iron_quarry: 'Iron Quarry',
+  frostwall_redoubt: 'Timber Post',
+  cistern_cloister: 'Old Bathhouse',
+  foundry_vault: 'Smelter Pit',
+  salt_hermitage: 'Dry Arch',
+  imperial_viaduct: 'High Road',
+  frost_orchard: 'Dead Orchard',
+  stepped_barrow: 'Long Steps',
+  brine_marsh: 'Salt Bog',
+  petrified_grove: 'White Timber',
+  kiln_terraces: 'Brick Hills',
+  basalt_quarry: 'Black Quarry',
+  salt_ossuary: 'Bone Cellars',
+  gate_watchtower: 'North Gate',
+  silver_rotunda: 'The White Dome',
 };
 
 export interface CreateCharacterInput {
@@ -108,7 +111,7 @@ export interface CreateCharacterInput {
   sex: SexId;
   race: RaceId;
   background: BackgroundId;
-  heirloom: HeirloomId;
+  southernPast?: SouthernPastId;
   survivalMode?: SurvivalMode;
   anatomy?: AnatomyProfile;
   skipIntro?: boolean;
@@ -119,12 +122,13 @@ export interface CreateCharacterInput {
 export function createNewGame(input: CreateCharacterInput): GameState {
   const raceDef = RACES[input.race];
   const bgDef = BACKGROUNDS[input.background];
+  const pastDef = input.southernPast ? SOUTHERN_PASTS[input.southernPast] : undefined;
 
   const stats = {
-    might: 1 + (raceDef.statMods.might ?? 0) + (bgDef.statMods.might ?? 0),
-    agility: 1 + (raceDef.statMods.agility ?? 0) + (bgDef.statMods.agility ?? 0),
-    wit: 1 + (raceDef.statMods.wit ?? 0) + (bgDef.statMods.wit ?? 0),
-    grit: 1 + (raceDef.statMods.grit ?? 0) + (bgDef.statMods.grit ?? 0),
+    might: 1 + (raceDef.statMods.might ?? 0) + (bgDef.statMods.might ?? 0) + (pastDef?.statMods.might ?? 0),
+    agility: 1 + (raceDef.statMods.agility ?? 0) + (bgDef.statMods.agility ?? 0) + (pastDef?.statMods.agility ?? 0),
+    wit: 1 + (raceDef.statMods.wit ?? 0) + (bgDef.statMods.wit ?? 0) + (pastDef?.statMods.wit ?? 0),
+    grit: 1 + (raceDef.statMods.grit ?? 0) + (bgDef.statMods.grit ?? 0) + (pastDef?.statMods.grit ?? 0),
   };
 
   const weapon = ITEMS[bgDef.startingWeaponId];
@@ -151,15 +155,24 @@ export function createNewGame(input: CreateCharacterInput): GameState {
     (armor?.maxResolveBonus ?? 0) +
     (trinket?.maxResolveBonus ?? 0);
 
-  const abilities = [raceDef.racialAbilityId, ...bgDef.abilityIds];
+  const abilities: string[] = [];
   const anatomy =
     input.anatomy ?? rollDefaultAnatomy(input.sex, input.race, input.background);
+
+  const startingItemsMerged = bgDef.startingItems.map((i) => ({ ...i }));
+  if (pastDef) {
+    for (const bi of pastDef.bonusItems) {
+      const existing = startingItemsMerged.find((e) => e.id === bi.id);
+      if (existing) existing.qty += bi.qty;
+      else startingItemsMerged.push({ ...bi });
+    }
+  }
 
   const startingKnownItems = [
     bgDef.startingWeaponId,
     bgDef.startingArmorId,
     ...(bgDef.startingTrinketId ? [bgDef.startingTrinketId] : []),
-    ...bgDef.startingItems.map((i) => i.id),
+    ...startingItemsMerged.map((i) => i.id),
   ];
 
   const skipIntro = Boolean(input.skipIntro);
@@ -176,7 +189,7 @@ export function createNewGame(input: CreateCharacterInput): GameState {
       sex: input.sex,
       race: input.race,
       background: input.background,
-      heirloom: input.heirloom,
+      southernPast: input.southernPast,
       anatomy,
       bodyMods: {},
       injuries: [],
@@ -207,12 +220,12 @@ export function createNewGame(input: CreateCharacterInput): GameState {
       maxReserves: 2,
       grace: 2,
       maxGrace: 2,
-      inventory: bgDef.startingItems.map((i) => ({ ...i })),
+      inventory: startingItemsMerged,
       abilities,
       perks: [],
-      crowns: bgDef.startingCrowns,
-      rations: bgDef.startingRations,
-      torches: bgDef.startingTorches,
+      crowns: bgDef.startingCrowns + (pastDef?.bonusCrowns ?? 0),
+      rations: bgDef.startingRations + (pastDef?.bonusRations ?? 0),
+      torches: bgDef.startingTorches + (pastDef?.bonusTorches ?? 0),
       statuses: [],
       determinationAvailable: true,
     },
@@ -245,6 +258,7 @@ export function createNewGame(input: CreateCharacterInput): GameState {
     frontier: createInitialFrontierState(),
     activeMerchant: null,
     pendingPerkIds: [],
+    defeatState: null,
     endingSummary: null,
     lastMessages: skipIntro
       ? ['Cold ash settles around your lone camp in the scrub.']
@@ -349,6 +363,39 @@ export function getSceneChoices(state: GameState): MenuEntry[] {
       return entries;
     }
     return getCampChoices(state);
+  }
+
+  if (state.scene === 'travel') {
+    return [{ index: 1, id: 'journey:next', label: 'Continue', enabled: true }];
+  }
+
+  if (state.scene === 'explore_beat' && state.exploreBeat) {
+    if (!state.exploreBeat.resolved && state.exploreBeat.kind === 'salvage') {
+      return [
+        { index: 1, id: 'explore:search', label: 'Search', enabled: true },
+        { index: 2, id: 'explore:leave', label: 'Leave', enabled: true },
+      ];
+    }
+    return [{ index: 1, id: 'explore:continue', label: 'Continue', enabled: true }];
+  }
+
+  if (state.scene === 'combat_approach' && state.combatApproach) {
+    if (state.combatApproach.ambushed) {
+      return [{ index: 1, id: 'approach:engage', label: 'Continue', enabled: true }];
+    }
+    const opts: ActionChoice[] = [
+      { index: 1, id: 'approach:engage', label: 'Engage', enabled: true },
+      { index: 2, id: 'approach:observe', label: 'Observe', enabled: !state.combatApproach.observed },
+    ];
+    if (state.combatApproach.canFlee) {
+      opts.push({ index: opts.length + 1, id: 'approach:flee', label: 'Slip Away', enabled: true });
+    }
+    opts.push({ index: opts.length + 1, id: 'open_journal', label: 'Journal', enabled: true });
+    return opts;
+  }
+
+  if (state.scene === 'defeat') {
+    return [{ index: 1, id: 'defeat:next', label: 'Continue', enabled: true }];
   }
 
   if (state.scene === 'aftermath') {
@@ -648,7 +695,10 @@ export function getSceneChoices(state: GameState): MenuEntry[] {
       entries.push({ index: 1, id: 'event_continue', label: 'Continue', enabled: true });
     } else {
       const ev = EVENTS.find((e) => e.id === state.activeEvent!.eventId);
-      if (ev) {
+      const beatIdx = state.activeEvent.beatIndex ?? 0;
+      if (ev?.promptBeats && beatIdx < ev.promptBeats.length - 1) {
+        entries.push({ index: 1, id: 'event_beat_next', label: 'Continue', enabled: true });
+      } else if (ev) {
         for (const ch of ev.choices) {
           if (!ch.visible || ch.visible(state)) {
             const check = ch.enabled ? ch.enabled(state) : { ok: true };
@@ -823,7 +873,7 @@ function drawRoadEvent(state: GameState): boolean {
   }
   state.scene = 'event';
   state.subMenu = 'root';
-  state.activeEvent = { eventId: chosen.id, resolved: false };
+  state.activeEvent = { eventId: chosen.id, beatIndex: 0, resolved: false };
   return true;
 }
 
@@ -848,7 +898,7 @@ function travelTo(state: GameState, destId: string): string[] {
   }
 
   if (
-    destId === 'cinderford' &&
+    destId === 'frostwall_redoubt' &&
     state.day >= 8 &&
     !hasFlag(state, 'cinderford_saved') &&
     !hasFlag(state, 'cinderford_fallen')
@@ -856,12 +906,12 @@ function travelTo(state: GameState, destId: string): string[] {
     setFlag(state, 'cinderford_fallen', true);
     recordChronicle(
       state,
-      'Cinderford Fell',
-      'Because the infected granary went ignored past Day 8, Cinderford succumbed from within.',
-      'cinderford',
+      'Timber Post Fell',
+      'Because the spoiled grain cellar went ignored past Day 8, Timber Post succumbed from within.',
+      'frostwall_redoubt',
     );
     msgs.push(
-      'Cinderford Keep has succumbed to the granary spores. Two stooped figures burst from the gatehouse.',
+      'Timber Post has succumbed to the cellar rot. Two stooped figures stumble out from the unbarred gatehouse.',
     );
     const { introMessages } = startCombatEncounter(state, {
       enemyIds: ['root_husk', 'root_husk'],
@@ -1522,6 +1572,126 @@ function processInputInner(
     return { messages: ['Bought Pitch-Torch.'], shouldQuit: false };
   }
 
+  if (chosen.id === 'journey:next' && state.travelState) {
+    const ts = state.travelState;
+    if (ts.beatIndex + 1 < ts.beats.length) {
+      ts.beatIndex += 1;
+      return { messages: [], shouldQuit: false };
+    }
+    const ambushId = ts.pendingAmbushEnemyId;
+    state.travelState = null;
+    if (ambushId) {
+      const msgs = beginCombatApproach(state, { enemyId: ambushId, canFlee: true, ambushed: true });
+      return { messages: ['Shadows cut across the trail ahead.', ...msgs], shouldQuit: false };
+    }
+    state.scene = 'location';
+    state.subMenu = 'root';
+    return { messages: [], shouldQuit: false };
+  }
+
+  if (chosen.id === 'explore:search' && state.exploreBeat) {
+    const eb = state.exploreBeat;
+    eb.resolved = true;
+    const foundParts: string[] = [];
+    if (eb.itemId) {
+      addItemToInventory(state, eb.itemId, 1);
+      foundParts.push(`You pry free ${ITEMS[eb.itemId]?.name ?? eb.itemId} and stow it in oilcloth.`);
+    }
+    if (eb.crownsMin !== undefined && eb.crownsMax !== undefined) {
+      const gain = eb.crownsMin + Math.floor(nextRandom(state) * (eb.crownsMax - eb.crownsMin + 1));
+      if (gain > 0) {
+        state.player.crowns += gain;
+        foundParts.push(`You scrape ${gain} sharp-edged Onyx coins out of the frost.`);
+      }
+    }
+    eb.outcomeText = foundParts.join('\n\n') || 'Nothing useful remains intact.';
+    return { messages: [], shouldQuit: false };
+  }
+
+  if ((chosen.id === 'explore:leave' || chosen.id === 'explore:continue') && state.exploreBeat) {
+    const ret = state.exploreBeat.returnScene;
+    state.exploreBeat = null;
+    state.scene = ret;
+    state.subMenu = 'root';
+    return { messages: [], shouldQuit: false };
+  }
+
+  if (chosen.id === 'approach:observe' && state.combatApproach) {
+    const ca = state.combatApproach;
+    ca.observed = true;
+    const leadTpl = ENEMIES[ca.enemyIds[0]] ?? ENEMIES.root_husk;
+    const chk = resolveCheck(state, 'wit', 11, 0, 'Pre-Combat Observe');
+    const lines = [chk.logLine];
+    if (leadTpl) {
+      lines.push(`Gear: ${leadTpl.visibleGear.weapon}; ${leadTpl.visibleGear.armor}.`);
+      if (chk.success) {
+        lines.push(`Build: ${leadTpl.anatomy.musculature}, ${leadTpl.anatomy.bodyShape}.`);
+        lines.push(`Tell: ${leadTpl.anatomy.distinguishingMark}.`);
+      } else {
+        lines.push('Distance and mist hide finer weaknesses until steel closes.');
+      }
+    }
+    ca.observedLines = lines;
+    return { messages: [], shouldQuit: false };
+  }
+
+  if (chosen.id === 'approach:flee' && state.combatApproach) {
+    const ca = state.combatApproach;
+    const chk = resolveCheck(state, 'agility', 11, 0, 'Slip Away');
+    if (chk.success) {
+      state.combatApproach = null;
+      state.scene = state.frontier.activeDungeonId
+        ? 'dungeon'
+        : state.locationId === 'camp_hub'
+          ? 'camp_hub'
+          : 'location';
+      state.subMenu = 'root';
+      return { messages: [chk.logLine, 'You keep low behind broken stone and slip away unseen.'], shouldQuit: false };
+    }
+    const { introMessages } = startCombatEncounter(state, {
+      enemyIds: ca.enemyIds,
+      canFlee: ca.canFlee,
+      onVictoryFlag: ca.onVictoryFlag,
+      onVictoryChronicle: ca.onVictoryChronicle,
+      preDamageRatio: ca.preDamageRatio,
+      brokenSeals: ca.brokenSeals,
+    });
+    state.combatApproach = null;
+    return { messages: [chk.logLine, 'Gravel crunches beneath your boot; the threat turns straight toward you.', ...introMessages], shouldQuit: false };
+  }
+
+  if (chosen.id === 'approach:engage' && state.combatApproach) {
+    const ca = state.combatApproach;
+    const { introMessages } = startCombatEncounter(state, {
+      enemyIds: ca.enemyIds,
+      canFlee: ca.canFlee,
+      onVictoryFlag: ca.onVictoryFlag,
+      onVictoryChronicle: ca.onVictoryChronicle,
+      preDamageRatio: ca.preDamageRatio,
+      brokenSeals: ca.brokenSeals,
+    });
+    state.combatApproach = null;
+    return { messages: introMessages, shouldQuit: false };
+  }
+
+  if (chosen.id === 'defeat:next' && state.defeatState) {
+    if (state.defeatState.beatIndex + 1 < state.defeatState.beats.length) {
+      state.defeatState.beatIndex += 1;
+      return { messages: [], shouldQuit: false };
+    }
+    const summary = [...state.defeatState.summaryNotes];
+    state.defeatState = null;
+    state.locationId = 'camp_hub';
+    state.scene = 'camp_hub';
+    state.subMenu = 'root';
+    return { messages: summary, shouldQuit: false };
+  }
+
+  if (chosen.id === 'event_beat_next' && state.activeEvent) {
+    state.activeEvent.beatIndex = (state.activeEvent.beatIndex ?? 0) + 1;
+    return { messages: [], shouldQuit: false };
+  }
+
   if (chosen.id === 'event_continue') {
     state.activeEvent = null;
     state.scene = state.frontier.activeDungeonId
@@ -1639,11 +1809,50 @@ export function renderCurrentScreen(state: GameState, messages: string[]): strin
       out.push(paint(`CAMP - ${campTitle}`, 'cyan', s));
       out.push(
         wrapText(
-          state.camp.fireLit
-            ? `Low embers hiss beneath sheltered stone as ${WEATHER_DATA[state.clock.weather].label.toLowerCase()} settles around your solo camp.`
-            : `You crouch in cold dark beneath sheltered stone while ${WEATHER_DATA[state.clock.weather].label.toLowerCase()} drifts past your camp.`,
+          renderProse(
+            state.camp.fireLit
+              ? 'Low embers hiss beneath sheltered stone as {weather} settles around your solo camp, warming {skin} skin.{if:greenskin} You tuck your pointed ears beneath dry wool away from the glare.{/if}{if:durnfolk} Heavy stone blocks the wind clean off your shoulders.{/if}'
+              : 'You crouch in cold dark beneath sheltered stone while {weather} drifts past your camp.{if:lantern_eyes} Your bright eyes pick out every frost-crack without tinder.{/if}{if:female} You keep {weapon} drawn close across your knees while listening to the dark.{/if}',
+            state,
+          ),
         ),
       );
+    }
+  } else if (state.scene === 'travel' && state.travelState) {
+    const ts = state.travelState;
+    const destName = LOCATIONS[ts.destId]?.name ?? ts.destId;
+    out.push(paint(`JOURNEY - ${destName.toUpperCase()} ${ts.beatIndex + 1}/${ts.beats.length}`, 'cyan', s));
+    out.push(wrapText(ts.beats[ts.beatIndex] ?? ''));
+  } else if (state.scene === 'explore_beat' && state.exploreBeat) {
+    const eb = state.exploreBeat;
+    out.push(paint(eb.title, 'yellow', s));
+    out.push(wrapText(eb.outcomeText ?? eb.prose));
+  } else if (state.scene === 'combat_approach' && state.combatApproach) {
+    const ca = state.combatApproach;
+    const leadTpl = ENEMIES[ca.enemyIds[0]] ?? ENEMIES.root_husk;
+    out.push(paint(ca.ambushed ? 'AMBUSH ON THE TRAIL' : 'CONTACT AHEAD', 'red', s));
+    if (leadTpl) {
+      out.push(wrapText(leadTpl.firstSightProse));
+    }
+    if (ca.openingBark) {
+      out.push('');
+      out.push(wrapText(ca.openingBark));
+    }
+    if (ca.observedLines && ca.observedLines.length > 0) {
+      out.push('');
+      for (const l of ca.observedLines) {
+        out.push(wrapText(`  ${l}`));
+      }
+    }
+  } else if (state.scene === 'defeat' && state.defeatState) {
+    const ds = state.defeatState;
+    out.push(paint(`DEFEAT - ${ds.beatIndex + 1}/${ds.beats.length}`, 'red', s));
+    out.push(wrapText(ds.beats[ds.beatIndex] ?? ''));
+    if (ds.beatIndex === ds.beats.length - 1 && ds.summaryNotes.length > 0) {
+      out.push('');
+      for (const note of ds.summaryNotes) {
+        out.push(wrapText(`  ${note}`));
+      }
     }
   } else if (state.scene === 'aftermath' && state.aftermath) {
     const current = state.aftermath.downedEnemies[state.aftermath.activeIndex];
@@ -1651,16 +1860,37 @@ export function renderCurrentScreen(state: GameState, messages: string[]): strin
     if (current) {
       out.push(
         wrapText(
-          `${current.displayName} lies broken and breathing in the wet ash at your boots. Decide its fate.`,
+          renderProse(
+            `${current.displayName} lies broken and breathing in the freezing mud at your boots. {if:towering}You tower above the crumpled form, checking {weapon} for nicks.{/if}{if:small_stature}You step in light and close, keeping {weapon} poised over its throat.{/if}{if:scarred_face}Cold wind stings the old scar on your face as you decide its fate.{/if}`,
+            state,
+          ),
         ),
       );
+    } else {
+      out.push(
+        wrapText(
+          renderProse(
+            'Silence settles back over the cold stone. You wipe dark gore off {weapon}, catch your {build} breath, and check your pack straps.{if:greenskin} Sleet beads on {skin} skin while you listen for other scavengers.{/if}{if:ael_thalor} Your {eyes} eyes scan the frost-rimed arches for movement.{/if}{if:female} You cinch your {armor} tighter against the wind before moving on.{/if}',
+            state,
+          ),
+        ),
+      );
+      if (state.aftermath.victorySummary.length > 0) {
+        out.push('');
+        for (const line of state.aftermath.victorySummary) {
+          out.push(wrapText(`  ${line}`));
+        }
+      }
     }
   } else if (state.scene === 'camp_hub') {
     if (state.subMenu === 'root') {
       out.push(paint('LONE CAMP', 'cyan', s));
       out.push(
         wrapText(
-          'A sheltered hollow of grey stone and banked embers marks your lone outpost at the edge of the drowned valley.',
+          renderProse(
+            '{if:vaelorian}A collapsed stone milestone shed and banked embers mark your lone camp beside the broken northern paving.{/if}{if:ael_thalor}A tight windbreak of frost-split pines and banked embers mark your lone camp above the ruined arches.{/if}{if:durnfolk}A dry stone culvert wedged beneath a cracked aqueduct pier marks your lone camp out of the gale.{/if}{if:grixi}A narrow iron-barred drain grate tucked under road flagstones marks your lone camp out of sight.{/if}{if:burn_scarred} Heat from the coals pulls at old burn-scars along your skin.{/if}',
+            state,
+          ),
         ),
       );
     } else if (state.subMenu === 'travel') {
@@ -1739,7 +1969,12 @@ export function renderCurrentScreen(state: GameState, messages: string[]): strin
     if (ev) {
       out.push(paint(ev.title.toUpperCase(), 'yellow', s));
       if (!state.activeEvent.resolved) {
-        out.push(wrapText(ev.prompt(state)));
+        const beatIdx = state.activeEvent.beatIndex ?? 0;
+        const beatText =
+          ev.promptBeats && ev.promptBeats[beatIdx]
+            ? ev.promptBeats[beatIdx](state)
+            : ev.prompt(state);
+        out.push(wrapText(beatText));
       }
     }
   } else if (state.scene === 'combat' && state.combat) {

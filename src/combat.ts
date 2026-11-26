@@ -18,7 +18,7 @@ import {
   rollArmorTierReduction,
   spendGrace,
 } from './systems/frontier.ts';
-import { ABILITIES, PERKS } from './content/characters.ts';
+import { ABILITIES, BACKGROUNDS, PERKS, RACES } from './content/characters.ts';
 import { ITEMS } from './content/items.ts';
 import { ENEMIES } from './content/enemies.ts';
 import { recordChronicle, setFlag } from './memory.ts';
@@ -183,6 +183,109 @@ export function clearNegativeStatuses(list: StatusEffect[]): StatusEffect[] {
   return list.filter((s) => !negatives.includes(s.type));
 }
 
+function getHumanoidCombatBark(
+  state: GameState,
+  enemy: { category: string; hp: number; maxHp: number },
+  phase: 'approach' | 'turn',
+): string | undefined {
+  if (enemy.category !== 'humanoid' && enemy.category !== 'orc_kin') return undefined;
+  if (enemy.category === 'orc_kin') {
+    const orcBarks =
+      phase === 'approach'
+        ? [
+            'A thick-necked guttural bark snaps from its throat: "Fresh meat! Crack the ribs!"',
+            'It spits black phlegm onto the frost and snarls: "Drop the iron or feed the dogs!"',
+          ]
+        : enemy.hp <= enemy.maxHp * 0.4
+          ? ['It coughs dark blood and bellows: "Still breathing! Come die closer!"']
+          : ['It hefts its notched blade with a wet snarl: "Bleed, soft-skin!"'];
+    return orcBarks[Math.floor(nextRandom(state) * orcBarks.length)];
+  }
+
+  const tags = state.player.anatomy.visibleTags;
+  if (phase === 'approach') {
+    if (tags.includes('greenskin')) {
+      return '"A goblin way out here? Empty your pack before I skin the ears off you."';
+    }
+    if (state.player.defilement >= 40) {
+      return '"Look at your eyes... you are half-turned already. Drop the steel and stay downwind."';
+    }
+    if (state.player.sex === 'female') {
+      return '"Didn\'t expect a woman still walking this ridge. Hand over the rations and nobody bleeds."';
+    }
+    if (tags.includes('towering')) {
+      return '"Big frame like yours eats twice as much. Let\'s see what\'s in that pack."';
+    }
+    const generic = [
+      '"Hold it right there, stranger. Toll\'s paid in salt, Onyx, or blood."',
+      '"Another runaway crawling out of the south. Drop the pack and keep your hands where I see them."',
+      '"No kings out here, friend. Just cold iron and empty bellies."',
+    ];
+    return generic[Math.floor(nextRandom(state) * generic.length)];
+  }
+
+  if (nextRandom(state) > 0.55) return undefined;
+  if (enemy.hp <= enemy.maxHp * 0.4) {
+    const low = [
+      '"Stay back! Damn you, stay back!"',
+      '"Gah—I\'ve got Onyx in my boot, just let me breathe!"',
+      '"You\'re bleeding me dry, you mute bastard!"',
+    ];
+    return low[Math.floor(nextRandom(state) * low.length)];
+  }
+  const mid = [
+    '"Keep your chin down or lose it!"',
+    '"Nothing personal—winter takes the slow ones first."',
+    '"Should\'ve stayed behind the southern walls!"',
+  ];
+  return mid[Math.floor(nextRandom(state) * mid.length)];
+}
+
+export function beginCombatApproach(
+  state: GameState,
+  opts: {
+    enemyId?: string;
+    enemyIds?: string[];
+    canFlee?: boolean;
+    ambushed?: boolean;
+    onVictoryFlag?: string;
+    onVictoryChronicle?: { title: string; summary: string; tag: string };
+    preDamageRatio?: number;
+    brokenSeals?: string[];
+  },
+): string[] {
+  const ids =
+    opts.enemyIds && opts.enemyIds.length > 0
+      ? opts.enemyIds
+      : opts.enemyId
+        ? [opts.enemyId]
+        : ['root_husk'];
+  const leadTpl = ENEMIES[ids[0]] ?? ENEMIES.root_husk ?? Object.values(ENEMIES)[0];
+  const openingBark = leadTpl
+    ? getHumanoidCombatBark(
+        state,
+        { category: leadTpl.category, hp: leadTpl.maxHp, maxHp: leadTpl.maxHp },
+        'approach',
+      )
+    : undefined;
+
+  state.combatApproach = {
+    enemyIds: ids,
+    canFlee: opts.canFlee ?? true,
+    ambushed: Boolean(opts.ambushed),
+    observed: false,
+    openingBark,
+    onVictoryFlag: opts.onVictoryFlag,
+    onVictoryChronicle: opts.onVictoryChronicle,
+    preDamageRatio: opts.preDamageRatio,
+    brokenSeals: opts.brokenSeals,
+  };
+  state.scene = 'combat_approach';
+  const msgs = [leadTpl ? leadTpl.firstSightProse : 'Movement cuts across the cold stone ahead.'];
+  if (openingBark) msgs.push(openingBark);
+  return msgs;
+}
+
 export function startCombatEncounter(
   state: GameState,
   opts: {
@@ -282,7 +385,6 @@ export function startCombatEncounter(
     swiftLeft: budget.swift,
     freeLeft: budget.free,
     graceMaxDamagePending: false,
-    heirloomUsedThisFight: false,
     guaranteedDodgeThisTurn: false,
     counterDamagePending: 0,
     bossSealsBroken: broken,
@@ -371,15 +473,6 @@ export function getCombatMenuOptions(state: GameState): CombatMenuOption[] {
       opts.push({ index: opts.length + 1, id: 'grace', label: 'Spend Grace', enabled: true });
     }
 
-    if (!combat.heirloomUsedThisFight) {
-      opts.push({
-        index: opts.length + 1,
-        id: 'heirloom',
-        label: 'Heirloom',
-        enabled: combat.swiftLeft > 0,
-        reason: combat.swiftLeft > 0 ? undefined : 'No Swift action left',
-      });
-    }
 
     const hasCombatItems = p.inventory.some((entry) => {
       const item = ITEMS[entry.id];
@@ -656,6 +749,16 @@ function resolveVictory(state: GameState): string[] {
     p.stamina = p.maxStamina;
     p.focus = p.maxFocus;
 
+    const learnablePool = [
+      RACES[p.race].racialAbilityId,
+      ...BACKGROUNDS[p.background].abilityIds,
+    ];
+    const nextAb = learnablePool.find((abId) => !p.abilities.includes(abId));
+    if (nextAb) {
+      p.abilities.push(nextAb);
+      msgs.push(`Learned ${ABILITIES[nextAb]?.name ?? nextAb}.`);
+    }
+
     const availablePerks = Object.keys(PERKS).filter((pid) => !p.perks.includes(pid));
     if (availablePerks.length > 0) {
       state.pendingPerkIds = availablePerks.slice(0, 3);
@@ -666,28 +769,19 @@ function resolveVictory(state: GameState): string[] {
     }
   }
 
+  state.aftermath = {
+    downedEnemies: downedList,
+    activeIndex: 0,
+    victorySummary: msgs,
+  };
+  state.scene = 'aftermath';
   if (downedList.length > 0) {
-    state.aftermath = {
-      downedEnemies: downedList,
-      activeIndex: 0,
-      victorySummary: msgs,
-    };
-    state.scene = 'aftermath';
     msgs.push(
       downedList.length === 1
-        ? `${downedList[0].displayName} still breathes in the ash, broken and helpless.`
-        : `${downedList.length} defeated foes still breathe in the ash.`,
+        ? `${downedList[0].displayName} still breathes in the slush, broken and helpless.`
+        : `${downedList.length} defeated foes still breathe in the slush.`,
     );
-    return msgs;
   }
-
-  state.scene = leveled
-    ? 'level_up'
-    : state.frontier?.activeDungeonId
-      ? 'dungeon'
-      : state.locationId === 'camp_hub'
-        ? 'camp_hub'
-        : 'location';
   return msgs;
 }
 
@@ -861,9 +955,20 @@ export function executeCombatAction(
       pierceArmor: Boolean(weapon?.traits?.includes('armorPiercing')),
     });
     const tName = getEnemyDisplayName(state, primaryEnemy);
-    const verb = isSubdue ? 'strike to subdue' : 'strike';
+    const wName = weapon?.name ?? 'bare steel';
+    const verb = isSubdue ? `drive the flat of ${wName} into` : `lash ${wName} across`;
+    const breakdownParts = [
+      `Roll ${diceTotal}`,
+      `${statName} ${statBonus >= 0 ? `+${statBonus}` : statBonus}`,
+    ];
+    if (weapon?.bonusDamage) breakdownParts.push(`weapon +${weapon.bonusDamage}`);
+    if (honed) breakdownParts.push('honed +1');
+    if (poise) breakdownParts.push('poise +1');
+    if (coatingBonus) breakdownParts.push(`coating +${coatingBonus}`);
+    if (roundOneBonus) breakdownParts.push(`ambush +${roundOneBonus}`);
+    if (perkDmg) breakdownParts.push(`perk +${perkDmg}`);
     logs.push(
-      `You ${verb} ${tName} with ${DAMAGE_TYPE_META[dType].label.toLowerCase()} force for ${hit.dealt} damage.${hit.relationNote}${coatingNote}`,
+      `You ${verb} ${tName} for ${hit.dealt} ${DAMAGE_TYPE_META[dType].label.toLowerCase()} damage - ${breakdownParts.join(', ')}.${hit.relationNote}${coatingNote}`,
     );
     if (hit.weatherNote) logs.push(hit.weatherNote);
   } else if (actionId === 'guard') {
@@ -958,40 +1063,6 @@ export function executeCombatAction(
     if (ab.applySelfStatus) {
       pushStatus(p.statuses, ab.applySelfStatus);
       logs.push(`You become ${ab.applySelfStatus.type}.`);
-    }
-  } else if (actionId === 'heirloom') {
-    if (combat.swiftLeft <= 0) {
-      return { messages: ['No Swift action left this turn.'] };
-    }
-    if (combat.heirloomUsedThisFight) {
-      return { messages: ['Your heirloom is already spent for this battle.'] };
-    }
-    spendActionPool(combat, 'swift');
-    combat.heirloomUsedThisFight = true;
-
-    if (p.heirloom === 'kiln_lantern') {
-      primaryEnemy.turnArmor = 0;
-      const hit = dealDamageToEnemy(state, primaryEnemy, 8, 'fire', { pierceArmor: true });
-      p.focus = Math.min(p.maxFocus, p.focus + 3);
-      logs.push(`Kiln Lantern sears ${getEnemyDisplayName(state, primaryEnemy)} for ${hit.dealt} fire damage.${hit.relationNote}`);
-    } else if (p.heirloom === 'orin_bell_shard') {
-      for (const idx of getLivingEnemyIndices(combat)) {
-        pushStatus(combat.enemies[idx].statuses, { type: 'staggered', turns: 1, power: 1 });
-      }
-      pushStatus(p.statuses, { type: 'guarded', turns: 3, power: 4 });
-      p.resolve = Math.min(p.maxResolve, p.resolve + 4);
-      logs.push('Orin Bell-Shard rings clear, staggering your foes and steadying your mind.');
-    } else if (p.heirloom === 'star_dew_vial') {
-      p.hp = Math.min(p.maxHp, p.hp + 14);
-      p.resolve = Math.min(p.maxResolve, p.resolve + 6);
-      p.statuses = clearNegativeStatuses(p.statuses);
-      pushStatus(p.statuses, { type: 'blessed', turns: 4, power: 2 });
-      logs.push('Star-Dew Vial restores 14 health, steadies resolve, and clears wounds.');
-    } else if (p.heirloom === 'grixi_chronometer') {
-      combat.guaranteedDodgeThisTurn = true;
-      combat.counterDamagePending =
-        rollDice(2, 6, state) + Math.max(getEffectiveStat(state, 'agility'), getEffectiveStat(state, 'wit'));
-      logs.push('Brass Chronometer slips half a heartbeat ahead.');
     }
   } else if (actionId.startsWith('item:')) {
     const itemId = actionId.slice(5);
@@ -1163,6 +1234,11 @@ export function executeCombatAction(
     const intent = enemy.intents[enemy.nextIntentIndex];
     const staggeredIdx = enemy.statuses.findIndex((s) => s.type === 'staggered');
 
+    const bark = getHumanoidCombatBark(state, enemy, 'turn');
+    if (bark && staggeredIdx < 0) {
+      logs.push(`${eName}: ${bark}`);
+    }
+
     if (staggeredIdx >= 0) {
       enemy.statuses.splice(staggeredIdx, 1);
       logs.push(`${eName} reels staggered and loses its action.`);
@@ -1170,7 +1246,7 @@ export function executeCombatAction(
       recordEnemyAttackObserved(state, enemy.templateId, intent.label);
       if (intent.kind === 'guard') {
         enemy.turnArmor += intent.armorGain ?? 4;
-        logs.push(`${eName} uses ${intent.label} and raises its guard.`);
+        logs.push(`${eName} uses ${intent.label} and raises guard by ${intent.armorGain ?? 4}.`);
       } else if (combat.guaranteedDodgeThisTurn) {
         combat.guaranteedDodgeThisTurn = false;
         const hit = dealDamageToEnemy(state, enemy, combat.counterDamagePending, 'piercing');
@@ -1186,7 +1262,10 @@ export function executeCombatAction(
           ? computeDamageAfterResistance(preRes, intent.damageType, playerResistances, state.clock.weather)
           : { finalDamage: 0, relation: 'neutral' as const };
         p.hp = Math.max(0, p.hp - res.finalDamage);
-        const tierNote = tierDr > 0 ? ` Armor absorbs ${tierDr}.` : '';
+        const mitParts: string[] = [`Base ${intent.damage}`];
+        if (dmgReduction > 0) mitParts.push(`dazed -${dmgReduction}`);
+        if (playerArmor > 0) mitParts.push(`armor -${playerArmor}`);
+        if (tierDr > 0) mitParts.push(`tier -${tierDr}`);
         const relText =
           res.relation === 'immune'
             ? ' Your body shrugs it off completely.'
@@ -1196,7 +1275,7 @@ export function executeCombatAction(
                 ? ' It tears straight into your weakness.'
                 : '';
         logs.push(
-          `${eName} strikes with ${intent.label} for ${res.finalDamage} ${DAMAGE_TYPE_META[intent.damageType].label.toLowerCase()} damage.${tierNote}${relText}`,
+          `${eName} strikes with ${intent.label} for ${res.finalDamage} ${DAMAGE_TYPE_META[intent.damageType].label.toLowerCase()} damage - ${mitParts.join(', ')}.${relText}`,
         );
         if (res.finalDamage > 0 && p.armorTierCurrent > 0 && rollDie(10, state) === 1) {
           const degMsg = degradeArmor(state);

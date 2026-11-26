@@ -53,7 +53,6 @@ export function spendGrace(state: GameState): boolean {
 
 export function hasLightSourceEquipped(state: GameState): boolean {
   const p = state.player;
-  if (p.heirloom === 'kiln_lantern') return true;
   for (const itemId of Object.values(p.equipment)) {
     const item = itemId ? ITEMS[itemId] : undefined;
     if (item?.traits?.includes('lightSource')) return true;
@@ -176,5 +175,5 @@ export function castAshTextOutOfCombat(state: GameState, itemId: string): string
   }
   const witBonus = Math.max(0, getEffectiveStat(state, 'wit'));
   p.focus = Math.min(p.maxFocus, p.focus + 4 + witBonus);
-  return [check.logLine, 'The ancient text burns to clean ash, steadying your focus for battle.'];
+  return [check.logLine, 'The charred parchment crumbles to dry soot, steadying your focus for battle.'];
 }

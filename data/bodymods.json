@@ -6,7 +6,7 @@
       "kind": "implant",
       "slot": "eyes",
       "defilementLoad": 10,
-      "description": "Crystallized drops of Star-Wood sap set into the irises to read bone and aura.",
+      "description": "Crystallized drops of winter-pine resin set into the irises to read bone and aura.",
       "bonusSummary": "Plus 2 Wit and automatic surface combat appraisal.",
       "drawbackSummary": "Vulnerable to lightning and raises Defilement by 10.",
       "statMods": {
@@ -58,12 +58,12 @@
     },
     "kiln_blood": {
       "id": "kiln_blood",
-      "name": "Kiln-Ember Blood",
+      "name": "Cinder-Hot Blood",
       "kind": "mutation",
       "slot": "blood",
       "defilementLoad": 16,
-      "description": "Soul-amber ash runs hot through the veins, turning breath smoky in winter air.",
-      "bonusSummary": "Plus 2 Might, resistant to fire and blight, grants Kiln-Spark.",
+      "description": "Volatile brimstone-salt runs hot through the veins, turning breath smoky in winter air.",
+      "bonusSummary": "Plus 2 Might, resistant to fire and blight, grants Cinder-Spark.",
       "drawbackSummary": "Minus 2 Max Resolve, vulnerable to cold, raises Defilement by 16.",
       "statMods": {
         "might": 2
@@ -142,7 +142,7 @@
     },
     "vesper_ribs": {
       "id": "vesper_ribs",
-      "name": "Vesper Rib-Cage",
+      "name": "Tallow-Sealed Ribcage",
       "kind": "implant",
       "slot": "chest",
       "defilementLoad": 15,
@@ -173,7 +173,7 @@
       "slot": "face",
       "defilementLoad": 14,
       "description": "Under-Warren alchemical sacs stitched beneath the jaw to neutralize venom and spit acid.",
-      "bonusSummary": "Resistant to acid and poison, grants Vesper-Flask.",
+      "bonusSummary": "Resistant to acid and poison, grants Vitriol-Flask.",
       "drawbackSummary": "Vulnerable to cold, stitched jawline stigma, raises Defilement by 14.",
       "resistances": {
         "acid": "resistant",
