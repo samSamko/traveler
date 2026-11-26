@@ -1,0 +1,93 @@
+{
+  "seerIntros": [
+    "Through two slit-holes in a tallow-stained hood, the Seer's blind eyes roll upward and speak two visions:",
+    "Pinching dead moths between blackened thumbs, the Seer rasps two scried fragments—whether truth or lie, even Verhu mocks:",
+    "Smoke curls from a cracked lead bowl as the Seer mutters two omens of the den awaiting you:",
+    "The Seer drags a rusted nail across your palm and whispers two things seen beneath the dirt:",
+    "Dripping wax onto a skull's brow, the Seer utters two fragmented prophecies of the vault below:",
+    "Shivering with fever, the Seer grips your collar and hisses two warnings before pulling back the curtain:"
+  ],
+  "overlandOpenings": [
+    "Mud sucks at your boots as blackened crows wheel overhead without a sound.",
+    "A crooked milestone points toward nothing, its carved letters scratched out by frantic fingernails.",
+    "Ash drifts lazily down from the western ridge, tasting faintly of burnt hair and copper.",
+    "A gutted wagon blocks the sunken lane, its spokes wrapped in damp funeral linen.",
+    "Rainwater pools in wagon ruts thick with pale maggots and rotting turnips.",
+    "The wind carries distant church bells from Galgenbeck—too slow, as if tolled by dying arms.",
+    "Skeletons of hanged deserters rattle softly in cages along the roadside.",
+    "Cold mist coils knee-high over the stunted grass, hiding rusted caltrops and sinkholes.",
+    "A half-starved hound trails your party at twenty paces, waiting for someone to collapse.",
+    "Smoke rises from a collapsed hamlet where only soot-blackened chimneys still stand.",
+    "Flies swarm thicker around the ditches as dusk bleeds into bruised purple.",
+    "Frost rims every stone along the track despite the stifling stink of rot.",
+    "A headless roadside saint points downward into a flooded quarry.",
+    "Wet parchment scraps cling to thornbushes—torn prayers to Verhu soaked in grime.",
+    "The horizon looks painted in oil and bile, flat and unyielding as a coffin lid."
+  ],
+  "weatherMoods": [
+    "The sky hangs low like wet burial wool.",
+    "Every gust cuts straight through threadbare wool to the ribs.",
+    "Visibility drops to ten paces in the sour gloom.",
+    "The air feels heavy, stale, and hard to draw into your lungs.",
+    "Soot and drizzle turn your cloaks into cold, clinging shrouds.",
+    "Thunder mutters far beneath the soil rather than above.",
+    "A dead quiet settles over the land, broken only by your own wet breathing.",
+    "The cold bites at cracked knuckles and bleeding ears."
+  ],
+  "sensorySmells": [
+    "A stale stench of damp tallow, copper blood, and wet stone.",
+    "Sour vinegar, moldering wool, and unwashed skin.",
+    "Acrid sulfur and scorched hair drifting up from deeper shafts.",
+    "Thick, sweet rot—like rotting lilies over a plague pit.",
+    "Woodsmoke, rendered lard, and charred bone.",
+    "Cold earthworm mud mixed with stagnant cellar water.",
+    "Sharp ammonia and rusting iron.",
+    "Stifling, frowst air that coats the back of the tongue.",
+    "Hot grease, rancid sweat, and boiled cabbage.",
+    "The unmistakable tang of open guts and wet ash."
+  ],
+  "sensorySounds": [
+    "Faint, melancholy violin music scrapes from somewhere deeper below.",
+    "Heavy iron chains clink rhythmically, though no wind blows.",
+    "Muffled coughing and booted footsteps echo behind thick masonry.",
+    "Frantic scratching sounds come from inside a sealed wall or floorboard.",
+    "Slow, steady dripping marks the seconds like a leaking hourglass.",
+    "A soft, off-key chanting rises in minor key through hairline cracks.",
+    "Something wet and impossibly heavy slides across stone in the dark.",
+    "Rats scurry inside hollow woodwork just out of torchlight.",
+    "A rusted hinge groans from an adjacent passage.",
+    "Absolute, suffocating silence presses against your eardrums."
+  ],
+  "lightingDetails": [
+    "A single sputtering oil lamp casts stretched, trembling shadows.",
+    "Two wall torches gutter low, spitting black grease.",
+    "Pitch darkness swallows the corners until your light sweeps across them.",
+    "Sickly pale luminescence seeps from damp lichen along the mortar.",
+    "Blazing hearthlight paints the soot-caked walls a bruised orange.",
+    "Distant crimson glow bleeds through cracks in the ceiling.",
+    "Dim grey twilight filters down from a collapsed airshaft.",
+    "Your own lantern light reflects off slick, sweating stone."
+  ],
+  "roomAtmospheres": [
+    "Cracked flagstones tilt slightly toward a blackened drain.",
+    "Scratched tally marks cover the doorjamb—hundreds of them, ending in a smear.",
+    "Old iron hooks hang from the ceiling beams, crusted brown.",
+    "Shattered pottery and gnawed marrow-bones crunch underfoot.",
+    "Damp tapestries rot off rusted nails, thick with cobwebs.",
+    "Water seeps down the walls in greasy, dark veins.",
+    "The masonry here looks hastily patched with skulls and mortar.",
+    "Someone dragged something heavy across the dust not long ago.",
+    "A faint draft stirs the dust without revealing where it enters.",
+    "Crude chalk wards—most smeared or broken—ring the threshold."
+  ],
+  "combatAftermaths": [
+    "Steam rises from spilled blood onto the freezing stone as breathing slows.",
+    "Someone wipes a notched blade on a dead foe's rag and listens for more footsteps.",
+    "The smell of ruptured bowels and hot iron lingers in the gloom.",
+    "Only the drip of gore and your own ragged heartbeat break the quiet.",
+    "Broken teeth and splintered bone litter the flagstones around your boots.",
+    "Your ears ring; the torchlight seems dimmer than before the bloodshed.",
+    "Whatever watches from the dark cracks has seen you survive—for now.",
+    "Filthy silver and ruined flesh are all that remain on the floor."
+  ]
+}

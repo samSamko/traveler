@@ -1,854 +1,96 @@
 {
-  "dungeons": [
-    {
-      "id": "barrow_undercroft",
-      "parentAreaId": "stepped_barrow",
-      "name": "Barrow Undercroft",
-      "description": "Oversized basalt burial vaults beneath Long Steps, dripping with cold groundwater.",
-      "entryRoomId": "bu_entry",
-      "danger": 2,
-      "rooms": [
-        {
-          "id": "bu_entry",
-          "name": "Mossy Stair",
-          "row": 1,
-          "col": 0,
-          "roomType": "entry",
-          "description": "Slick basalt risers cut for longer strides drop into a low landing smelling of wet lime.",
-          "exits": [
-            {
-              "id": "bu_e1",
-              "toRoomId": "bu_hall",
-              "label": "East"
-            }
-          ]
-        },
-        {
-          "id": "bu_hall",
-          "name": "Bone Corridor",
-          "row": 1,
-          "col": 1,
-          "roomType": "corridor",
-          "description": "Narrow wall niches packed with brittle ribs line a flooded stone passage.",
-          "enemyIds": [
-            "root_husk"
-          ],
-          "trapDc": 11,
-          "trapDamage": 4,
-          "exits": [
-            {
-              "id": "bu_e2",
-              "toRoomId": "bu_entry",
-              "label": "West"
-            },
-            {
-              "id": "bu_e3",
-              "toRoomId": "bu_lever",
-              "label": "North"
-            },
-            {
-              "id": "bu_e4",
-              "toRoomId": "bu_vault",
-              "label": "East",
-              "lockedBySwitchId": "bu_gate_switch"
-            }
-          ]
-        },
-        {
-          "id": "bu_lever",
-          "name": "Chain Alcove",
-          "row": 0,
-          "col": 1,
-          "roomType": "chamber",
-          "description": "A rusted iron counterweight chain hangs beside weathered stone carvings of tall robed figures.",
-          "switchId": "bu_gate_switch",
-          "switchLabel": "Pull Chain",
-          "exits": [
-            {
-              "id": "bu_e5",
-              "toRoomId": "bu_hall",
-              "label": "South"
-            }
-          ]
-        },
-        {
-          "id": "bu_vault",
-          "name": "Sunken Reliquary",
-          "row": 1,
-          "col": 2,
-          "roomType": "boss",
-          "description": "A tarnished bronze chest rests behind a cracked stone slab guarded by tall bronze-clad dead.",
-          "enemyIds": [
-            "barrow_wight"
-          ],
-          "lootItemId": "echo_shell",
-          "crowns": 25,
-          "isBoss": true,
-          "exits": [
-            {
-              "id": "bu_e6",
-              "toRoomId": "bu_hall",
-              "label": "West"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "cistern_sluice",
-      "parentAreaId": "brine_marsh",
-      "name": "Sulfur Sluice-Vaults",
-      "description": "Echoing brick drainage tunnels linking Salt Bog vents to flooded stone reservoirs.",
-      "entryRoomId": "cs_entry",
-      "danger": 2,
-      "rooms": [
-        {
-          "id": "cs_entry",
-          "name": "Sluice Landing",
-          "row": 1,
-          "col": 0,
-          "roomType": "entry",
-          "description": "Warm black brine laps against brick walkways below rusted iron floodgates.",
-          "exits": [
-            {
-              "id": "cs_e1",
-              "toRoomId": "cs_drain",
-              "label": "East"
-            }
-          ]
-        },
-        {
-          "id": "cs_drain",
-          "name": "Sulfur Culvert",
-          "row": 1,
-          "col": 1,
-          "roomType": "corridor",
-          "description": "Yellow sulfur crust rims cracked drainage pipes while pale silk hangs from the ceiling.",
-          "enemyIds": [
-            "chitin_weaver"
-          ],
-          "trapDc": 12,
-          "trapDamage": 5,
-          "exits": [
-            {
-              "id": "cs_e2",
-              "toRoomId": "cs_entry",
-              "label": "West"
-            },
-            {
-              "id": "cs_e3",
-              "toRoomId": "cs_valve",
-              "label": "South"
-            },
-            {
-              "id": "cs_e4",
-              "toRoomId": "cs_sanctum",
-              "label": "East",
-              "lockedBySwitchId": "cs_sluice_switch"
-            }
-          ]
-        },
-        {
-          "id": "cs_valve",
-          "name": "Valve Chamber",
-          "row": 2,
-          "col": 1,
-          "roomType": "chamber",
-          "description": "A seized iron flood-wheel sits half-buried in steaming peat silt.",
-          "switchId": "cs_sluice_switch",
-          "switchLabel": "Turn Wheel",
-          "exits": [
-            {
-              "id": "cs_e5",
-              "toRoomId": "cs_drain",
-              "label": "North"
-            }
-          ]
-        },
-        {
-          "id": "cs_sanctum",
-          "name": "Flooded Treasury",
-          "row": 1,
-          "col": 2,
-          "roomType": "boss",
-          "description": "Dry marble steps rise out of black brine around a sealed copper chest and a cornered poacher.",
-          "enemyIds": [
-            "salt_poacher",
-            "chitin_weaver"
-          ],
-          "lootItemId": "chitin_serum",
-          "crowns": 30,
-          "isBoss": true,
-          "exits": [
-            {
-              "id": "cs_e6",
-              "toRoomId": "cs_drain",
-              "label": "West"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "collapsed_kiln_shaft",
-      "parentAreaId": "kiln_terraces",
-      "name": "Collapsed Flue Shaft",
-      "description": "Vitrified brick slag-tunnels burrowing beneath Brick Hills furnace heaps.",
-      "entryRoomId": "ks_entry",
-      "danger": 3,
-      "rooms": [
-        {
-          "id": "ks_entry",
-          "name": "Soot Mouth",
-          "row": 1,
-          "col": 0,
-          "roomType": "entry",
-          "description": "Glazed brick arches frame a soot-choked incline still radiating dry heat.",
-          "exits": [
-            {
-              "id": "ks_e1",
-              "toRoomId": "ks_flue",
-              "label": "East"
-            }
-          ]
-        },
-        {
-          "id": "ks_flue",
-          "name": "Clinker Flue",
-          "row": 1,
-          "col": 1,
-          "roomType": "corridor",
-          "description": "Sharp black slag litters the floor beside blistered iron damper-doors.",
-          "enemyIds": [
-            "kiln_flagellant"
-          ],
-          "trapDc": 13,
-          "trapDamage": 6,
-          "exits": [
-            {
-              "id": "ks_e2",
-              "toRoomId": "ks_entry",
-              "label": "West"
-            },
-            {
-              "id": "ks_e3",
-              "toRoomId": "ks_damper",
-              "label": "North"
-            },
-            {
-              "id": "ks_e4",
-              "toRoomId": "ks_core",
-              "label": "East",
-              "lockedBySwitchId": "ks_damper_switch"
-            }
-          ]
-        },
-        {
-          "id": "ks_damper",
-          "name": "Damper Alcove",
-          "row": 0,
-          "col": 1,
-          "roomType": "chamber",
-          "description": "A soot-caked iron lever sticks out of the brickwork beside stacked coal buckets.",
-          "switchId": "ks_damper_switch",
-          "switchLabel": "Drop Damper",
-          "exits": [
-            {
-              "id": "ks_e5",
-              "toRoomId": "ks_flue",
-              "label": "South"
-            }
-          ]
-        },
-        {
-          "id": "ks_core",
-          "name": "Slag Pit",
-          "row": 1,
-          "col": 2,
-          "roomType": "boss",
-          "description": "Molten-crust slag surrounds an iron-bound strongbox guarded by a swollen furnace horror.",
-          "enemyIds": [
-            "pit_maw"
-          ],
-          "lootItemId": "kiln_pitch",
-          "crowns": 36,
-          "isBoss": true,
-          "exits": [
-            {
-              "id": "ks_e6",
-              "toRoomId": "ks_flue",
-              "label": "West"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "belfry_choir_pit",
-      "parentAreaId": "silver_rotunda",
-      "name": "Drowned Dome Pit",
-      "description": "Subterranean marble galleries encircling the sunken bronze dais beneath The White Dome.",
-      "entryRoomId": "bc_entry",
-      "danger": 5,
-      "rooms": [
-        {
-          "id": "bc_entry",
-          "name": "Silver Stair",
-          "row": 1,
-          "col": 0,
-          "roomType": "entry",
-          "description": "Frost-rimmed white marble stairs spiral downward into dead-quiet metallic chill.",
-          "exits": [
-            {
-              "id": "bc_e1",
-              "toRoomId": "bc_nave",
-              "label": "East"
-            }
-          ]
-        },
-        {
-          "id": "bc_nave",
-          "name": "Pillar Gallery",
-          "row": 1,
-          "col": 1,
-          "roomType": "corridor",
-          "description": "Tarnished silver ribs arch overhead while frost-dusted figures drift between plinths.",
-          "enemyIds": [
-            "blight_acolyte",
-            "silver_sleeper"
-          ],
-          "trapDc": 15,
-          "trapDamage": 7,
-          "exits": [
-            {
-              "id": "bc_e2",
-              "toRoomId": "bc_entry",
-              "label": "West"
-            },
-            {
-              "id": "bc_e3",
-              "toRoomId": "bc_chime",
-              "label": "North"
-            },
-            {
-              "id": "bc_e4",
-              "toRoomId": "bc_pit",
-              "label": "East",
-              "lockedBySwitchId": "bc_gate_lock"
-            }
-          ]
-        },
-        {
-          "id": "bc_chime",
-          "name": "Bell Counterweight",
-          "row": 0,
-          "col": 1,
-          "roomType": "chamber",
-          "description": "A frozen bronze counterweight bar jams the inner dome portcullis.",
-          "switchId": "bc_gate_lock",
-          "switchLabel": "Free Pin",
-          "exits": [
-            {
-              "id": "bc_e5",
-              "toRoomId": "bc_nave",
-              "label": "South"
-            }
-          ]
-        },
-        {
-          "id": "bc_pit",
-          "name": "Silver Vault",
-          "row": 1,
-          "col": 2,
-          "roomType": "boss",
-          "description": "Orbiting silver rings hover in freezing stillness above an intact bronze reliquary.",
-          "enemyIds": [
-            "silver_chorister"
-          ],
-          "lootItemId": "writ_blight_wave",
-          "crowns": 60,
-          "isBoss": true,
-          "exits": [
-            {
-              "id": "bc_e6",
-              "toRoomId": "bc_nave",
-              "label": "West"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "viaduct_undercroft",
-      "parentAreaId": "imperial_viaduct",
-      "name": "Pier Cistern",
-      "description": "Hollow stone chambers built inside a massive High Road support pier.",
-      "entryRoomId": "vu_entry",
-      "danger": 1,
-      "rooms": [
-        {
-          "id": "vu_entry",
-          "name": "Broken Arch",
-          "row": 1,
-          "col": 0,
-          "roomType": "entry",
-          "description": "Shattered masonry opens into a dry stone chamber littered with gnawed mule bones.",
-          "exits": [
-            {
-              "id": "vu_e1",
-              "toRoomId": "vu_den",
-              "label": "East"
-            }
-          ]
-        },
-        {
-          "id": "vu_den",
-          "name": "Wain Store",
-          "row": 1,
-          "col": 1,
-          "roomType": "corridor",
-          "description": "Rotted crate staves and stolen southern boots lie heaped beside a cold fire-ring.",
-          "enemyIds": [
-            "gaunt_wolf",
-            "mire_rat_pack"
-          ],
-          "exits": [
-            {
-              "id": "vu_e2",
-              "toRoomId": "vu_entry",
-              "label": "West"
-            },
-            {
-              "id": "vu_e3",
-              "toRoomId": "vu_stash",
-              "label": "East",
-              "lockedByItemId": "iron_wire_kit"
-            },
-            {
-              "id": "vu_e4",
-              "toRoomId": "vu_post",
-              "label": "South"
-            }
-          ]
-        },
-        {
-          "id": "vu_post",
-          "name": "Watch Niche",
-          "row": 2,
-          "col": 1,
-          "roomType": "boss",
-          "description": "A cornered levy deserter guards a dry blanket roll and a stolen iron strongbox.",
-          "enemyIds": [
-            "iron_deserter"
-          ],
-          "lootItemId": "poultice",
-          "crowns": 16,
-          "isBoss": true,
-          "exits": [
-            {
-              "id": "vu_e5",
-              "toRoomId": "vu_den",
-              "label": "North"
-            }
-          ]
-        },
-        {
-          "id": "vu_stash",
-          "name": "Locked Locker",
-          "row": 1,
-          "col": 2,
-          "roomType": "chamber",
-          "description": "Behind picked bronze pins sits an untouched courier dispatch tin.",
-          "lootItemId": "amber_tonic",
-          "crowns": 22,
-          "exits": [
-            {
-              "id": "vu_e6",
-              "toRoomId": "vu_den",
-              "label": "West"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "orchard_cellar",
-      "parentAreaId": "frost_orchard",
-      "name": "Root Cellar",
-      "description": "Frozen stone storage vaults tucked beneath Dead Orchard terrace walls.",
-      "entryRoomId": "oc_entry",
-      "danger": 1,
-      "rooms": [
-        {
-          "id": "oc_entry",
-          "name": "Iced Hatch",
-          "row": 1,
-          "col": 0,
-          "roomType": "entry",
-          "description": "Cracked oak doors slant downward into dark stone shelves smelling of frozen cider.",
-          "exits": [
-            {
-              "id": "oc_e1",
-              "toRoomId": "oc_bin",
-              "label": "East"
-            }
-          ]
-        },
-        {
-          "id": "oc_bin",
-          "name": "Cask Row",
-          "row": 1,
-          "col": 1,
-          "roomType": "corridor",
-          "description": "Burst barrel hoops litter frozen dirt where tusked beasts rooted for winter turnips.",
-          "enemyIds": [
-            "frost_boar"
-          ],
-          "trapDc": 11,
-          "trapDamage": 4,
-          "exits": [
-            {
-              "id": "oc_e2",
-              "toRoomId": "oc_entry",
-              "label": "West"
-            },
-            {
-              "id": "oc_e3",
-              "toRoomId": "oc_latch",
-              "label": "North"
-            },
-            {
-              "id": "oc_e4",
-              "toRoomId": "oc_larder",
-              "label": "East",
-              "lockedBySwitchId": "oc_bar_switch"
-            }
-          ]
-        },
-        {
-          "id": "oc_latch",
-          "name": "Winch Post",
-          "row": 0,
-          "col": 1,
-          "roomType": "chamber",
-          "description": "A greased iron hook holds the heavy larder bar jammed in place.",
-          "switchId": "oc_bar_switch",
-          "switchLabel": "Lift Bar",
-          "exits": [
-            {
-              "id": "oc_e5",
-              "toRoomId": "oc_bin",
-              "label": "South"
-            }
-          ]
-        },
-        {
-          "id": "oc_larder",
-          "name": "Bloodied Larder",
-          "row": 1,
-          "col": 2,
-          "roomType": "boss",
-          "description": "An orc-kin driver camps beside smoked carcasses and stolen southern supply packs.",
-          "enemyIds": [
-            "orc_houndmaster"
-          ],
-          "lootItemId": "stamina_draught",
-          "crowns": 20,
-          "isBoss": true,
-          "exits": [
-            {
-              "id": "oc_e6",
-              "toRoomId": "oc_bin",
-              "label": "West"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "quarry_deep_shaft",
-      "parentAreaId": "basalt_quarry",
-      "name": "Deep Hoist Shaft",
-      "description": "Stepped black slate galleries sinking below Black Quarry crane beams.",
-      "entryRoomId": "qd_entry",
-      "danger": 4,
-      "rooms": [
-        {
-          "id": "qd_entry",
-          "name": "Crane Landing",
-          "row": 1,
-          "col": 0,
-          "roomType": "entry",
-          "description": "Snapped bronze cables dangle past forty-foot basalt walls into black meltwater.",
-          "exits": [
-            {
-              "id": "qd_e1",
-              "toRoomId": "qd_cut",
-              "label": "East"
-            }
-          ]
-        },
-        {
-          "id": "qd_cut",
-          "name": "Acid Sump",
-          "row": 1,
-          "col": 1,
-          "roomType": "corridor",
-          "description": "Smoking green puddles hiss along slate tracks while bone shards crunch underfoot.",
-          "enemyIds": [
-            "quarry_centipede",
-            "quarry_cannibal"
-          ],
-          "trapDc": 14,
-          "trapDamage": 6,
-          "exits": [
-            {
-              "id": "qd_e2",
-              "toRoomId": "qd_entry",
-              "label": "West"
-            },
-            {
-              "id": "qd_e3",
-              "toRoomId": "qd_pawl",
-              "label": "South"
-            },
-            {
-              "id": "qd_e4",
-              "toRoomId": "qd_nest",
-              "label": "East",
-              "lockedBySwitchId": "qd_hoist_switch"
-            }
-          ]
-        },
-        {
-          "id": "qd_pawl",
-          "name": "Winch Gear",
-          "row": 2,
-          "col": 1,
-          "roomType": "chamber",
-          "description": "A massive iron ratchet wheel holds the lower shaft grate pinned shut.",
-          "switchId": "qd_hoist_switch",
-          "switchLabel": "Trip Pawl",
-          "exits": [
-            {
-              "id": "qd_e5",
-              "toRoomId": "qd_cut",
-              "label": "North"
-            }
-          ]
-        },
-        {
-          "id": "qd_nest",
-          "name": "Onyx Seam",
-          "row": 1,
-          "col": 2,
-          "roomType": "boss",
-          "description": "A wagon-sized, Onyx-crusted crawler guards a collapsed vein of uncut black stone.",
-          "enemyIds": [
-            "quarry_matriarch"
-          ],
-          "lootItemId": "iron_sap_draught",
-          "crowns": 55,
-          "isBoss": true,
-          "exits": [
-            {
-              "id": "qd_e6",
-              "toRoomId": "qd_cut",
-              "label": "West"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "ossuary_catacomb",
-      "parentAreaId": "salt_ossuary",
-      "name": "Lower Bone Vault",
-      "description": "Deep salt-packed limestone galleries below Bone Cellars grilles.",
-      "entryRoomId": "oca_entry",
-      "danger": 4,
-      "rooms": [
-        {
-          "id": "oca_entry",
-          "name": "Salt Chute",
-          "row": 1,
-          "col": 0,
-          "roomType": "entry",
-          "description": "Dry white salt drifts knee-deep across narrow stone stairs.",
-          "exits": [
-            {
-              "id": "oca_e1",
-              "toRoomId": "oca_aisle",
-              "label": "East"
-            }
-          ]
-        },
-        {
-          "id": "oca_aisle",
-          "name": "Grille Aisle",
-          "row": 1,
-          "col": 1,
-          "roomType": "corridor",
-          "description": "Iron bone-cages lean inward, rattling whenever blind flitters swoop overhead.",
-          "enemyIds": [
-            "salt_corpse",
-            "ossuary_bat"
-          ],
-          "trapDc": 14,
-          "trapDamage": 6,
-          "exits": [
-            {
-              "id": "oca_e2",
-              "toRoomId": "oca_entry",
-              "label": "West"
-            },
-            {
-              "id": "oca_e3",
-              "toRoomId": "oca_latch",
-              "label": "North"
-            },
-            {
-              "id": "oca_e4",
-              "toRoomId": "oca_crypt",
-              "label": "East",
-              "lockedBySwitchId": "oca_grille_switch"
-            }
-          ]
-        },
-        {
-          "id": "oca_latch",
-          "name": "Iron Capstan",
-          "row": 0,
-          "col": 1,
-          "roomType": "chamber",
-          "description": "A rusted iron capstan tensions the grille chains across the lower crypt.",
-          "switchId": "oca_grille_switch",
-          "switchLabel": "Slack Chain",
-          "exits": [
-            {
-              "id": "oca_e5",
-              "toRoomId": "oca_aisle",
-              "label": "South"
-            }
-          ]
-        },
-        {
-          "id": "oca_crypt",
-          "name": "Wired Charnel",
-          "row": 1,
-          "col": 2,
-          "roomType": "boss",
-          "description": "An iron-bound skeleton rattling with Onyx coins guards a sealed bone reliquary.",
-          "enemyIds": [
-            "ossuary_sentinel"
-          ],
-          "lootItemId": "silver_ash_oil",
-          "crowns": 48,
-          "isBoss": true,
-          "exits": [
-            {
-              "id": "oca_e6",
-              "toRoomId": "oca_aisle",
-              "label": "West"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "gate_bastion_vault",
-      "parentAreaId": "gate_watchtower",
-      "name": "Bastion Cells",
-      "description": "Frost-locked garrison cells beneath North Gate.",
-      "entryRoomId": "gb_entry",
-      "danger": 5,
-      "rooms": [
-        {
-          "id": "gb_entry",
-          "name": "Watch Stair",
-          "row": 1,
-          "col": 0,
-          "roomType": "entry",
-          "description": "Hoarfrost coats iron handrails descending beneath the towering arch.",
-          "exits": [
-            {
-              "id": "gb_e1",
-              "toRoomId": "gb_cell",
-              "label": "East"
-            }
-          ]
-        },
-        {
-          "id": "gb_cell",
-          "name": "Frozen Cells",
-          "row": 1,
-          "col": 1,
-          "roomType": "corridor",
-          "description": "Rusted cell doors hang ajar over frozen corpses clutching broken spears.",
-          "enemyIds": [
-            "hollow_watchman",
-            "frozen_revenant"
-          ],
-          "trapDc": 15,
-          "trapDamage": 7,
-          "exits": [
-            {
-              "id": "gb_e2",
-              "toRoomId": "gb_entry",
-              "label": "West"
-            },
-            {
-              "id": "gb_e3",
-              "toRoomId": "gb_bar",
-              "label": "South"
-            },
-            {
-              "id": "gb_e4",
-              "toRoomId": "gb_armory",
-              "label": "East",
-              "lockedBySwitchId": "gb_cell_switch"
-            }
-          ]
-        },
-        {
-          "id": "gb_bar",
-          "name": "Guard Post",
-          "row": 2,
-          "col": 1,
-          "roomType": "chamber",
-          "description": "A heavy bronze bolt-wheel sits iced beside cracked watch-slates.",
-          "switchId": "gb_cell_switch",
-          "switchLabel": "Draw Bolt",
-          "exits": [
-            {
-              "id": "gb_e5",
-              "toRoomId": "gb_cell",
-              "label": "North"
-            }
-          ]
-        },
-        {
-          "id": "gb_armory",
-          "name": "Bell Armory",
-          "row": 1,
-          "col": 2,
-          "roomType": "boss",
-          "description": "A headless bronze bell-hulk stands motionless beside intact southern armor racks.",
-          "enemyIds": [
-            "gate_pendulum"
-          ],
-          "lootItemId": "writ_star_ward",
-          "crowns": 52,
-          "isBoss": true,
-          "exits": [
-            {
-              "id": "gb_e6",
-              "toRoomId": "gb_cell",
-              "label": "West"
-            }
-          ]
-        }
-      ]
-    }
+  "nameFirst": [
+    "Slaughter", "Death", "Night", "Hadean", "Hell", "Plague",
+    "Sin", "Doom", "Dark", "Murder", "Torture", "Slave"
+  ],
+  "nameSecond": [
+    "pit", "church", "temple", "tunnels", "crypt", "grave",
+    "fort", "ziggurat", "den", "maze", "house", "waste"
+  ],
+  "inactiveReasons": [
+    "The place was invaded",
+    "Everything ended in disaster",
+    "It was no longer needed",
+    "A Misery was fulfilled"
+  ],
+  "imminentDangers": [
+    "Is slowly flooding with oil or water",
+    "Berserkers are appearing",
+    "Is about to collapse",
+    "Senses are being distorted",
+    "Underworld emissions of poisonous spores",
+    "A hunted cult intends it to be their new hideout",
+    "A terrible, dormant curse about to be unleashed",
+    "Fire is spreading from the deepest chamber",
+    "The gate will shut and seal, and not open again until seven days have passed",
+    "A lethal mechanism is about to activate"
+  ],
+  "dwellers": [
+    "Animated suits of armor battling goblins",
+    "Nechrubel-worshipping lich with a skeletal court",
+    "Heretic cult lead by a possessed 11-year old",
+    "A vengeful cabal of undead porcelain dolls",
+    "Desperate thieves guild dying slowly of cholera",
+    "A meaty mass of slime, larvae and spider legs",
+    "Wickheads running from foreboding darkness",
+    "A Bark-Witch and her root-children",
+    "Four-legged pale gremlins stinking of dirt",
+    "Tergol's escaped experiment",
+    "Disease spreading ochre-beetles",
+    "Dissident courtiers dedicated to the occult"
+  ],
+  "distinctiveFeatures": [
+    "Portal to the land of the dead, soon ready",
+    "Lab where corpses are assembled into golems",
+    "Black prism which twists all Powers",
+    "300 emaciated, mutilated prisoners",
+    "Blind hermit, firmly rooted in the ground, spreading his vile corruption",
+    "Bony remains of the Basilisk's spawn",
+    "Obelisk that separates body and soul",
+    "Rooms move around the dungeon's center",
+    "High ceilings, whispers in the upper dark",
+    "Artwork affecting the surroundings",
+    "Ensnaring, intelligent plants",
+    "Giant pools of boiling tar"
+  ],
+  "sampleRooms": [
+    "Inscriptions (vomit-inducing, terrifying, hypnotic, childish, teleporting, or ugly)",
+    "Bloodied beds",
+    "Flooded chamber",
+    "Leaning masonry",
+    "Overpowering stench",
+    "Fire damage",
+    "Obvious traps",
+    "Full of blood",
+    "Torture chamber",
+    "Sooty walls",
+    "Freezing draft",
+    "Creaking doors",
+    "Compact darkness",
+    "Locked sarcophagi",
+    "Shelves with obscure literature or rotting food",
+    "Abyssal pits",
+    "Mirrors everywhere",
+    "Ungodly yet exquisite chandeliers",
+    "Utterly silent",
+    "Full of debris",
+    "Sacrificial altar (cracked or fresh blood)",
+    "Remains of a throne",
+    "Smoke-filled",
+    "Bonfire in the center"
+  ],
+  "trapsAndDevilry": [
+    "Well dressed corpse, booby trapped",
+    "Wall-holes shoot poisonous arrows",
+    "Bells and marbles on the floor",
+    "Scorpion-filled basket poised to fall",
+    "Fish hooks hanging at eye level",
+    "Chest marked with explosive runes",
+    "Lock trapped with vial of poison gas",
+    "Jewel removal leads to roof collapse",
+    "Slanted floor, translucent oil, pit",
+    "Snake-cages on collapsing ceiling tiles",
+    "Evil urns release cold ghosts",
+    "Coins coated in grime and poison"
   ]
 }

@@ -1,0 +1,376 @@
+{
+  "patrons": [
+    {
+      "id": "masked_seer",
+      "name": "A Masked Courtier of the Shadow King",
+      "hookIntro": "You face execution for heretical theft, yet a masked courtier offers clemency in exchange for dirty work beneath the earth."
+    },
+    {
+      "id": "blind_inquisitor",
+      "name": "A Scarred Prelate of the Two-Headed Basilisks",
+      "hookIntro": "With irons cooling beside the brazier, an inquisitor offers to commute your penance if you cleanse a sunken den of apostates."
+    },
+    {
+      "id": "pale_envoy",
+      "name": "A Frost-Bitten Envoy from Alliáns",
+      "hookIntro": "Wrapped in grey fur that radiates unnatural chill, Blood-Countess Anthelia's courier demands something vivid brought back from the dark."
+    },
+    {
+      "id": "schleswig_bailiff",
+      "name": "A Twitching Bailiff of King Fathmu IX",
+      "hookIntro": "Stinking of cheap liquor and paranoia, the bailiff slides a wax-sealed writ across the table—deliver or hang."
+    },
+    {
+      "id": "grift_undertaker",
+      "name": "A Despairing Undertaker of Grift",
+      "hookIntro": "Before the Cliff of Terion claims another hundred souls, this bone-thin clerk wants a stolen heirloom dragged out of the abyss."
+    },
+    {
+      "id": "sarkash_hermit",
+      "name": "A Moss-Caked Witch of Sarkash",
+      "hookIntro": "Speaking through a bag of clicking teeth, the witch promises shelter from the spreading forest if you settle an old score underground."
+    },
+    {
+      "id": "galgenbeck_fence",
+      "name": "A One-Eyed Fence of the Galgenbeck Gutters",
+      "hookIntro": "Your debts have been bought by worse people. Clear this subterranean vault and your ledger is wiped clean."
+    },
+    {
+      "id": "creton_monk",
+      "name": "An Unshaved Monk of the Creton Order",
+      "hookIntro": "Trembling over a torn leaf of the Nameless Scriptures, the monk begs you to silence a blasphemous warlock before dawn."
+    },
+    {
+      "id": "berg_chrypt_exile",
+      "name": "A Frost-Scarred Exile of Bergen Chrypt",
+      "hookIntro": "Missing three fingers from the mountain cold, the exile offers silver and salt if you descend into the black cracks below."
+    },
+    {
+      "id": "onda_smuggler",
+      "name": "A Waterlogged Smuggler from Lake Onda",
+      "hookIntro": "Their barge sank under dead-fish mist, and their cargo sits guarded by cannibals in a drowned cellar."
+    },
+    {
+      "id": "graven_tosk_bellman",
+      "name": "A Graveside Bellman of Graven-Tosk",
+      "hookIntro": "The scratching beneath the tombstones stopped only when something dragged the parish relic below."
+    },
+    {
+      "id": "velvet_usurer",
+      "name": "A Velvety Usurer with Blackened Nails",
+      "hookIntro": "Silently counting teeth into a velvet pouch, the usurer gives you three days to recover what was stolen from their strongbox."
+    }
+  ],
+  "objectives": [
+    {
+      "id": "lost_heir",
+      "kind": "rescue_heir",
+      "title": "Retrieve the Lost Heir",
+      "targetName": "Prince Aldon, the arrogant captive",
+      "brief": "Find the missing heir locked behind a secret stone chamber and drag him back alive—willing or not.",
+      "refusesLeave": true
+    },
+    {
+      "id": "warlock_head",
+      "kind": "slay_boss",
+      "title": "Claim the Warlock's Head",
+      "targetName": "the master of the den",
+      "brief": "Descend to the deepest slaughter-forge, slay the warlock ruling the vault, and return with proof.",
+      "refusesLeave": false
+    },
+    {
+      "id": "basilisk_chalice",
+      "kind": "steal_relic",
+      "title": "Steal the Basilisk Chalice",
+      "targetName": "the Lead Chalice of Verhu",
+      "brief": "Crack the hidden sanctum vault and smuggle out the chalice before the cult completes its rite.",
+      "refusesLeave": false
+    },
+    {
+      "id": "stolen_ledger",
+      "kind": "steal_relic",
+      "title": "Recover the Blood-Ledger",
+      "targetName": "the Bound Skin-Ledger",
+      "brief": "Infiltrate the secret archive room and reclaim the ledger naming every heretic in Tveland.",
+      "refusesLeave": false
+    },
+    {
+      "id": "missing_priest",
+      "kind": "rescue_heir",
+      "title": "Extract the Missing Confessor",
+      "targetName": "Brother Vorst, the scarred confessor",
+      "brief": "Locate the surviving priest sealed in the hidden chamber before the dungeon's dwellers devour him.",
+      "refusesLeave": true
+    },
+    {
+      "id": "poison_vat",
+      "kind": "sabotage",
+      "title": "Taint the Ritual Well",
+      "targetName": "the Sanctum Offering Altar",
+      "brief": "Reach the hidden vault, desecrate the sanctum altar, and escape before the entire den collapses.",
+      "refusesLeave": false
+    },
+    {
+      "id": "crown_shard",
+      "kind": "steal_relic",
+      "title": "Claim the Crippled Crown Shard",
+      "targetName": "the Black Iron Shard",
+      "brief": "Unlock the secret chamber behind the idol and take the shard before the rival faction claims it.",
+      "refusesLeave": false
+    },
+    {
+      "id": "noble_hostage",
+      "kind": "rescue_heir",
+      "title": "Ransom the Kidnapped Baronet",
+      "targetName": "Lady Ylvira, filthy and defiant",
+      "brief": "Bring the noble captive back discreetly; she prefers the dark to her family's court.",
+      "refusesLeave": true
+    },
+    {
+      "id": "slay_usurper",
+      "kind": "slay_boss",
+      "title": "Execute the Vault Tyrant",
+      "targetName": "the tyrannical warlock",
+      "brief": "Cut down the tyrant controlling the apex horror in the pit and escape to claim your bounty.",
+      "refusesLeave": false
+    },
+    {
+      "id": "stolen_icon_eyes",
+      "kind": "steal_relic",
+      "title": "Retrieve the Icon's Stolen Eyes",
+      "targetName": "the Twin Obsidian Eyes",
+      "brief": "Pry open the secret vault and recover the obsidian eyes stolen from Galgenbeck's altar.",
+      "refusesLeave": false
+    },
+    {
+      "id": "destroy_idol",
+      "kind": "sabotage",
+      "title": "Shatter the Whispering Idol",
+      "targetName": "the Bone-Carved Idol",
+      "brief": "Gain entry to the sealed sanctum and smash the idol feeding the dungeon's madness.",
+      "refusesLeave": false
+    },
+    {
+      "id": "flesh_alchemist_notes",
+      "kind": "steal_relic",
+      "title": "Seize Tergol's Flesh-Codex",
+      "targetName": "the Flesh-Bound Codex",
+      "brief": "Retrieve the forbidden alchemy codex hidden behind the statue's secret door.",
+      "refusesLeave": false
+    }
+  ],
+  "centralHazards": [
+    {
+      "id": "rotblack_sludge",
+      "name": "Rotblack Sludge",
+      "description": "Sixty feet deep of oily, scorching black gunk reeking of sulfur, bridged only by a pillar where two skeletons play sad violin music.",
+      "testAbility": "toughness",
+      "testDr": 8,
+      "failDamageDie": "d4",
+      "apexCreatureId": "gutworm",
+      "sensoryHint": "Faint, melancholy violin music and hot sulfuric fumes drift from the black cavern."
+    },
+    {
+      "id": "blood_cistern",
+      "name": "Flooded Blood-Cistern",
+      "description": "Chest-deep coagulating crimson water choked with floating ribs and iron chains.",
+      "testAbility": "toughness",
+      "testDr": 10,
+      "failDamageDie": "d4",
+      "apexCreatureId": "abyssal_leviathan",
+      "sensoryHint": "Coppery dampness and heavy splashing echo through the fractured stonework."
+    },
+    {
+      "id": "bone_chasm",
+      "name": "Bottomless Bone-Chasm",
+      "description": "A jagged subterranean gorge spanned by rotting rope-planks and slick wet femurs.",
+      "testAbility": "agility",
+      "testDr": 10,
+      "failDamageDie": "d6",
+      "apexCreatureId": "chasm_weaver",
+      "sensoryHint": "A freezing draft whistles upward from a chasm thick with spider-silk."
+    },
+    {
+      "id": "sulfuric_tar_vats",
+      "name": "Boiling Tar-Vats",
+      "description": "Blistering pools of pitch-black tar bubbling beneath cracked masonry arches.",
+      "testAbility": "toughness",
+      "testDr": 10,
+      "failDamageDie": "d6",
+      "apexCreatureId": "gutworm",
+      "sensoryHint": "Acrid heat and popping tar bubbles blister the nearby walls."
+    },
+    {
+      "id": "mercury_pit",
+      "name": "Weeping Mercury Pit",
+      "description": "A mirror-bright lagoon of toxic quicksilver reflecting distorted, screaming silhouettes.",
+      "testAbility": "toughness",
+      "testDr": 12,
+      "failDamageDie": "d4",
+      "apexCreatureId": "abyssal_leviathan",
+      "sensoryHint": "A metallic taste coats your teeth and silver ripples shiver across the dark."
+    },
+    {
+      "id": "root_maw",
+      "name": "Writhing Root-Maw",
+      "description": "A tangled sinkhole of pale Sarkash roots dripping sap and human marrow.",
+      "testAbility": "agility",
+      "testDr": 10,
+      "failDamageDie": "d4",
+      "apexCreatureId": "chasm_weaver",
+      "sensoryHint": "Wet creaking roots shift slowly behind collapsed masonry."
+    }
+  ],
+  "rivalFactions": [
+    {
+      "id": "lesdy_hosts",
+      "name": "Lesdy & the Three Hosts",
+      "leaderName": "Lesdy",
+      "appearance": "Long dark hair, dressed in a gunny sack with armholes, seated beside a sweet-smelling campfire inside a glass-walled greenhouse.",
+      "agenda": "Wants to turn the apex horror against the dungeon Boss and seize the deep caves.",
+      "brewName": "Sweet Herbal Brew",
+      "zealotCreatureId": "cult_zealot"
+    },
+    {
+      "id": "pale_choir",
+      "name": "Sister Vael & the Pale Choir",
+      "leaderName": "Sister Vael",
+      "appearance": "Hollow-eyed acolytes humming in minor key around tallow candles and potted nightshade.",
+      "agenda": "Needs outsiders to murder the Boss so they can harvest the sanctum altar.",
+      "brewName": "Chalk-White Tonic",
+      "zealotCreatureId": "cult_zealot"
+    },
+    {
+      "id": "glass_gardeners",
+      "name": "Marrow-Keepers of the Glass Cellar",
+      "leaderName": "Brother Galt",
+      "appearance": "Mud-caked squatters tending mushrooms grown from prisoner bones behind cracked stained glass.",
+      "agenda": "Will drug weary delvers unless bribed or kept strictly on guard.",
+      "brewName": "Spore-Tea",
+      "zealotCreatureId": "cult_zealot"
+    },
+    {
+      "id": "deserter_commune",
+      "name": "The Candle-Eaters",
+      "leaderName": "Mother Krev",
+      "appearance": "Feral survivors wrapped in moth-eaten tapestries, sharing melted wax over a brazier.",
+      "agenda": "Desperate to see the Boss slain, yet ready to slit throats for food and silver.",
+      "brewName": "Warm Tallow Broth",
+      "zealotCreatureId": "sharpened_guard"
+    },
+    {
+      "id": "rat_penitents",
+      "name": "The Rat-Penitents",
+      "leaderName": "Prior Skiv",
+      "appearance": "Kneeling zealots wearing wire cages full of blind rats around their necks.",
+      "agenda": "Wait for a sign from the Seer's prophecy before ambushing unbelievers.",
+      "brewName": "Fermented Root-Wine",
+      "zealotCreatureId": "cult_zealot"
+    },
+    {
+      "id": "ash_scavengers",
+      "name": "Tergol's Runaways",
+      "leaderName": "Nivra",
+      "appearance": "Stitched-up escapees hiding in a warm cellar packed with stolen crates.",
+      "agenda": "Offer bandages and stew while sizing up whether the party can be robbed.",
+      "brewName": "Pepper-Spiced Bone Soup",
+      "zealotCreatureId": "sharpened_guard"
+    },
+    {
+      "id": "mirror_heretics",
+      "name": "The Mirror-Watchers",
+      "leaderName": "Elda of the Shards",
+      "appearance": "Cloaked heretics staring into cracked silvered glass while singing softly.",
+      "agenda": "Trade secrets about the Boss's key for a taste of blood or silver.",
+      "brewName": "Violet Poppy Draught",
+      "zealotCreatureId": "cult_zealot"
+    },
+    {
+      "id": "bell_coven",
+      "name": "The Muffled Bell Coven",
+      "leaderName": "Old Hobb",
+      "appearance": "Hunched bell-ringers with tongues bound in linen, warming skewers over glowing coals.",
+      "agenda": "Lure travelers to sit by the fire before springing their knives.",
+      "brewName": "Honeyed Vinegar Draft",
+      "zealotCreatureId": "cult_zealot"
+    }
+  ],
+  "puzzleStatues": [
+    {
+      "id": "one_eyed_king",
+      "name": "Black Statue of One-Eyed King Lenard II",
+      "description": "A towering basalt idol with a fresh bloodstained cavity where one eye should be. The cobbled floor tilts slowly toward the abyss.",
+      "socketItemName": "Glass-Stained Human Eye",
+      "unlockText": "You press the eye into the king's bloodied socket. Stone grinds on stone—a heavy secret door cracks open!"
+    },
+    {
+      "id": "weeping_saint",
+      "name": "Iron Virgin of St. Anuk",
+      "description": "A rusted statue clutching an empty lead bowl beneath two hollow eye sockets.",
+      "socketItemName": "Severed Watchman Eye",
+      "unlockText": "The eye sinks into the hollow socket with a wet click, sliding aside the hidden slab to the sanctum."
+    },
+    {
+      "id": "toothless_basilisk",
+      "name": "Twin-Headed Basilisk Bust",
+      "description": "Two stone serpents hiss around a sunken keyhole shaped like a human molar.",
+      "socketItemName": "Golden-Capped Molar",
+      "unlockText": "The molar locks into the serpent's jaw, retracting the stone bolts of the secret vault."
+    },
+    {
+      "id": "wax_lord",
+      "name": "Melting Wax Effigy of the Shadow King",
+      "description": "A slumped wax monarch missing its signet ring finger; heat radiates from the wall behind it.",
+      "socketItemName": "Tarnished Signet Ring",
+      "unlockText": "Slipping the ring onto the wax stub melts the seal with a hiss, revealing the secret vault."
+    },
+    {
+      "id": "chained_angel",
+      "name": "Blindfolded Cherub of Graven-Tosk",
+      "description": "A weeping stone angel extending an open palm etched with a crescent depression.",
+      "socketItemName": "Black-Stone Medallion",
+      "unlockText": "The medallion drops into the cherub's palm. Chains rattle inside the wall as the secret door parts."
+    },
+    {
+      "id": "skull_lectern",
+      "name": "Brass Skull Lectern",
+      "description": "An ancient brass cranium missing its lower jawbone, bolted beside a seamless stone wall.",
+      "socketItemName": "Inscribed Jawbone",
+      "unlockText": "The jawbone snaps shut with a metallic shriek, swinging open the secret passage."
+    }
+  ],
+  "bosses": [
+    { "id": "cannibal_warlock", "keyName": "Oddly-Shaped Iron Key" },
+    { "id": "glass_cult_archon", "keyName": "Prism-Cut Brass Key" },
+    { "id": "plague_alchemist", "keyName": "Acid-Etched Copper Key" },
+    { "id": "blood_inquisitor", "keyName": "Flayed-Leather Keyring" }
+  ],
+  "tableAEncounters": [
+    { "creatureId": "dusk_gnoum", "countFormula": "d4", "intro": "Dusk gnoums drop chittering from cracks in the ceiling!" },
+    { "creatureId": "mongrel", "countFormula": "d2", "intro": "Massive oily-furred mongrels lunge out of the dark!" },
+    { "creatureId": "sharpened_guard", "countFormula": "d4", "intro": "Gaunt guards with filed teeth block your path, licking their lips!" },
+    { "creatureId": "nesting_death", "countFormula": "1", "intro": "A hound-sized bone-spider drops silently from its ceiling nest!" }
+  ],
+  "tableBAnomalies": [
+    {
+      "id": "distraught_spirit",
+      "name": "Distraught Spirit",
+      "description": "A weeping apparition agitated by the depravities of this place begs you to slay the warlock controlling the beast in the depths."
+    },
+    {
+      "id": "sagsobuth_bazaar",
+      "name": "Bazaar from a Distorted Dimension",
+      "description": "Sagsobuth manifests—shapeless, ethereal, her face a vortex of light. She offers Violet Poison (30s) and a Beechwood Tube holding a Foul Protean Scroll (30s)."
+    },
+    {
+      "id": "terrible_silence",
+      "name": "A Terrible Silence",
+      "description": "All sounds are inexplicably muted in this chamber. Even shouts die on your lips, and scrolls cannot be spoken aloud here."
+    },
+    {
+      "id": "teleport_sarcophagus",
+      "name": "The Shifting Sarcophagus",
+      "description": "An ornate stone sarcophagus sits dead center in the room, humming faintly beneath a thin coat of dust."
+    }
+  ]
+}

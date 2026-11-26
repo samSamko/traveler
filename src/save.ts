@@ -1,9 +1,8 @@
 import { existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { GameState, MetaProfile } from './types.ts';
-import { countBrokenSeals, hasFlag } from './memory.ts';
 
-const DEFAULT_SAVE_DIR = join(process.cwd(), '.traveler-saves');
+export const DEFAULT_SAVE_DIR = join(process.cwd(), '.morkborg-saves');
 
 function ensureDir(dir: string): void {
   if (!existsSync(dir)) {
@@ -27,50 +26,9 @@ export function loadGame(saveDir = DEFAULT_SAVE_DIR): GameState | null {
   if (!existsSync(path)) return null;
   try {
     const raw = readFileSync(path, 'utf8');
-    const parsed = JSON.parse(raw) as GameState & {
-      player: GameState['player'] & {
-        weaponId?: string;
-        armorId?: string;
-        trinketId?: string | null;
-      };
-    };
-    const p = parsed.player;
-    if (!p.equipment) {
-      p.equipment = {
-        mainHand: p.weaponId ?? null,
-        offHand: null,
-        armor: p.armorId ?? null,
-        cloak: null,
-        trinket: p.trinketId ?? null,
-      };
-      delete p.weaponId;
-      delete p.armorId;
-      delete p.trinketId;
-    }
-    if (p.armorTierCurrent === undefined) p.armorTierCurrent = 1;
-    if (p.weaponCoating === undefined) p.weaponCoating = null;
-    if (p.reserves === undefined) p.reserves = 2;
-    if (p.maxReserves === undefined) p.maxReserves = 2;
-    if (p.grace === undefined) p.grace = 2;
-    if (p.maxGrace === undefined) p.maxGrace = 2;
-    if (parsed.clock) {
-      if (!parsed.clock.lunarPhase) parsed.clock.lunarPhase = 'waxing_moon';
-      if (parsed.clock.lunarCycleDay === undefined) parsed.clock.lunarCycleDay = 3;
-    }
-    if (!parsed.frontier) {
-      parsed.frontier = {
-        unlockedAreas: parsed.visitedLocations ? [...parsed.visitedLocations] : [],
-        unlockedTowns: ['cinderford'],
-        unlockedSubAreas: [],
-        unlockedDungeons: [],
-        activeSubArea: {},
-        stash: [],
-        dungeonStates: {},
-        activeDungeonId: null,
-      };
-    }
-    if (parsed.activeMerchant === undefined) {
-      parsed.activeMerchant = null;
+    const parsed = JSON.parse(raw) as GameState;
+    if (!parsed || parsed.version !== 2 || !parsed.party || !Array.isArray(parsed.party.members) || !parsed.activeContract) {
+      return null;
     }
     return parsed;
   } catch {
@@ -90,7 +48,7 @@ export function loadMetaProfile(saveDir = DEFAULT_SAVE_DIR): MetaProfile {
   if (!existsSync(path)) {
     return {
       runsPlayed: 0,
-      victories: 0,
+      apocalypses: 0,
       bestDayReached: 0,
       history: [],
     };
@@ -100,45 +58,43 @@ export function loadMetaProfile(saveDir = DEFAULT_SAVE_DIR): MetaProfile {
   } catch {
     return {
       runsPlayed: 0,
-      victories: 0,
+      apocalypses: 0,
       bestDayReached: 0,
       history: [],
     };
   }
 }
 
-export function saveMetaProfile(
-  profile: MetaProfile,
-  saveDir = DEFAULT_SAVE_DIR,
-): void {
+export function saveMetaProfile(profile: MetaProfile, saveDir = DEFAULT_SAVE_DIR): void {
   ensureDir(saveDir);
   atomicWriteJson(join(saveDir, 'meta_profile.json'), profile);
 }
 
 export function recordRunCompletion(
   state: GameState,
-  outcome: 'victory' | 'death',
-  endingTitle?: string,
+  outcome: 'apocalypse' | 'tpk' | 'abandoned',
   saveDir = DEFAULT_SAVE_DIR,
-): { profile: MetaProfile; newlyUnlocked: string[] } {
-  deleteActiveSave(saveDir);
+): MetaProfile {
   const profile = loadMetaProfile(saveDir);
   profile.runsPlayed += 1;
-  if (outcome === 'victory') profile.victories += 1;
-  profile.bestDayReached = Math.max(profile.bestDayReached, state.day);
-
+  if (outcome === 'apocalypse') {
+    profile.apocalypses += 1;
+  }
+  if (state.calendar.day > profile.bestDayReached) {
+    profile.bestDayReached = state.calendar.day;
+  }
   profile.history.unshift({
-    name: state.player.name,
-    race: state.player.race,
-    background: state.player.background,
-    sex: state.player.sex,
+    date: new Date().toISOString(),
     outcome,
-    day: state.day,
-    level: state.player.level,
-    endingTitle,
+    dayReached: state.calendar.day,
+    miseriesTriggered: state.calendar.triggeredMiseries.length,
+    survivors: state.party.members.filter((m) => m.status !== 'dead').map((m) => m.name),
+    fallen: state.party.members.filter((m) => m.status === 'dead').map((m) => m.name),
   });
-  profile.history = profile.history.slice(0, 15);
-
+  profile.history = profile.history.slice(0, 20);
   saveMetaProfile(profile, saveDir);
-  return { profile, newlyUnlocked: [] };
+  if (outcome !== 'abandoned') {
+    deleteActiveSave(saveDir);
+  }
+  return profile;
 }

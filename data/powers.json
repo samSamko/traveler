@@ -1,0 +1,48 @@
+{
+  "uncleanScrolls": [
+    { "roll": 1, "name": "Palms Open the Southern Gate", "effect": "A ball of fire hits d2 creatures dealing d8 damage per creature." },
+    { "roll": 2, "name": "Tongue of Eris", "effect": "A creature of your choice is confused for 10 minutes." },
+    { "roll": 3, "name": "Te-le-kin-esis", "effect": "Move an object up to d10x10 feet for d6 minutes." },
+    { "roll": 4, "name": "Lucy-fires Levitation", "effect": "Hover for Presence + d10 rounds." },
+    { "roll": 5, "name": "Daemon of Capillaries", "effect": "One creature suffocates for d6 rounds, losing d4 HP per round." },
+    { "roll": 6, "name": "Nine Violet Signs Unknot the Storm", "effect": "Produce d2 lightning bolts dealing d6 damage each." },
+    { "roll": 7, "name": "Metzhuotl Blind Your Eye", "effect": "A creature becomes invisible for d6 rounds or until damaged, attacking/defending with DR6." },
+    { "roll": 8, "name": "Foul Psychompomp", "effect": "Summon (d6): 1-3 d4 skeletons, 4-6 d4 zombies." },
+    { "roll": 9, "name": "Eyelid Blinds the Mind", "effect": "d4 creatures fall asleep for one hour unless they succeed a DR14 test." },
+    { "roll": 10, "name": "Death", "effect": "All creatures within 30 feet lose a total of 4d10 HP." }
+  ],
+  "sacredScrolls": [
+    { "roll": 1, "name": "Grace of a Dead Saint", "effect": "d2 creatures regain d10 HP each." },
+    { "roll": 2, "name": "Grace for a Sinner", "effect": "A creature of your choice gets +d6 on one roll (damage, tests etc.)." },
+    { "roll": 3, "name": "Whispers Pass the Gate", "effect": "Ask three questions to a deceased creature." },
+    { "roll": 4, "name": "Aegis of Sorrow", "effect": "A creature of your choice gains 2d6 extra HP for 10 rounds." },
+    { "roll": 5, "name": "Unmet Fate", "effect": "One creature, dead for no more than a week, is awakened with terrible memories." },
+    { "roll": 6, "name": "Bestial Speech", "effect": "You may speak with animals for d20 minutes." },
+    { "roll": 7, "name": "False Dawn/Night's Chariot", "effect": "Light or pitch black for 3d10 minutes." },
+    { "roll": 8, "name": "Hermetic Step", "effect": "You find all traps in your path for 2d10 minutes." },
+    { "roll": 9, "name": "Roskoe's Consuming Glare", "effect": "d4 creatures lose d8 HP each." },
+    { "roll": 10, "name": "Enochian Syntax", "effect": "One creature blindly obeys a single command." }
+  ],
+  "arcaneCatastrophes": [
+    { "roll": 1, "text": "One by one your teeth fall out. Long, brittle fingernails replace them in your gums. Your smile is horrific and you find it hard to eat." },
+    { "roll": 2, "text": "You feel fine. It's fine. You pustulate with a magical STD. Those intimate with you will die of plague within d4 days then rise as woeful weeping zombies." },
+    { "roll": 3, "text": "Your skeleton is possessed by some unearthly force and will do anything to kill you and escape. Test Strength DR10 in stressful situations or take d4 damage. When you die, you become a zombie." },
+    { "roll": 4, "text": "The illusion of the celestial sphere is lifted, you now see what dwells beyond. And it sees you. Gazing upon a clear night sky drives you mad with fear." },
+    { "roll": 5, "text": "Around you falls an unending snow of black ash which only you and the mad can perceive. Water sickens you from this day on. Only ash, soot or burnt remains can quench your thirst." },
+    { "roll": 6, "text": "The earth decays around you like wet flesh. You sink 3 feet and cannot climb out without help. Clinging to you are d4 translucent, crayfish-like children with your face (HP 3, No armor, Bite/pinch d4)." },
+    { "roll": 7, "text": "Your skin tatters like paper, your flesh melts like wax and your intestines bloat like balloons, bursting and falling out until all that is left is a walking, talking skeleton." },
+    { "roll": 8, "text": "A gnashing gaptoothed mouth splits open on your neck. It spits out your secrets and inner thoughts and can be silenced to sleep only with blood." },
+    { "roll": 9, "text": "The sky warps and stars spin like wheels. Thrown one day into the future, you arrive vomiting Time as evaporating silver bile. A Misery is fulfilled." },
+    { "roll": 10, "text": "Light itself despises you. If you gaze upon a candle, lamp or torch it goes out." },
+    { "roll": 11, "text": "Within d4 days a vile cocoon heaves from the ground, soon bursting and spawning your exact clone. It spreads mischief and suffering every couple of days until cleansed with holy water or fire." },
+    { "roll": 12, "text": "Your eyes burn with insufferable agony, bleeding heavily before loosening and falling from their gory pits. You continue to see through them wherever they are." },
+    { "roll": 13, "text": "You and a random nearby creature pass out. When you wake up, your souls have switched. Welcome to your new flesh." },
+    { "roll": 14, "text": "Five twisted, skeletal arms burst from your back. The hands are mischievous, violent and terribly cruel." },
+    { "roll": 15, "text": "Your skin pales then begins to emit a sickly greenish light. Living things held close to you slowly fall ill; their bones become brittle, teeth and hair fall out." },
+    { "roll": 16, "text": "The Power works, but fate or a demonic force perverts its effects to your precise disadvantage." },
+    { "roll": 17, "text": "The scroll crumbles to tendrils of fine black powder which reach for your nose and mouth. Make a DR14 Toughness test or lose d10 HP." },
+    { "roll": 18, "text": "The Power pierces you like a knife, feeding on your anima. You are permanently gaunt and drawn, insatiably hungry. When resting you restore only half of the rolled HP." },
+    { "roll": 19, "text": "You fall through Refva into the esoteric dimension of Cube-Violet. To leave (d4): 1. Slay riddling Kulvan; 2. Poison a close friend with Sict-Shroom; 3. Reach through fire for golden key (d4 fingers burn to ash); 4. Wait until another fool arrives." },
+    { "roll": 20, "text": "Perhaps it's for the best. HE emerges from the shadows. At least your suffering is short, almost instantaneous, as the two-headed basilisk devours you." }
+  ]
+}

@@ -1,4 +1,5 @@
 node_modules/
+.morkborg-saves/
 .traveler-saves/
 *.tmp
 .env

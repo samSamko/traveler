@@ -1,0 +1,373 @@
+{
+  "classes": [
+    {
+      "id": "fanged_deserter",
+      "name": "Fanged Deserter",
+      "description": "You have thirty or so friends who never let you down: YOUR TEETH. Disloyal, deranged or simply uncontrollable.",
+      "silverFormula": "2d6*10",
+      "omenDie": 2,
+      "hpDie": 10,
+      "abilityRolls": {
+        "agility": "3d6-1",
+        "presence": "3d6-1",
+        "strength": "3d6+2",
+        "toughness": "3d6"
+      },
+      "weaponDie": 10,
+      "armorDie": 4,
+      "canRerollHeavyArmor": false,
+      "canUseScrolls": false,
+      "canCastInMediumArmor": false,
+      "normalAgilityDr": 14,
+      "stealthDrMod": 0,
+      "specialAttack": "Bite attack: DR10 to attack, d6 damage. Must be close. 1-2 on d6 chance enemy gets a free attack.",
+      "originsTitle": "Earliest Memories",
+      "originsDie": 6,
+      "origins": [
+        { "rollMin": 1, "rollMax": 1, "text": "A burnt-black building in Sarkash. Your home?" },
+        { "rollMin": 2, "rollMax": 2, "text": "A derelict rotting ship rolling endlessly across a grey sea." },
+        { "rollMin": 3, "rollMax": 3, "text": "A brothel in Schleswig. Quite a friendly environment." },
+        { "rollMin": 4, "rollMax": 4, "text": "Sleeping with dogs in the corner of an inn, waiting for someone to return." },
+        { "rollMin": 5, "rollMax": 5, "text": "Following an army in eastern Wästland." },
+        { "rollMin": 6, "rollMax": 6, "text": "Suckling a wolf in the wild of Bergen Chrypt." }
+      ],
+      "featuresCount": 1,
+      "features": [
+        {
+          "roll": 1,
+          "name": "Crumpled Monster Mask",
+          "description": "Strikes primitive fear into lesser creatures like goblins, gnoums and children. While worn, they check Morale every round."
+        },
+        {
+          "roll": 2,
+          "name": "The Brown Scimitar of Galgenbeck",
+          "description": "A stinking sword pulled from a military shit-ditch. d6 damage. DR10 attack and defence while wielded. 1 in 6 chance a wounded enemy is smitten with potent sepsis, dying in 10 minutes."
+        },
+        {
+          "roll": 3,
+          "name": "Wizard Teeth",
+          "description": "Four weird teeth rattle within a blackened pouch. Before battle roll a d6 for each one. For every 6 one of your attacks deals maximum damage."
+        },
+        {
+          "roll": 4,
+          "name": "Old Sigûrd's Sling",
+          "description": "Woven from long grey hair, 2d4 damage, requires fist-sized rocks which are everywhere."
+        },
+        {
+          "roll": 5,
+          "name": "Ancient Gore-Hound",
+          "description": "Asthmatic, deluded, superb nose to sniffle up treasure. Attacks DR10 (bite d6), Defends DR12, 10 HP. Frenzied around goblins and berserkers."
+        },
+        {
+          "roll": 6,
+          "name": "The Shoe of Death's Horse",
+          "description": "Hits with DR10, d4 damage. 1 in 6 chance the shoe smashes the skull, instantly killing small-to-medium creatures. Returns to your hand like a boomerang."
+        }
+      ]
+    },
+    {
+      "id": "gutterborn_scum",
+      "name": "Gutterborn Scum",
+      "description": "An ill star smiled upon your birth. Poverty, crime and bad parenting didn't help either.",
+      "silverFormula": "1d6*10",
+      "omenDie": 2,
+      "hpDie": 6,
+      "abilityRolls": {
+        "agility": "3d6",
+        "presence": "3d6",
+        "strength": "3d6-2",
+        "toughness": "3d6"
+      },
+      "weaponDie": 6,
+      "armorDie": 2,
+      "canRerollHeavyArmor": false,
+      "canUseScrolls": true,
+      "canCastInMediumArmor": false,
+      "normalAgilityDr": 10,
+      "stealthDrMod": -2,
+      "specialAttack": "Stealthy: all Presence and Agility tests have their DR reduced by 2 (normal tests are DR10 instead of DR12).",
+      "originsTitle": "Bad Birth",
+      "originsDie": 6,
+      "origins": [
+        { "rollMin": 1, "rollMax": 1, "text": "Dumped onto a moving shit-cart still in your birth caul." },
+        { "rollMin": 2, "rollMax": 2, "text": "Mother hanged from a tree outside of Galgenbeck, you fell from the corpse." },
+        { "rollMin": 3, "rollMax": 3, "text": "Raised by rats in the gutters of Grift." },
+        { "rollMin": 4, "rollMax": 4, "text": "Kicked and beaten beneath a baker's table in Schleswig." },
+        { "rollMin": 5, "rollMax": 5, "text": "Escaped the Tvelandian orphanarium." },
+        { "rollMin": 6, "rollMax": 6, "text": "Educated by outlaws in a hovel south of Alliáns." }
+      ],
+      "featuresCount": 1,
+      "features": [
+        {
+          "roll": 1,
+          "name": "Coward's Jab",
+          "description": "When attacking by surprise test Agility DR10. On success automatically hit once with a light one-handed weapon, dealing normal damage +3."
+        },
+        {
+          "roll": 2,
+          "name": "Filthy Fingersmith",
+          "description": "Pick pockets and pick locks with a DR8 Agility test. Also begins with lockpicks."
+        },
+        {
+          "roll": 3,
+          "name": "Abominable Gob Lobber",
+          "description": "Spit d2 times during a fight. DR8 Presence for accuracy. Targets blinded, retching and vomiting d4 rounds. Witnesses test Toughness (PCs DR10, enemies DR12) or also vomit."
+        },
+        {
+          "roll": 4,
+          "name": "Escaping Fate",
+          "description": "Every time you use an Omen there is a 50% chance it is not spent."
+        },
+        {
+          "roll": 5,
+          "name": "Excretal Stealth",
+          "description": "Hide in muck, debris and filth; a DR16 Presence test is required to notice you."
+        },
+        {
+          "roll": 6,
+          "name": "Dodging Death",
+          "description": "On death, if there is even the slightest possibility you survived, 50% chance you pop back up after 10 rounds with d4 HP."
+        }
+      ]
+    },
+    {
+      "id": "esoteric_hermit",
+      "name": "Esoteric Hermit",
+      "description": "The stone of your cave is one with the stars. Silence and perfection, now disturbed by a fallen world.",
+      "silverFormula": "1d6*10",
+      "omenDie": 4,
+      "hpDie": 4,
+      "abilityRolls": {
+        "agility": "3d6",
+        "presence": "3d6+2",
+        "strength": "3d6-2",
+        "toughness": "3d6"
+      },
+      "weaponDie": 4,
+      "armorDie": 2,
+      "canRerollHeavyArmor": false,
+      "canUseScrolls": true,
+      "canCastInMediumArmor": false,
+      "normalAgilityDr": 12,
+      "stealthDrMod": 0,
+      "specialAttack": "Begins with one random scroll (sacred or unclean).",
+      "originsTitle": "Eldritch Origins",
+      "originsDie": 6,
+      "origins": [
+        { "rollMin": 1, "rollMax": 1, "text": "Awakening, adult, in a ritual circle underneath the northern bridge to Grift." },
+        { "rollMin": 2, "rollMax": 2, "text": "Wandered, memoryless, from the mouth of a cavern at the cliffs of Terion." },
+        { "rollMin": 3, "rollMax": 3, "text": "Single child survivor of an incident in the Valley of the Unfortunate Undead." },
+        { "rollMin": 4, "rollMax": 4, "text": "Dying of plague in a Bergen Chrypt hovel, you touched something from outside." },
+        { "rollMin": 5, "rollMax": 5, "text": "An average individual until you encountered something in a dim glade in Sarkash." },
+        { "rollMin": 6, "rollMax": 6, "text": "Raised on a lonely island in Lake Onda. No one else has ever heard of it." }
+      ],
+      "featuresCount": 1,
+      "features": [
+        {
+          "roll": 1,
+          "name": "Master of Fate",
+          "description": "What use are maps when causality is open to you? You know the right way with a DR8 Presence test."
+        },
+        {
+          "roll": 2,
+          "name": "Book of Boiling Blood",
+          "description": "Once a day open and read. Enemy tests DR12 to prevent; on fail d2 Berserker-slayers appear (1-4 ally, 5-6 attack you)."
+        },
+        {
+          "roll": 3,
+          "name": "Speaker of Truths",
+          "description": "Twice per day use your wisdom to lower the DR of a creature's next test by 4."
+        },
+        {
+          "roll": 4,
+          "name": "Initiate of the Invisible College",
+          "description": "Once per day summon d2 single-use scrolls (d4: 1-2 sacred, 3-4 unclean). Turn to ash at sunrise if unused."
+        },
+        {
+          "roll": 5,
+          "name": "Bard of the Undying",
+          "description": "The music of your Harp gives +d4 on reaction rolls."
+        },
+        {
+          "roll": 6,
+          "name": "Hawk as Weapon",
+          "description": "Crafty loyal hawk keeps watch, scouts, and swoops. Attacks/defence DR10 (claws/bite d4), HP 8."
+        }
+      ]
+    },
+    {
+      "id": "wretched_royalty",
+      "name": "Wretched Royalty",
+      "description": "Bowed down only by the memories of your own lost glory, you could never submit to anyone else.",
+      "silverFormula": "4d6*10",
+      "omenDie": 2,
+      "hpDie": 6,
+      "abilityRolls": {
+        "agility": "3d6",
+        "presence": "3d6",
+        "strength": "3d6",
+        "toughness": "3d6"
+      },
+      "weaponDie": 8,
+      "armorDie": 4,
+      "canRerollHeavyArmor": true,
+      "canUseScrolls": true,
+      "canCastInMediumArmor": false,
+      "normalAgilityDr": 12,
+      "stealthDrMod": 0,
+      "specialAttack": "Painfully average, adjust no abilities. Reroll if heavy armor is rolled.",
+      "originsTitle": "Things were going so well, until...",
+      "originsDie": 6,
+      "origins": [
+        { "rollMin": 1, "rollMax": 1, "text": "Your Wästland palace was reduced to rubble." },
+        { "rollMin": 2, "rollMax": 2, "text": "Your caravan kingdom of Tveland fell into penury." },
+        { "rollMin": 3, "rollMax": 3, "text": "King Fathmu IX's brother Zigmund, your father, was murdered." },
+        { "rollMin": 4, "rollMax": 4, "text": "The southern empire of Südglans sank into the sea." },
+        { "rollMin": 5, "rollMax": 5, "text": "Anthelia demanded a gift of noble blood." },
+        { "rollMin": 6, "rollMax": 6, "text": "Two young princes were kidnapped west of Bergen Chrypt." }
+      ],
+      "featuresCount": 2,
+      "features": [
+        {
+          "roll": 1,
+          "name": "The Blade of your Ancestors",
+          "description": "Foppish magical talking sword that despises you. Deals d6+1 damage, Attack/Defence DR10. 1 in 6 chance to 'accidentally' attack you or companions if disappointed."
+        },
+        {
+          "roll": 2,
+          "name": "'Poltroon' the Court Jester",
+          "description": "Capering makes enemies lose focus. For the first two rounds of combat you and allies get +2 on attack/defence."
+        },
+        {
+          "roll": 3,
+          "name": "Barbarister the Incredible Horse",
+          "description": "Magical, arrogant, talking horse. Adds +2 to Presence tests involving logic and intellect if persuaded."
+        },
+        {
+          "roll": 4,
+          "name": "Hamfund the Squire",
+          "description": "Cowardly guardian of the cursed sword Eurekia (2d6 damage). Roll d6 per swing; on 1 squire is slain and Eurekia vanishes forever."
+        },
+        {
+          "roll": 5,
+          "name": "The Snake-Skin Gift",
+          "description": "Sandalwood box with a dagger (d4 damage); on a 1 (on damage or roll) target dies immediately of deadly poison."
+        },
+        {
+          "roll": 6,
+          "name": "Horn of the Schleswig Lords!",
+          "description": "Once per day test Presence DR12 to grant one creature automatic success on their next non-combat test."
+        }
+      ]
+    },
+    {
+      "id": "heretical_priest",
+      "name": "Heretical Priest",
+      "description": "Hunted by the Two-Headed Basilisks of the One True Faith, raving in ruins and desecrating cathedrals by night.",
+      "silverFormula": "3d6*10",
+      "omenDie": 4,
+      "hpDie": 8,
+      "abilityRolls": {
+        "agility": "3d6",
+        "presence": "3d6+2",
+        "strength": "3d6-2",
+        "toughness": "3d6"
+      },
+      "weaponDie": 8,
+      "armorDie": 4,
+      "canRerollHeavyArmor": false,
+      "canUseScrolls": true,
+      "canCastInMediumArmor": true,
+      "normalAgilityDr": 12,
+      "stealthDrMod": 0,
+      "specialAttack": "May use Powers while wearing medium armor.",
+      "originsTitle": "Unholy Origins",
+      "originsDie": 6,
+      "origins": [
+        { "rollMin": 1, "rollMax": 1, "text": "Galgenbeck, near the cathedral of the Two-Headed Basilisks." },
+        { "rollMin": 2, "rollMax": 2, "text": "Massacred Alliáns cult, sole survivor." },
+        { "rollMin": 3, "rollMax": 3, "text": "The crypts of Grift." },
+        { "rollMin": 4, "rollMax": 4, "text": "Temple ruins in the Valley of the Unfortunate Undead." },
+        { "rollMin": 5, "rollMax": 5, "text": "One of the many Graven-Tosk thief-tunnels." },
+        { "rollMin": 6, "rollMax": 6, "text": "Secret Bergen Chrypt church." }
+      ],
+      "featuresCount": 1,
+      "features": [
+        {
+          "roll": 1,
+          "name": "Sacred Shepherd's Crook",
+          "description": "Human bone hook inscribed with anti-prayers. Staff does 2d4 damage except to faithless humans."
+        },
+        {
+          "roll": 2,
+          "name": "Stolen Mitre",
+          "description": "While worn, Defence DR10. Pulled over ears outside battle, nearly invisible (stealth DR8)."
+        },
+        {
+          "roll": 3,
+          "name": "List of Sins",
+          "description": "Presence DR10 surrounds evil creatures in strange light; owner defends with +2 against them."
+        },
+        {
+          "roll": 4,
+          "name": "The Blasphemous Nechrubel Bible",
+          "description": "Peruse once per day and roll a die. Even: PCs heal d4 HP after 5 min rest all day. Odd: d3 demonic hallucinations until sunrise."
+        },
+        {
+          "roll": 5,
+          "name": "Stones from Thel-Emas' Lost Temple",
+          "description": "Cast stones to reveal danger in adjacent room. Test Presence DR10 to see if they are true."
+        },
+        {
+          "roll": 6,
+          "name": "(Wrong Jesus) Crucifix",
+          "description": "Check morale (modified by Presence) against undead, lesser trolls, and goblins to make them bow and leave."
+        }
+      ]
+    },
+    {
+      "id": "occult_herbmaster",
+      "name": "Occult Herbmaster",
+      "description": "Born of the mushroom, raised in the glade, watched by the eye of the moon in a silverblack pool.",
+      "silverFormula": "2d6*10",
+      "omenDie": 2,
+      "hpDie": 6,
+      "abilityRolls": {
+        "agility": "3d6",
+        "presence": "3d6",
+        "strength": "3d6-2",
+        "toughness": "3d6+2"
+      },
+      "weaponDie": 6,
+      "armorDie": 2,
+      "canRerollHeavyArmor": false,
+      "canUseScrolls": true,
+      "canCastInMediumArmor": false,
+      "normalAgilityDr": 12,
+      "stealthDrMod": 0,
+      "specialAttack": "Carries a portable laboratory. Daily brews two random decoctions (d4 total doses, expire after 24h).",
+      "originsTitle": "Probably Raised In",
+      "originsDie": 8,
+      "origins": [
+        { "rollMin": 1, "rollMax": 3, "text": "Calm isolation in the Sarkash dark." },
+        { "rollMin": 4, "rollMax": 4, "text": "The illegal midnight markets of Schleswig." },
+        { "rollMin": 5, "rollMax": 5, "text": "The heretic isle of Crëlut, two nautical miles east of Grift." },
+        { "rollMin": 6, "rollMax": 6, "text": "The old frozen ruins not far from Alliáns." },
+        { "rollMin": 7, "rollMax": 7, "text": "A little witches cottage in Galgenbeck." },
+        { "rollMin": 8, "rollMax": 8, "text": "The ruins of the Shadow King's manse, thick with memories of mushrooms and smoke." }
+      ],
+      "featuresCount": 0,
+      "features": []
+    }
+  ],
+  "herbmasterDecoctions": [
+    { "roll": 1, "name": "Red Poison", "effect": "Toughness DR12 or -d10 HP." },
+    { "roll": 2, "name": "Ezumiels Vapor", "effect": "Pass a DR14 test or severe (and arguably fun) hallucinations for d4 hours." },
+    { "roll": 3, "name": "Southern Frog Stew", "effect": "Vomit for d4 hours; pass a DR14 test or you can do nothing else." },
+    { "roll": 4, "name": "Elixir Vitalis", "effect": "Heals d6 HP and stops infection. Can be habit-forming." },
+    { "roll": 5, "name": "Spider-Owl Soup", "effect": "See in darkness, climb on walls for 30 minutes." },
+    { "roll": 6, "name": "Fernor's Philtre", "effect": "Translucent oil, dabbed into the eye. Heals infection and gives +2 on Presence tests for d4 hours." },
+    { "roll": 7, "name": "Hyphos' Enervating Snuff", "effect": "Berserk! Two attacks per round but defend with DR14. Lasts one fight. Causes sneezing." },
+    { "roll": 8, "name": "Black Poison", "effect": "Toughness DR14 or -d6 HP and blinded for one hour." }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "outcasts": [
+    {
+      "id": "earthbound",
+      "name": "Earthbound",
+      "description": "Roughly three parts human to one part dog. Isolation and contempt have made them self-reliant scavengers.",
+      "hp": 8,
+      "morale": 7,
+      "armorName": "Leather (-d2)",
+      "weaponName": "Staff/Femur (d4)",
+      "traits": ["Arrogant", "Quiet", "Joking", "Hypochondriac"],
+      "specialties": [
+        "Excellent cooking (d4 extra HP when resting)",
+        "Finds the right path",
+        "Senses danger",
+        "Makes/repairs items"
+      ],
+      "values": [
+        "Fireplace discussions",
+        "Praise",
+        "Endless tasks",
+        "Items as payment",
+        "Carnal relations",
+        "Diluted black poison"
+      ]
+    },
+    {
+      "id": "wild_wickhead",
+      "name": "Wild Wickhead",
+      "description": "Wildest and vilest cast from their solitary community. Fickle, suspicious, and bad.",
+      "hp": 10,
+      "morale": 7,
+      "armorName": "No armor",
+      "weaponName": "Knife (d4)",
+      "traits": ["Grumpy", "Apathetic", "Careless", "Moody"],
+      "specialties": [
+        "Walking lightsource",
+        "Walking lightsource",
+        "Expert with a knife (d4+2)",
+        "Backstab (GM d20 DR8, weapon dmg + 3); carries up to five items"
+      ],
+      "values": [
+        "Holding long monologues about oneself",
+        "Verbal conflicts within the group",
+        "Getting paid in sharp weapons",
+        "Burnt meat",
+        "Depressing stories",
+        "Captured slaves"
+      ]
+    },
+    {
+      "id": "pale_one",
+      "name": "Pale One",
+      "description": "As if fallen from the stars, the pale ones fit in nowhere. Destructive and detached.",
+      "hp": 5,
+      "morale": 8,
+      "armorName": "No armor",
+      "weaponName": "Unarmed (d2)",
+      "traits": ["Bitter", "Incoherent", "Mute", "Self-harming behaviour"],
+      "specialties": [
+        "Once/day: create d2 doses of a random decoction",
+        "Once/day: create d2 doses Elixir Vitalis (heals d6 HP and stops infection)",
+        "Once/day: use one random unclean Power",
+        "Once/day: use one random sacred Power"
+      ],
+      "values": [
+        "Not having to use their speciality all the time",
+        "Cleanliness",
+        "Listening to melancholic melodies",
+        "A couple of hours alone in darkness",
+        "Wine",
+        "Obscure rituals with the group"
+      ]
+    },
+    {
+      "id": "prowler",
+      "name": "Prowler",
+      "description": "Lawless good-for-nothing crooks banished from civilization, seeking retribution and coin.",
+      "hp": 8,
+      "morale": 8,
+      "armorName": "Leather (-d2)",
+      "weaponName": "Knife/Femur (d4) or Filthy Shortsword (d4+1)",
+      "traits": ["Lazy", "Bragging", "Liar", "Traitor"],
+      "specialties": [
+        "Disarm traps (DR8)",
+        "Steal single items (DR8)",
+        "Climb impossible routes alone (DR8)",
+        "Finds trails and corners that keep the group hidden (DR8)"
+      ],
+      "values": [
+        "Payment in silver",
+        "Food",
+        "Gossip",
+        "Liquor",
+        "Pointless death",
+        "Getting the credit for exploits"
+      ]
+    }
+  ]
+}

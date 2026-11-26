@@ -1,12 +1,12 @@
 {
-  "name": "traveler",
-  "version": "1.0.0",
-  "description": "Offline terminal text RPG set in the Gloaming Reach frontier",
+  "name": "morkborg-simulator",
+  "version": "2.0.0",
+  "description": "MÖRK BORG Bare Bones Edition 100% offline procedural GM terminal simulator",
   "type": "module",
   "scripts": {
     "start": "node src/index.ts",
     "stealth": "node src/index.ts --stealth",
-    "validate": "node scripts/validate-lore.ts",
+    "validate": "node scripts/validate-data.ts",
     "test": "node --test test/engine.test.ts"
   },
   "engines": {
