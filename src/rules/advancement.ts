@@ -1,6 +1,7 @@
 import type { WorldDatabase } from '../db/loader.ts';
 import type { AbilityName, Character, GameState } from '../types.ts';
-import { rollDice, rollDie } from '../dice.ts';
+import { ensureFeatureState, rollDice, rollDie } from '../dice.ts';
+import { applyClassFeatureStartingLoadout } from './class_features.ts';
 
 export function improveCharacter(
   pc: Character,
@@ -75,6 +76,27 @@ export function improveCharacter(
   }
   pc.carryingCapacity = Math.max(1, pc.abilities.strength + 8);
   logs.push(`${pc.name} abilities: ${changes.join(', ')}.`);
+
+  // Gutterborn Scum (p. 49): first time getting better rolls a 2nd specialty
+  if (pc.classId === 'gutterborn_scum') {
+    const fs = ensureFeatureState(pc);
+    const scumDef = world.classesById.gutterborn_scum;
+    if (!fs.scumImprovedOnce && scumDef) {
+      fs.scumImprovedOnce = true;
+      const available = scumDef.features.filter(
+        (f) => !pc.classFeatures.some((cf) => cf.startsWith(f.name)),
+      );
+      if (available.length > 0) {
+        const picked = available[rollDie(available.length, state) - 1];
+        pc.classFeatures.push(`${picked.name}: ${picked.description}`);
+        if (picked.name === 'Filthy Fingersmith') {
+          pc.inventory.push({ id: `scum_picks_${Date.now()}`, name: 'Lockpicks', kind: 'gear' });
+        }
+        applyClassFeatureStartingLoadout(pc);
+        logs.push(`${pc.name} (Gutterborn Scum) gains 2nd specialty: ${picked.name}!`);
+      }
+    }
+  }
 
   return logs;
 }

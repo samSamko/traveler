@@ -12,23 +12,138 @@ import type {
   WeaponDef,
 } from '../types.ts';
 import {
+  ensureFeatureState,
   parseDiceExprDetailed,
   roll4d6DropLowestDetailed,
   rollDie,
   scoreToAbilityMod,
 } from '../dice.ts';
+import { applyClassFeatureStartingLoadout } from './class_features.ts';
+import { rollContractRewards, rollContractSize } from './dungeon.ts';
 
-function pickInitialContract(world: WorldDatabase, rng: { rngState: number }): ActiveContract {
-  const patron = world.campaigns.patrons[rollDie(world.campaigns.patrons.length, rng) - 1];
+export function buildPersonalContractHook(
+  members: Character[],
+  rng: { rngState: number },
+  world: WorldDatabase,
+): { pcId: string; note: string; preferredRegionId?: string } {
+  const living = members.filter((m) => m.status !== 'dead');
+  const pc = living[rollDie(Math.max(1, living.length), rng) - 1] ?? members[0];
+  if (!pc) return { pcId: 'pc_1', note: 'Only silver keeps the hangman and starvation at bay for one more dawn.' };
+
+  const tale = pc.traits.troublingTale.toLowerCase();
+  const origin = pc.traits.origin;
+
+  // Detect region referenced in PC's origin for campaign continuity
+  const matchedRegion = world.regions.find((r) =>
+    origin.toLowerCase().includes(r.name.toLowerCase()) ||
+    (r.id === 'wastland_schleswig' && (origin.toLowerCase().includes('wästland') || origin.toLowerCase().includes('schleswig'))) ||
+    (r.id === 'valley_undead' && origin.toLowerCase().includes('valley of the unfortunate')),
+  );
+
+  if (tale.includes('massive debt')) {
+    return {
+      pcId: pc.id,
+      note: `${pc.name}'s traded debt ledger has landed in this patron's hands — finish the job or lose your fingers.`,
+      preferredRegionId: matchedRegion?.id,
+    };
+  }
+  if (tale.includes('manslaughter') || tale.includes('deserted military') || tale.includes('murdered a close relative')) {
+    return {
+      pcId: pc.id,
+      note: `They know the blood on ${pc.name}'s name and promise silence — and forged papers — only if you return with the prize.`,
+      preferredRegionId: matchedRegion?.id,
+    };
+  }
+  if (tale.includes('escaped cult')) {
+    return {
+      pcId: pc.id,
+      note: `${pc.name} recognizes the same crooked cult marks on the wax seal — running is no longer an option.`,
+      preferredRegionId: matchedRegion?.id,
+    };
+  }
+  if (tale.includes('royal family')) {
+    return {
+      pcId: pc.id,
+      note: `Whispers of ${pc.name}'s treasonous royal affair have reached the wrong ears; this contract buys another week of breath.`,
+      preferredRegionId: matchedRegion?.id,
+    };
+  }
+  if (tale.includes('rare, sought after')) {
+    return {
+      pcId: pc.id,
+      note: `Word of ${pc.name}'s coveted relic drew hungry eyes — take this dive into the dark or face hired knives in the alley.`,
+      preferredRegionId: matchedRegion?.id,
+    };
+  }
+
+  // Class-driven personal stakes
+  if (pc.classId === 'heretical_priest') {
+    return {
+      pcId: pc.id,
+      note: `Galgenbeck's Inquisition is closing on ${pc.name}; surviving another night requires silver and darker relics than theirs.`,
+      preferredRegionId: matchedRegion?.id,
+    };
+  }
+  if (pc.classId === 'wretched_royalty') {
+    return {
+      pcId: pc.id,
+      note: `What little remains of ${pc.name}'s ruined bloodline demands coin — or at least a blade sharp enough to keep the peons back.`,
+      preferredRegionId: matchedRegion?.id,
+    };
+  }
+  if (pc.classId === 'esoteric_hermit') {
+    return {
+      pcId: pc.id,
+      note: `The stars above ${pc.name}'s cave warned that this vault hides a shard of causality worth bleeding for.`,
+      preferredRegionId: matchedRegion?.id,
+    };
+  }
+  if (pc.classId === 'occult_herbmaster') {
+    return {
+      pcId: pc.id,
+      note: `Only the rot below yields rare spores for ${pc.name}'s portable laboratory — and the patron's silver buys clean glass.`,
+      preferredRegionId: matchedRegion?.id,
+    };
+  }
+  if (pc.classId === 'fanged_deserter') {
+    return {
+      pcId: pc.id,
+      note: `No army will take ${pc.name} back; only filthy jobs in forgotten pits still pay for teeth and iron.`,
+      preferredRegionId: matchedRegion?.id,
+    };
+  }
+  if (pc.classId === 'gutterborn_scum') {
+    return {
+      pcId: pc.id,
+      note: `${pc.name} knows every gutter fence in the Dying World — and knows refusing this mark means floating face-down by dawn.`,
+      preferredRegionId: matchedRegion?.id,
+    };
+  }
+
+  return {
+    pcId: pc.id,
+    note: `With the Seventh Seal creeping closer, ${pc.name} takes the only coin still warm in the Dying World — blood silver beneath the earth.`,
+    preferredRegionId: matchedRegion?.id,
+  };
+}
+
+function pickInitialContract(
+  world: WorldDatabase,
+  rng: { rngState: number },
+  hook: OpeningHook,
+  members: Character[],
+): ActiveContract {
   const obj = world.campaigns.objectives[rollDie(world.campaigns.objectives.length, rng) - 1];
   const d1 = world.dungeonTables.nameFirst[rollDie(world.dungeonTables.nameFirst.length, rng) - 1];
   const d2 = world.dungeonTables.nameSecond[rollDie(world.dungeonTables.nameSecond.length, rng) - 1];
-  const rewardSilver = (rollDie(6, rng) + 4) * 20;
+  const contractSize = rollContractSize(1, rng);
+  const { rewardSilver, travelLegsRemaining } = rollContractRewards(contractSize, rng);
+  const personal = buildPersonalContractHook(members, rng, world);
 
   return {
     contractNumber: 1,
-    patronName: patron.name,
-    patronHook: patron.hookIntro,
+    patronName: hook.who,
+    patronHook: `While ${hook.where.toLowerCase()}, ${hook.who} corners you beneath a grey sky. The crisis: ${hook.spark}. Desperate for disposable necks, they point you toward ${`The ${d1} ${d2}`} and promise silver if you crawl back alive.`,
     objectiveId: obj.id,
     objectiveKind: obj.kind,
     objectiveTitle: obj.title,
@@ -38,11 +153,19 @@ function pickInitialContract(world: WorldDatabase, rng: { rngState: number }): A
     dungeonName: `The ${d1} ${d2}`,
     rewardSilver,
     prophecies: ['A hollow eye watches from stone.', 'Something vast hungers beneath the black mud.'],
+    prophecyTruthIndex: 0,
+    prophecyRevealed: false,
     phase: 'briefing',
-    travelLegsRemaining: rollDie(2, rng),
+    travelLegsRemaining,
     objectiveSecured: false,
     bossSlain: false,
     shopVisited: false,
+    personalHookPcId: personal.pcId,
+    personalHookNote: personal.note,
+    negotiated: false,
+    contractSize,
+    activeVignetteId: null,
+    vignetteResolved: false,
   };
 }
 
@@ -156,11 +279,18 @@ export function generateCharacter(
       extraFood += 5;
       inventory.push({ id: nextUid(), name: entry.name, kind: 'food' });
     } else {
+      const lower = entry.name.toLowerCase();
+      let uses: number | undefined;
+      if (entry.kind === 'medicine') {
+        uses = lower.includes('life elixir') ? rollDie(4, rng) : Math.max(1, abilities.presence + 4);
+      } else if (entry.kind === 'poison') {
+        uses = rollDie(4, rng);
+      }
       inventory.push({
         id: nextUid(),
         name: entry.name,
         kind: entry.kind as InventoryItem['kind'],
-        uses: entry.kind === 'medicine' ? Math.max(1, abilities.presence + 4) : undefined,
+        uses,
       });
     }
   };
@@ -188,6 +318,7 @@ export function generateCharacter(
       kind: 'decoction',
       uses: Math.ceil(doses / 2),
       notes: d1.effect,
+      expiresAtDawn: true,
     });
     if (doses > 1) {
       inventory.push({
@@ -196,6 +327,7 @@ export function generateCharacter(
         kind: 'decoction',
         uses: Math.floor(doses / 2) || 1,
         notes: d2.effect,
+        expiresAtDawn: true,
       });
     }
   }
@@ -308,7 +440,7 @@ export function generateCharacter(
     creationRolls.classFeatures = `[${featureRolls.join(', ')}] -> ${classFeatures.join(' | ')}`;
   }
 
-  return {
+  const pc: Character = {
     id: `pc_${index}`,
     name,
     classId,
@@ -332,7 +464,7 @@ export function generateCharacter(
     armorName: armorDef.name,
     hasShield,
     containerName: container.name,
-    carryingCapacity: Math.max(1, abilities.strength + 8),
+    carryingCapacity: Math.max(1, abilities.strength + 8 + container.capacityBonus),
     inventory,
     foodDays: rollDie(4, rng) + extraFood,
     waterDays: 4,
@@ -350,6 +482,14 @@ export function generateCharacter(
     notes: [],
     creationRolls,
   };
+  if (pc.inventory.some((i) => i.name.toLowerCase().includes('vicious dog'))) {
+    ensureFeatureState(pc).dogHp = rollDie(6, rng) + 2;
+  }
+  if (pc.inventory.some((i) => i.name.toLowerCase().includes('monkeys'))) {
+    ensureFeatureState(pc).monkeyCount = rollDie(4, rng);
+  }
+  applyClassFeatureStartingLoadout(pc);
+  return pc;
 }
 
 export function rollOpeningHook(world: WorldDatabase, rng: { rngState: number }): OpeningHook {
@@ -424,7 +564,7 @@ export function createInitialGameState(
 
   const hook = rollOpeningHook(world, rng);
   const calendarDie: CalendarDie = options?.calendarDie ?? 10;
-  const activeContract = pickInitialContract(world, rng);
+  const activeContract = pickInitialContract(world, rng, hook, members);
 
   return {
     version: 2,

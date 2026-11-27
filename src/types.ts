@@ -46,6 +46,55 @@ export interface InventoryItem {
   scrollKind?: 'unclean' | 'sacred';
   scrollRoll?: number;
   proteanScroll?: boolean;
+  expiresAtDawn?: boolean;
+  silverValue?: number;
+}
+
+export interface CharacterFeatureState {
+  wizardTeethCharges?: number;
+  gobLobberUsesLeft?: number;
+  speakerOfTruthsUsesToday?: number;
+  dailyFeatureUsedDay?: number;
+  nextTestDrBonus?: number;
+  autoPassNextTest?: boolean;
+  listOfSinsActive?: boolean;
+  bibleHealDay?: number;
+  hallucinationDay?: number;
+  berserkFight?: boolean;
+  presenceBuffActive?: boolean;
+  poisonedBladeUses?: number;
+  squireDead?: boolean;
+  shieldBreakArmed?: boolean;
+  cowardsJabUsed?: boolean;
+  goreHoundHp?: number;
+  hawkHp?: number;
+  downedRounds?: number;
+  pendingWakeHp?: number;
+  hemorrhageHoursLeft?: number;
+  paralyzedRounds?: number;
+  paralyzedHours?: number;
+  blindedHours?: number;
+  zombieCurseDaysLeft?: number;
+  goblinCurseDaysLeft?: number;
+  spiderVenomHours?: number;
+  bookDizzyHours?: number;
+  flailBurnDay?: number;
+  wraithDrainFight?: number;
+  tempHp?: number;
+  invisibleRounds?: number;
+  graceRollBonus?: boolean;
+  hermeticTrapSteps?: number;
+  omenArmed?: 'reduce_dmg' | 'reroll' | 'neutralize' | 'lower_dr';
+  scumImprovedOnce?: boolean;
+  skeletonPossessed?: boolean;
+  waterSickens?: boolean;
+  blindfoldWorn?: boolean;
+  blackCrownWorn?: boolean;
+  immortalTorchMinutes?: number;
+  dogHp?: number;
+  monkeyCount?: number;
+  horseSkipUsedContract?: number;
+  ratScout?: boolean;
 }
 
 export interface CharacterTraits {
@@ -93,6 +142,7 @@ export interface Character {
   arcaneCatastrophes: number[];
   notes: string[];
   creationRolls?: Record<string, string>;
+  featureState?: CharacterFeatureState;
 }
 
 export interface OutcastFollower {
@@ -140,7 +190,12 @@ export type DungeonRoomRole =
   | 'puzzle_statue'
   | 'locked_vault'
   | 'debris_room'
-  | 'boss_lair';
+  | 'boss_lair'
+  | 'ritual_sanctum'
+  | 'ossuary'
+  | 'shrine'
+  | 'trap_gallery'
+  | 'stairwell_down';
 
 export interface RoomInteractable {
   id: string;
@@ -159,7 +214,16 @@ export interface RoomInteractable {
     | 'rival_camp'
     | 'sarcophagus'
     | 'bazaar'
-    | 'spirit';
+    | 'spirit'
+    | 'sabotage_altar'
+    | 'inscription_cipher'
+    | 'blood_altar'
+    | 'stray_beast'
+    | 'shrine_offering'
+    | 'ossuary_loot'
+    | 'riddle_door'
+    | 'offering_scale'
+    | 'read_graffiti';
   label: string;
   used: boolean;
 }
@@ -178,6 +242,10 @@ export interface DungeonRoom {
   exits: number[];
   x: number;
   y: number;
+  floor: number;
+  sensory?: { light: string; smell: string; sound: string; atmo: string };
+  graffiti?: string | null;
+  revisitCount?: number;
   lockedByKey?: boolean;
   secretHidden?: boolean;
   requiresNoHeavyArmor?: boolean;
@@ -223,6 +291,14 @@ export interface DungeonState {
   rivalBrewTaken: boolean;
   guardsAlerted: boolean;
   tableBTriggered: boolean;
+  puzzleKind: 'socket_statue' | 'inscription_cipher' | 'blood_altar' | 'riddle_door' | 'offering_scale';
+  puzzleCluesFound: number;
+  riddleIndex?: number;
+  size?: ContractSize;
+  floors?: number;
+  dangerTicks: number;
+  movesSinceDanger: number;
+  previousRoomId?: number;
 }
 
 export interface CombatEnemy {
@@ -245,6 +321,11 @@ export interface CombatEnemy {
   moraleCheckedHalf: boolean;
   isLeader: boolean;
   invisibleRounds?: number;
+  stunnedRounds?: number;
+  asleepRounds?: number;
+  confusedRounds?: number;
+  suffocatingRounds?: number;
+  allied?: boolean;
 }
 
 export interface CombatState {
@@ -255,6 +336,8 @@ export interface CombatState {
   enemies: CombatEnemy[];
   ambush: boolean;
   log: string[];
+  parleyAttempted?: boolean;
+  bloodDrawn?: boolean;
 }
 
 export interface OpeningHook {
@@ -272,6 +355,8 @@ export interface OpeningHook {
   };
 }
 
+export type ContractSize = 'small' | 'medium' | 'large';
+
 export interface ActiveContract {
   contractNumber: number;
   patronName: string;
@@ -285,11 +370,21 @@ export interface ActiveContract {
   dungeonName: string;
   rewardSilver: number;
   prophecies: [string, string];
+  prophecyTruthIndex?: number;
+  prophecyRevealed?: boolean;
   phase: 'briefing' | 'travel' | 'dungeon';
   travelLegsRemaining: number;
   objectiveSecured: boolean;
   bossSlain: boolean;
   shopVisited: boolean;
+  personalHookPcId?: string;
+  personalHookNote?: string;
+  basiliskDemand?: string;
+  negotiated?: boolean;
+  outcastHired?: boolean;
+  contractSize?: ContractSize;
+  activeVignetteId?: string | null;
+  vignetteResolved?: boolean;
 }
 
 export interface ChoiceOption {
@@ -320,6 +415,7 @@ export interface GameState {
   pendingChoiceOptions: ChoiceOption[];
   recentProseIds: string[];
   dailyBugEatenDay?: number;
+  trollVendettaCount?: number;
   gameOverReason: string | null;
 }
 

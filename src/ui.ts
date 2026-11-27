@@ -3,6 +3,8 @@ import { join } from 'node:path';
 import { stdin, stdout } from 'node:process';
 import { createInterface } from 'node:readline';
 import type { Character, GameState } from './types.ts';
+import { canParleyInCombat } from './combat.ts';
+import { getActiveMiseryEffects } from './rules/calendar.ts';
 
 export type UiStyle =
   | 'yellow'
@@ -380,11 +382,11 @@ function formatDiceRollDisplay(specs: number[], faces: number[]): string {
 export async function animateInlineRoll(
   label: string,
   stealth: boolean,
-  options?: { isGmRoll?: boolean; forceInteractive?: boolean },
+  options?: { isGmRoll?: boolean; forceInteractive?: boolean; noAnim?: boolean },
 ): Promise<void> {
-  const isTty = options?.forceInteractive || Boolean(stdout.isTTY);
+  const isTty = !options?.noAnim && (options?.forceInteractive || Boolean(stdout.isTTY));
   if (!isTty) {
-    console.log(`  * ${label}`);
+    console.log(paint(`  * ${label}`, 'bone', stealth));
     return;
   }
 
@@ -433,11 +435,12 @@ export async function animateInlineRoll(
       return;
     }
   }
+  const isRollLine = label.startsWith('[Roll]');
   const styled = label.includes('[CRIT!]') || label.includes('SLAIN')
     ? paint(`  * ${label}`, 'bile', stealth)
     : label.includes('[FUMBLE!]') || label.includes('DEAD') || label.includes('INFECTED')
       ? paint(`  * ${label}`, 'red', stealth)
-      : paint(`  * ${label}`, 'bone', stealth);
+      : paint(`  * ${label}`, isRollLine ? 'dim' : 'bone', stealth);
   console.log(styled);
   await sleep(140);
 }
@@ -619,6 +622,7 @@ export function renderDrAndCombatModTable(stealth: boolean): string {
 
 export function renderSummaryOverview(state: GameState, stealth: boolean): string {
   const c = state.activeContract;
+  const miseries = getActiveMiseryEffects(state);
   const lines: string[] = [
     renderPartyBar(state, stealth),
     paint(
@@ -628,6 +632,9 @@ export function renderSummaryOverview(state: GameState, stealth: boolean): strin
     ),
     paint(`Seer Prophecies: 1) ${c.prophecies[0]} | 2) ${c.prophecies[1]}`, 'dim', stealth),
   ];
+  if (miseries.summaries.length > 0) {
+    lines.push(paint(`Active Misery World Rules: ${miseries.summaries.join(' | ')}`, 'red', stealth));
+  }
   if (state.chronicle.length > 0) {
     lines.push(paint('Recent Chronicle:', 'pink', stealth));
     for (const entry of state.chronicle.slice(-5)) {
@@ -644,7 +651,7 @@ export function getGameScreenParts(state: GameState, stealth: boolean): GameScre
   if (state.lastEvents.length > 0) {
     before.push(paint('--- Rolls & Events ---', 'dim', stealth));
     for (const ev of state.lastEvents) {
-      before.push(paint(`  * ${ev}`, 'bone', stealth));
+      before.push(paint(`  * ${ev}`, ev.startsWith('[Roll]') ? 'dim' : 'bone', stealth));
     }
   }
 
@@ -662,7 +669,9 @@ export function getGameScreenParts(state: GameState, stealth: boolean): GameScre
     const c = state.activeCombat;
     before.push(paint(`\n--- VIOLENCE: ROUND ${c.round} ---`, 'red', stealth));
     before.push(paint('Player-facing combat: roll to attack (DR12) and roll Agility (DR12) to defend.', 'dim', stealth));
-    before.push(renderDrAndCombatModTable(stealth));
+    if (c.round === 1) {
+      before.push(renderDrAndCombatModTable(stealth));
+    }
     c.enemies.forEach((e, idx) => {
       const st = e.status === 'active' ? `${e.hp}/${e.maxHp} HP` : e.status.toUpperCase();
       before.push(
@@ -673,14 +682,70 @@ export function getGameScreenParts(state: GameState, stealth: boolean): GameScre
         ),
       );
     });
+    before.push(paint('Party Combat Strip:', 'dim', stealth));
+    state.party.members.forEach((m, idx) => {
+      const tags: string[] = [];
+      if (m.status !== 'alive') tags.push(m.status.toUpperCase());
+      if (m.infected) tags.push('INFECTED');
+      if ((m.featureState?.paralyzedRounds ?? 0) > 0) tags.push('PARALYZED');
+      if (m.weaponBroken) tags.push('WPN-BROKEN');
+      const tagStr = tags.length > 0 ? ` [${tags.join(',')}]` : '';
+      const wpnStr = m.weaponBroken ? 'Unarmed (d2)' : `${m.weapon.name} (${m.weapon.damageDie})`;
+      const armStr = `T${m.armorTier}${m.hasShield ? '+Shd' : ''}`;
+      before.push(
+        paint(
+          `  [PC${idx + 1}] ${m.name} | HP ${m.hp}/${m.maxHp} | ${wpnStr} | Arm ${armStr} | Omens ${m.omens}${tagStr}`,
+          m.status === 'alive' ? 'bone' : 'dim',
+          stealth,
+        ),
+      );
+    });
     const activePc = state.party.members[state.party.activePcIndex];
-    after.push(paint(`\nActing PC: ${activePc?.name ?? 'None'} (use "pc <1-4>" to switch)`, 'ochre', stealth));
+    const orderDisplay = c.turnOrderPcIds
+      .map((id, idx) => {
+        const m = state.party.members.find((x) => x.id === id);
+        if (!m || m.status !== 'alive') return null;
+        return idx === c.activeTurnIdx ? `[> ${m.name}]` : m.name;
+      })
+      .filter(Boolean)
+      .join(' -> ');
+    if (c.turnOrderPcIds.length > 1 && orderDisplay) {
+      after.push(paint(`\nInitiative Order (AGI+d6): ${orderDisplay}`, 'dim', stealth));
+    }
+    after.push(paint(`${c.turnOrderPcIds.length > 1 ? '' : '\n'}Acting PC: ${activePc?.name ?? 'None'} (following rolled initiative)`, 'ochre', stealth));
     after.push(paint('Combat Actions:', 'yellow', stealth));
-    after.push(paint('  1. Attack enemy #1 (or type: attack <enemy#>)', 'bone', stealth));
-    after.push(paint('  2. Attack #1 spending 1 Omen for MAX damage', 'bone', stealth));
-    after.push(paint('  3. Attack #1 spending 1 Omen for -4 DR', 'bone', stealth));
-    after.push(paint('  4. Cast a scroll (or type: cast <scroll#>)', 'bone', stealth));
-    after.push(paint('  5. Flee combat (Agility DR12)', 'bone', stealth));
+    const activeEnemies = c.enemies.map((e, idx) => ({ e, idx })).filter((x) => x.e.status === 'active');
+    if (activeEnemies.length <= 1) {
+      after.push(paint('  1. Attack enemy #1 (or type: attack <enemy#>)', 'bone', stealth));
+      after.push(paint('  2. Attack #1 spending 1 Omen for MAX damage', 'bone', stealth));
+      after.push(paint('  3. Attack #1 spending 1 Omen for -4 DR', 'bone', stealth));
+      after.push(paint('  4. Cast a scroll (or type: cast <scroll#>)', 'bone', stealth));
+      after.push(paint('  5. Flee combat (Agility DR12)', 'bone', stealth));
+    } else {
+      activeEnemies.forEach((x, n) => {
+        after.push(paint(`  ${n + 1}. Attack [${x.idx + 1}] ${x.e.name} (${x.e.hp}/${x.e.maxHp} HP)`, 'bone', stealth));
+      });
+      const k = activeEnemies.length;
+      after.push(paint(`  ${k + 1}. Attack #1 spending 1 Omen for MAX damage`, 'bone', stealth));
+      after.push(paint(`  ${k + 2}. Attack #1 spending 1 Omen for -4 DR`, 'bone', stealth));
+      after.push(paint(`  ${k + 3}. Cast a scroll (or type: cast <scroll#>)`, 'bone', stealth));
+      after.push(paint(`  ${k + 4}. Flee combat (Agility DR12)`, 'bone', stealth));
+    }
+    if (activePc?.classId === 'fanged_deserter') {
+      after.push(paint('  bite       Fanged Deserter Bite (DR10, d6 dmg; 1-2 on d6 free enemy counter)', 'bone', stealth));
+    }
+    if (activePc && activePc.classFeatures.length > 0) {
+      after.push(paint('  feature    Trigger active class feature', 'bone', stealth));
+    }
+    if (canParleyInCombat(state)) {
+      after.push(paint('  parley     Attempt Round-1 Reaction parley (2d6; 9+ peace, 7-8 withdraw)', 'bone', stealth));
+    }
+    after.push(paint('  use <#> [pc#] Use inventory item # (optionally targeting ally pc#)', 'bone', stealth));
+    after.push(paint('  equip <#>  Equip weapon/shield from inventory', 'bone', stealth));
+    after.push(paint('  omen <m>   Arm Omen (dmg | reroll | neutralize | dr | clear)', 'bone', stealth));
+    if (activePc?.hasShield) {
+      after.push(paint('  shield     Arm shield-break to absorb all damage from next hit', 'bone', stealth));
+    }
     return {
       beforeNarration: before.join('\n'),
       narration: '',
@@ -688,11 +753,23 @@ export function getGameScreenParts(state: GameState, stealth: boolean): GameScre
     };
   }
 
-  // Spoiler-free dungeon view: only current room label + visible exits
+  // Spoiler-free dungeon view: only current room label + visible exits + status strip
   if (state.mode === 'dungeon' && state.activeDungeon) {
     const d = state.activeDungeon;
     const cur = d.rooms[d.currentRoomId];
-    before.push(paint(`\n--- ${d.name} | ${cur.label} ---`, 'ochre', stealth));
+    const floorTag = (d.floors ?? 1) > 1 ? ` | Floor ${cur.floor ?? 1}/${d.floors}` : '';
+    before.push(paint(`\n--- ${d.name} | ${cur.label}${floorTag} ---`, 'ochre', stealth));
+    const aliveHp = state.party.members.filter((m) => m.status !== 'dead').reduce((s, m) => s + Math.max(0, m.hp), 0);
+    const maxHp = state.party.members.filter((m) => m.status !== 'dead').reduce((s, m) => s + m.maxHp, 0);
+    const totalSilver = state.party.members.reduce((s, m) => s + m.silver, 0);
+    const objDone = state.activeContract.objectiveSecured || (state.activeContract.objectiveKind === 'slay_boss' && state.activeContract.bossSlain);
+    before.push(
+      paint(
+        `Party HP: ${aliveHp}/${maxHp} | Silver: ${totalSilver}s | Obj: ${objDone ? 'SECURED' : 'Pending'} | ${d.hasBossKey ? 'Key: Yes' : 'Key: No'} | Hazard: ${d.centralHazardName}`,
+        'dim',
+        stealth,
+      ),
+    );
     const visibleExits = cur.exits.filter((id) => !d.rooms[id]?.secretHidden || d.puzzleSolved);
     before.push(
       paint(

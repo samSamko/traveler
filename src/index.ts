@@ -29,10 +29,11 @@ async function promptManualRoll(stealth: boolean, contextLabel?: string): Promis
 async function doManualRoll(
   label: string,
   stealth: boolean,
+  noAnim: boolean,
   options?: { context?: string; isGmRoll?: boolean },
 ): Promise<void> {
-  await promptManualRoll(stealth, options?.context);
-  await animateInlineRoll(label, stealth, { isGmRoll: options?.isGmRoll });
+  await promptManualRoll(stealth || noAnim, options?.context);
+  await animateInlineRoll(label, stealth, { isGmRoll: options?.isGmRoll, noAnim });
 }
 
 async function askValidOption(
@@ -66,8 +67,22 @@ function isReadOnlyCommand(lower: string): boolean {
     lower.startsWith('pc ') ||
     lower === 'calendar' ||
     lower === 'map' ||
+    lower === 'look' ||
+    lower === 'l' ||
+    lower === 'graveyard' ||
+    lower === 'history' ||
     lower === 'tables' ||
     lower === 'mods' ||
+    lower === 'shop' ||
+    lower === 'repair' ||
+    lower === 'omen' ||
+    lower.startsWith('omen ') ||
+    lower.startsWith('buy ') ||
+    lower === 'sell' ||
+    lower.startsWith('sell ') ||
+    lower.startsWith('equip ') ||
+    lower.startsWith('give ') ||
+    lower.startsWith('drop ') ||
     lower === 'quit' ||
     lower === 'exit'
   );
@@ -87,14 +102,13 @@ function isPartyWideCommand(lower: string): boolean {
 function shouldPromptManualRoll(state: GameState, lower: string): boolean {
   if (isReadOnlyCommand(lower)) return false;
   if (state.mode === 'combat') {
+    const n = Number.parseInt(lower, 10);
     return (
-      lower === '1' ||
-      lower === '2' ||
-      lower === '3' ||
-      lower === '4' ||
-      lower === '5' ||
+      (!Number.isNaN(n) && String(n) === lower && n >= 1 && n <= 12) ||
       lower.startsWith('attack') ||
       lower === 'flee' ||
+      lower === 'bite' ||
+      lower === 'parley' ||
       lower === 'cast' ||
       lower.startsWith('cast ')
     );
@@ -136,8 +150,9 @@ async function revealCharacterCreationRolls(
   state: GameState,
   world: WorldDatabase,
   stealth: boolean,
+  noAnim: boolean,
 ): Promise<void> {
-  const isInteractive = !stealth && Boolean(stdout.isTTY);
+  const isInteractive = !stealth && !noAnim && Boolean(stdout.isTTY);
 
   for (let idx = 0; idx < state.party.members.length; idx += 1) {
     const pc = state.party.members[idx];
@@ -146,32 +161,33 @@ async function revealCharacterCreationRolls(
       const r = pc.creationRolls ?? {};
       console.log(paint(`\n=== Forging Wretch #${idx + 1} (${pc.className}) ===`, 'pink', false));
       console.log(renderClassRollModifiers(cls, false));
-      await doManualRoll(`Name (d6+d8): ${r.name ?? pc.name}`, stealth, { context: 'Name' });
+      await doManualRoll(`Name (d6+d8): ${r.name ?? pc.name}`, stealth, noAnim, { context: 'Name' });
       console.log('\n' + renderAbilityModTable(false));
-      await doManualRoll(`Agility (${r.agilityFormula ?? cls?.abilityRolls.agility ?? '3d6'}): ${r.agility ?? fmtMod(pc.abilities.agility)}`, stealth, { context: 'Agility' });
-      await doManualRoll(`Presence (${r.presenceFormula ?? cls?.abilityRolls.presence ?? '3d6'}): ${r.presence ?? fmtMod(pc.abilities.presence)}`, stealth, { context: 'Presence' });
-      await doManualRoll(`Strength (${r.strengthFormula ?? cls?.abilityRolls.strength ?? '3d6'}): ${r.strength ?? fmtMod(pc.abilities.strength)}`, stealth, { context: 'Strength' });
-      await doManualRoll(`Toughness (${r.toughnessFormula ?? cls?.abilityRolls.toughness ?? '3d6'}): ${r.toughness ?? fmtMod(pc.abilities.toughness)}`, stealth, { context: 'Toughness' });
-      await doManualRoll(`Hit Points (TOU+d${cls?.hpDie ?? 8}): ${r.hp ?? `${pc.maxHp} HP`}`, stealth, { context: 'Hit Points' });
-      await doManualRoll(`Omens (d${pc.omenDie}): ${r.omens ?? `${pc.omens} Omens`}`, stealth, { context: 'Omens' });
-      await doManualRoll(`Daily Powers (PRE+d4): ${r.powers ?? pc.powersMaxToday}`, stealth, { context: 'Powers' });
-      await doManualRoll(`Starting Silver (${cls?.silverFormula ?? '2d6x10'}): ${r.silver ?? `${pc.silver}s`}`, stealth, { context: 'Silver' });
-      await doManualRoll(`Weapon (${r.weaponFormula ?? `d${cls?.weaponDie ?? 10}`}): ${r.weapon ?? pc.weapon.name}`, stealth, { context: 'Weapon' });
-      await doManualRoll(`Armor (${r.armorFormula ?? `d${cls?.armorDie ?? 4}`}): ${r.armor ?? `${pc.armorName} (Tier ${pc.armorTier})`}`, stealth, { context: 'Armor' });
+      await doManualRoll(`Agility (${r.agilityFormula ?? cls?.abilityRolls.agility ?? '3d6'}): ${r.agility ?? fmtMod(pc.abilities.agility)}`, stealth, noAnim, { context: 'Agility' });
+      await doManualRoll(`Presence (${r.presenceFormula ?? cls?.abilityRolls.presence ?? '3d6'}): ${r.presence ?? fmtMod(pc.abilities.presence)}`, stealth, noAnim, { context: 'Presence' });
+      await doManualRoll(`Strength (${r.strengthFormula ?? cls?.abilityRolls.strength ?? '3d6'}): ${r.strength ?? fmtMod(pc.abilities.strength)}`, stealth, noAnim, { context: 'Strength' });
+      await doManualRoll(`Toughness (${r.toughnessFormula ?? cls?.abilityRolls.toughness ?? '3d6'}): ${r.toughness ?? fmtMod(pc.abilities.toughness)}`, stealth, noAnim, { context: 'Toughness' });
+      await doManualRoll(`Hit Points (TOU+d${cls?.hpDie ?? 8}): ${r.hp ?? `${pc.maxHp} HP`}`, stealth, noAnim, { context: 'Hit Points' });
+      await doManualRoll(`Omens (d${pc.omenDie}): ${r.omens ?? `${pc.omens} Omens`}`, stealth, noAnim, { context: 'Omens' });
+      await doManualRoll(`Daily Powers (PRE+d4): ${r.powers ?? pc.powersMaxToday}`, stealth, noAnim, { context: 'Powers' });
+      await doManualRoll(`Starting Silver (${cls?.silverFormula ?? '2d6x10'}): ${r.silver ?? `${pc.silver}s`}`, stealth, noAnim, { context: 'Silver' });
+      await doManualRoll(`Weapon (${r.weaponFormula ?? `d${cls?.weaponDie ?? 10}`}): ${r.weapon ?? pc.weapon.name}`, stealth, noAnim, { context: 'Weapon' });
+      await doManualRoll(`Armor (${r.armorFormula ?? `d${cls?.armorDie ?? 4}`}): ${r.armor ?? `${pc.armorName} (Tier ${pc.armorTier})`}`, stealth, noAnim, { context: 'Armor' });
       await doManualRoll(
         `Gear & Supplies (d6+d12+d12): ${r.gear ?? `${pc.containerName}, ${pc.inventory.map((i) => i.name).join('; ')}`} (${pc.foodDays}d food, ${pc.waterDays}d water)`,
         stealth,
+        noAnim,
         { context: 'Equipment' },
       );
       if (cls) {
-        await doManualRoll(`Origin (d${cls.originsDie}): ${r.origin ?? pc.traits.origin}`, stealth, { context: 'Origin' });
+        await doManualRoll(`Origin (d${cls.originsDie}): ${r.origin ?? pc.traits.origin}`, stealth, noAnim, { context: 'Origin' });
       }
-      await doManualRoll(`Terrible Traits (2d20): ${r.terrible ?? pc.traits.terrible.join(' / ')}`, stealth, { context: 'Terrible Traits' });
-      await doManualRoll(`Broken Body (d20): ${r.brokenBody ?? pc.traits.brokenBody}`, stealth, { context: 'Broken Body' });
-      await doManualRoll(`Bad Habit (d20): ${r.badHabit ?? pc.traits.badHabit}`, stealth, { context: 'Bad Habit' });
-      await doManualRoll(`Troubling Tale (d20): ${r.troublingTale ?? pc.traits.troublingTale}`, stealth, { context: 'Troubling Tale' });
+      await doManualRoll(`Terrible Traits (2d20): ${r.terrible ?? pc.traits.terrible.join(' / ')}`, stealth, noAnim, { context: 'Terrible Traits' });
+      await doManualRoll(`Broken Body (d20): ${r.brokenBody ?? pc.traits.brokenBody}`, stealth, noAnim, { context: 'Broken Body' });
+      await doManualRoll(`Bad Habit (d20): ${r.badHabit ?? pc.traits.badHabit}`, stealth, noAnim, { context: 'Bad Habit' });
+      await doManualRoll(`Troubling Tale (d20): ${r.troublingTale ?? pc.traits.troublingTale}`, stealth, noAnim, { context: 'Troubling Tale' });
       if (pc.classFeatures.length > 0) {
-        await doManualRoll(`Class Feature(s) (d6): ${r.classFeatures ?? pc.classFeatures.join(' | ')}`, stealth, { context: 'Class Feature' });
+        await doManualRoll(`Class Feature(s) (d6): ${r.classFeatures ?? pc.classFeatures.join(' | ')}`, stealth, noAnim, { context: 'Class Feature' });
       }
       console.log('');
     }
@@ -183,6 +199,7 @@ async function revealCharacterCreationRolls(
 async function main(): Promise<void> {
   const args = new Set(process.argv.slice(2));
   const stealth = args.has('--stealth');
+  const noAnim = args.has('--no-anim') || stealth;
   const world = loadWorldDatabase();
 
   initTerminal();
@@ -206,12 +223,21 @@ async function main(): Promise<void> {
       await typewriteText(
         'No one has seen the sun in years. Distances shift, paths warp, and the prophecies of the two-headed basilisk Verhu march toward inevitable annihilation.',
         stealth,
+        { instant: noAnim },
+      );
+
+      console.log(paint('\n--- The Ash Ledger (Why You Descend) ---', 'ochre', stealth));
+      await typewriteText(
+        'Between Galgenbeck\'s gallows, Fathmu\'s tax-raids, and starvation, wretches like you live on borrowed breath. Every dirty job passes through the Blind Seer\'s tattered curtain — desperate patrons buy disposable necks with silver, sending you down into rot-choked vaults again and again until your purse is full, your bones break, or the Seventh Seal burns the world.',
+        stealth,
+        { instant: noAnim },
       );
 
       console.log(paint('\n--- The Calendar of Nechrubel ---', 'pink', stealth));
       await typewriteText(
         'Each dawn, a die is cast against the Nameless Scriptures. On a 1, a Misery befalls the world. When the seventh seal breaks at 7:7, the game and your lives end. Burn the book.',
         stealth,
+        { instant: noAnim },
       );
       console.log('Select Calendar die (when will all this agony end?):');
       console.log('  1. d100 (Years of pain)');
@@ -233,6 +259,7 @@ async function main(): Promise<void> {
       await typewriteText(
         'Do you wander as a doomed band rolled by fate (d3+1), or walk alone into the dark as a single wretch?',
         stealth,
+        { instant: noAnim },
       );
       console.log('  1. Rolled party (d3+1 wretches)');
       console.log('  2. Solo wretch (1 PC — brutal)');
@@ -243,6 +270,7 @@ async function main(): Promise<void> {
       await typewriteText(
         'Your characters are frail, scarred, and burdened by terrible traits, broken bodies, bad habits, and troubling tales. Most will die in the mud.',
         stealth,
+        { instant: noAnim },
       );
       const seed = Date.now() >>> 0;
       const previewSize = solo ? { dieRoll: 0, count: 1 } : rollPartySize({ rngState: seed });
@@ -252,6 +280,7 @@ async function main(): Promise<void> {
         await doManualRoll(
           `Party size rolled: d3(${previewSize.dieRoll}) + 1 = ${previewSize.count} PCs.`,
           stealth,
+          noAnim,
           { context: 'Party Size (d3+1)' },
         );
       }
@@ -287,12 +316,14 @@ async function main(): Promise<void> {
         await typewriteText(
           '0. Classless Scvm — No class; 4d6 drop lowest on two abilities (3d6 on two), HP: TOU+d8, Omens: d2, Wpn: d10, Arm: d4, Silver: 2d6*10.',
           stealth,
+          { instant: noAnim },
         );
         for (let cIdx = 0; cIdx < world.classes.length; cIdx += 1) {
           const c = world.classes[cIdx];
           await typewriteText(
             `${cIdx + 1}. ${c.name} — ${c.description}\n${renderClassRollModifiers(c, stealth)}`,
             stealth,
+            { instant: noAnim },
           );
         }
         const idList: ClassId[] = [
@@ -320,19 +351,19 @@ async function main(): Promise<void> {
         classChoices,
       });
 
-      await revealCharacterCreationRolls(state, world, stealth);
+      await revealCharacterCreationRolls(state, world, stealth, noAnim);
 
-      if (!stealth && stdout.isTTY) {
+      if (!stealth && !noAnim && stdout.isTTY) {
         console.log(paint('--- Opening Fate ---', 'pink', false));
         const hr = state.hook.rolls;
-        await doManualRoll(`Where do you wander? (d12): [${hr?.where ?? '?'}] -> ${state.hook.where} (${state.hook.regionName})`, stealth, { context: 'Where (d12)' });
-        await doManualRoll(`Weather (d12): [${hr?.weather ?? '?'}] -> ${state.hook.weather}`, stealth, { context: 'Weather (d12)' });
-        await doManualRoll(`Who contacts you? (d20): [${hr?.who ?? '?'}] -> ${state.hook.who}`, stealth, { context: 'Contact (d20)' });
-        await doManualRoll(`Adventure Spark (d100): [${hr?.spark ?? '?'}] -> ${state.hook.spark}`, stealth, { context: 'Spark (d100)' });
+        await doManualRoll(`Where do you wander? (d12): [${hr?.where ?? '?'}] -> ${state.hook.where} (${state.hook.regionName})`, stealth, noAnim, { context: 'Where (d12)' });
+        await doManualRoll(`Weather (d12): [${hr?.weather ?? '?'}] -> ${state.hook.weather}`, stealth, noAnim, { context: 'Weather (d12)' });
+        await doManualRoll(`Who contacts you? (d20): [${hr?.who ?? '?'}] -> ${state.hook.who}`, stealth, noAnim, { context: 'Contact (d20)' });
+        await doManualRoll(`Adventure Spark (d100): [${hr?.spark ?? '?'}] -> ${state.hook.spark}`, stealth, noAnim, { context: 'Spark (d100)' });
         await readTerminalLine(paint('\nPress Enter to face the Seer and begin... ', 'yellow', false));
       }
 
-      await pauseTransition('The Seer draws back the tattered curtain', stealth, 500);
+      await pauseTransition('The Seer draws back the tattered curtain', stealth || noAnim, 500);
       initializeOpeningScene(state, world);
       saveGame(state);
     }
@@ -342,7 +373,7 @@ async function main(): Promise<void> {
       if (parts.beforeNarration) console.log('\n' + parts.beforeNarration);
       if (parts.narration) {
         console.log('');
-        await typewriteText(parts.narration, stealth);
+        await typewriteText(parts.narration, stealth, { instant: noAnim });
       }
       if (parts.afterNarration) console.log('\n' + parts.afterNarration);
 
@@ -356,13 +387,13 @@ async function main(): Promise<void> {
           await promptCharacterSelection(state, stealth);
         }
         if (shouldPromptManualRoll(state, lower)) {
-          await promptManualRoll(stealth);
+          await promptManualRoll(stealth || noAnim);
         }
       }
 
       if (trimmed && !isReadOnlyCommand(lower) && state.mode !== 'combat' && state.mode !== 'game_over') {
         const activePc = state.party.members[state.party.activePcIndex];
-        await pauseTransition(`${activePc?.name ?? 'The party'} moves into the dark`, stealth, 350);
+        await pauseTransition(`${activePc?.name ?? 'The party'} moves into the dark`, stealth || noAnim, 350);
       }
 
       const out = processPlayerInput(state, world, input, stealth);
@@ -382,7 +413,7 @@ async function main(): Promise<void> {
             ev.includes('starves') ||
             ev.includes('infection') ||
             ev.includes('CATASTROPHE');
-          await animateInlineRoll(ev, stealth, { isGmRoll: isGm });
+          await animateInlineRoll(ev, stealth, { isGmRoll: isGm, noAnim });
         }
         state.lastEvents = [];
       }
@@ -398,7 +429,7 @@ async function main(): Promise<void> {
       if (state.mode === 'game_over') {
         const overParts = getGameScreenParts(state, stealth);
         if (overParts.beforeNarration) console.log('\n' + overParts.beforeNarration);
-        if (overParts.narration) await typewriteText(overParts.narration, stealth);
+        if (overParts.narration) await typewriteText(overParts.narration, stealth, { instant: noAnim });
         if (overParts.afterNarration) console.log('\n' + overParts.afterNarration);
         const outcome = state.calendar.worldEnded ? 'apocalypse' : 'tpk';
         recordRunCompletion(state, outcome);

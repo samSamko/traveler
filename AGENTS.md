@@ -24,10 +24,12 @@ And verify offline CLI startup in stealth mode:
 - `src/types.ts`: Domain contracts (`GameState.version = 2`) for PCs, Outcasts, Contracts, Calendar of Nechrubel, 12–15 room Dungeons, Violence combat, and dynamic choices.
 - `src/dice.ts`: Seeded `mulberry32` PRNG, dice parser, `d66`, `4d6 drop lowest`, Bad Habit #19 whistle-on-stealth checks, and MÖRK BORG DR tests.
 - `src/rules/chargen.ts`: Solo or `d3 + 1` party creation, classless + 6 Optional Classes, mechanical trait items, and initial Contract seeding.
+- `src/rules/class_features.ts`: All 30 Optional Class features, Fanged Deserter bite, all 8 Occult Herbmaster decoctions + dawn re-brewing, combat companions, and `use` item handlers.
+- `src/rules/shop.ts`: Quartermaster catalog, equipment/weapon/armor/ammo purchasing, armor tier repair (p. 25), and hospice recovery.
 - `src/rules/traits.ts`: 80-entry trait reactivity (tags, non-repeating prose callouts, Reaction/DR modifiers, contextual `[Trait]` choices, and *Troubling Tale* pursuers).
-- `src/rules/calendar.ts`, `src/rules/rest.ts`, `src/rules/advancement.ts`, `src/rules/powers.ts`: Dawn Misery `7:7`, rest/starvation/infection/Protean Scroll dawn mutations, *Getting Better*, and silenced-room / Protean 1–3 scroll casting.
+- `src/rules/calendar.ts`, `src/rules/rest.ts`, `src/rules/advancement.ts`, `src/rules/powers.ts`: Dawn Misery `7:7`, rest/starvation/infection/curse/hemorrhage/Protean Scroll dawn updates, *Getting Better* (including Scum 2nd specialty), and all 20 Scrolls + 20 Arcane Catastrophes.
 - `src/rules/dungeon.ts`: Procedural 12–15 room *Rotblack Sludge*-style dungeon graph (noise-alerted guards, pit traps into narrow crawlways, rival factions, central hazards + apex beasts, puzzle statues -> secret vaults, key-bearing bosses).
-- `src/combat.ts`: Player-facing *Violence*, Boss round-3 Powers & sympathy backlash, Boss death pacifying the Apex Beast, Apex devour checks, Morale, and Omen spending.
+- `src/combat.ts`: Player-facing *Violence*, Boss round-3 Powers & sympathy backlash, Boss death pacifying the Apex Beast, Apex devour checks, Creature specials, Broken `d4` recovery, Morale, and all 5 Omen uses.
 - `src/gm/procedural.ts`: 100% offline Procedural GM driving Contract/Seer briefings, overland travel, multi-layered room prose, cross-room puzzles, freeform verb-keyword matching, and campaign progression.
 - `src/engine.ts`, `src/ui.ts`, `src/save.ts`, `src/index.ts`: State machine, muted grimdark ANSI / `--stealth` UI, 5.5s decelerating dice animations, skip-on-key typewriter, atomic v2 saves in `.morkborg-saves/`, and CLI entrypoint.
-- `old/`: Archived legacy `traveler` files kept for reference only.
+- `scripts/playtest.ts`: Multi-seed tactical playtest simulator & rule verification harness.

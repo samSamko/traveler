@@ -219,6 +219,46 @@
       "failDamageDie": "d4",
       "apexCreatureId": "chasm_weaver",
       "sensoryHint": "Wet creaking roots shift slowly behind collapsed masonry."
+    },
+    {
+      "id": "glacier_crevasse",
+      "name": "Screaming Ice-Crevasse",
+      "description": "A blue-black split in subterranean permafrost bridged by chained sled-planks.",
+      "testAbility": "agility",
+      "testDr": 10,
+      "failDamageDie": "d6",
+      "apexCreatureId": "chasm_weaver",
+      "sensoryHint": "Razor wind howls out of freezing darkness glazed with black ice."
+    },
+    {
+      "id": "ash_kiln",
+      "name": "Smoldering Ash-Kiln",
+      "description": "An ancient cremation pit choked with glowing cinders and molten glass slag.",
+      "testAbility": "toughness",
+      "testDr": 10,
+      "failDamageDie": "d4",
+      "apexCreatureId": "gutworm",
+      "sensoryHint": "Dry cinder-heat parches your throat before the archway even opens."
+    },
+    {
+      "id": "plague_cistern",
+      "name": "Sunken Plague-Cistern",
+      "description": "Greasy olive water dotted with swollen corpses and floating wax masks.",
+      "testAbility": "toughness",
+      "testDr": 10,
+      "failDamageDie": "d4",
+      "apexCreatureId": "abyssal_leviathan",
+      "sensoryHint": "Sour bile-vapors curl lazily across the threshold stones."
+    },
+    {
+      "id": "bell_chasm",
+      "name": "Drowned Bell-Chasm",
+      "description": "A half-flooded well shaft hung with cracked bronze church bells swaying in black tide.",
+      "testAbility": "agility",
+      "testDr": 10,
+      "failDamageDie": "d4",
+      "apexCreatureId": "abyssal_leviathan",
+      "sensoryHint": "Heavy iron clappers boom faintly from below as dark water surges."
     }
   ],
   "rivalFactions": [
@@ -343,13 +383,27 @@
     { "id": "cannibal_warlock", "keyName": "Oddly-Shaped Iron Key" },
     { "id": "glass_cult_archon", "keyName": "Prism-Cut Brass Key" },
     { "id": "plague_alchemist", "keyName": "Acid-Etched Copper Key" },
-    { "id": "blood_inquisitor", "keyName": "Flayed-Leather Keyring" }
+    { "id": "blood_inquisitor", "keyName": "Flayed-Leather Keyring" },
+    { "id": "frost_matriarch", "keyName": "Rime-Locked Silver Key" },
+    { "id": "root_hierophant", "keyName": "Twisted-Bramble Key" },
+    { "id": "bone_margrave", "keyName": "Tomb-Iron Skeleton Key" },
+    { "id": "salt_drowned_captain", "keyName": "Corroded Brass Cabin Key" }
   ],
   "tableAEncounters": [
     { "creatureId": "dusk_gnoum", "countFormula": "d4", "intro": "Dusk gnoums drop chittering from cracks in the ceiling!" },
     { "creatureId": "mongrel", "countFormula": "d2", "intro": "Massive oily-furred mongrels lunge out of the dark!" },
     { "creatureId": "sharpened_guard", "countFormula": "d4", "intro": "Gaunt guards with filed teeth block your path, licking their lips!" },
-    { "creatureId": "nesting_death", "countFormula": "1", "intro": "A hound-sized bone-spider drops silently from its ceiling nest!" }
+    { "creatureId": "nesting_death", "countFormula": "1", "intro": "A hound-sized bone-spider drops silently from its ceiling nest!" },
+    { "creatureId": "goblin", "countFormula": "d3", "intro": "Crazed, trembling goblins shriek from shadowed alcoves with rusted knives!" },
+    { "creatureId": "scum", "countFormula": "d2", "intro": "Hunched dungeon scum slide out behind cracked masonry with poisoned daggers!" },
+    { "creatureId": "skeleton", "countFormula": "d3", "intro": "Blood-drenched skeletons drag ancient shortswords across the stone!" },
+    { "creatureId": "zombie", "countFormula": "d3", "intro": "Weeping corpses shamble out of open wall-niches, jaws dripping rot!" },
+    { "creatureId": "undead_doll", "countFormula": "d2", "intro": "Porcelain dolls click across the floor with dead glass eyes!" },
+    { "creatureId": "wickhead", "countFormula": "d2", "intro": "Lantern-headed figures glide toward you, their wick-flames guttering violet!" },
+    { "creatureId": "grotesque", "countFormula": "1", "intro": "A clay-and-stone grotesque peels itself off the archway with grinding claws!" },
+    { "creatureId": "berserker", "countFormula": "1", "intro": "A frothing skull-faced berserker charges through the gloom swinging heavy iron!" },
+    { "creatureId": "wraith", "countFormula": "1", "intro": "Frost blooms on the stone as a shrieking wraith drifts straight through the wall!" },
+    { "creatureId": "troll", "countFormula": "1", "intro": "A hulking, weeping troll squeezes down from a collapsed cellar shaft!" }
   ],
   "tableBAnomalies": [
     {
@@ -371,6 +425,36 @@
       "id": "teleport_sarcophagus",
       "name": "The Shifting Sarcophagus",
       "description": "An ornate stone sarcophagus sits dead center in the room, humming faintly beneath a thin coat of dust."
+    },
+    {
+      "id": "weeping_bell",
+      "name": "The Weeping Brass Bell",
+      "description": "A cracked sanctuary bell hangs from bone-cords, weeping salt-water onto the flagstones."
+    },
+    {
+      "id": "blood_mirror",
+      "name": "Mirror of Coagulated Silver",
+      "description": "A tall tarnishing mirror reflects rooms you have not yet entered in blurred crimson."
+    },
+    {
+      "id": "hanging_censers",
+      "name": "Smoking Grave-Censers",
+      "description": "Three brass censers swing lazily in dead air, breathing sweet poppy smoke and graveyard rot."
+    },
+    {
+      "id": "whispering_well",
+      "name": "The Whispering Cistern-Well",
+      "description": "Drowned voices murmur from a narrow well-shaft choked with bent coins."
+    },
+    {
+      "id": "rotting_oracle",
+      "name": "Mummified Oracle in Wax",
+      "description": "A jaw-wired corpse entombed in candle wax still clicks its tongue whenever footsteps pass."
+    },
+    {
+      "id": "salt_circle",
+      "name": "Unbroken Salt & Bone Ward",
+      "description": "A thick ring of coarse sea-salt and crushed teeth shields the flagstones from creeping filth."
     }
   ]
 }

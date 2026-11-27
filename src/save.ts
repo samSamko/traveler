@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileS
 import { join } from 'node:path';
 import type { GameState, MetaProfile } from './types.ts';
 
-export const DEFAULT_SAVE_DIR = join(process.cwd(), '.morkborg-saves');
+export const DEFAULT_SAVE_DIR = process.env.MORKBORG_SAVE_DIR || join(process.cwd(), '.morkborg-saves');
 
 function ensureDir(dir: string): void {
   if (!existsSync(dir)) {
